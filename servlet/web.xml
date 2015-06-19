@@ -15,45 +15,36 @@
                       http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 	version="3.0" metadata-complete="true">
 
-	<display-name>Welcome to Tomcat</display-name>
+	<display-name>BDFS</display-name>
 	<description>
-		Welcome to Tomcat
+		Welcome to BDFS
 	</description>
 
 	<servlet>
-		<servlet-name>BDFSMain</servlet-name>
-		<servlet-class>com.yuncore.bdfs.web.BDFSMain</servlet-class>
+		<servlet-name>LoadServlet</servlet-name>
+		<servlet-class>com.yuncore.bdfs.servlet.LoadServlet</servlet-class>
 		<load-on-startup>5</load-on-startup>
+		<init-param>
+			<param-name>libserver</param-name>
+			<param-value>https://github.com/fecloud/bdfs/blob/master/release/server.jar?raw=true</param-value>
+		</init-param>
 	</servlet>
 
 	<servlet>
-		<servlet-name>BDFS</servlet-name>
-		<servlet-class>com.yuncore.bdfs.web.BDFSServlet</servlet-class>
+		<servlet-name>BDFSServlet</servlet-name>
+		<servlet-class>com.yuncore.bdfs.server.BDFSServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>BDFS</servlet-name>
+		<servlet-name>BDFSServlet</servlet-name>
 		<url-pattern>/bdfs</url-pattern>
 	</servlet-mapping>
-	
+
 	<servlet-mapping>
-		<servlet-name>BDFSMain</servlet-name>
-		<url-pattern>/bdfsmain</url-pattern>
+		<servlet-name>LoadServlet</servlet-name>
+		<url-pattern>/load</url-pattern>
 	</servlet-mapping>
-<!-- 
-	<error-page>
-		<error-code>404</error-code>
-		<location>/</location>
-	</error-page>
-
-	<error-page>
-		<error-code>405</error-code>
-		<location>/</location>
-	</error-page>
-
-	<error-page>
-		<error-code>500</error-code>
-		<location>/</location>
-	</error-page>
-	 -->
+	<!-- <error-page> <error-code>404</error-code> <location>/</location> </error-page> 
+		<error-page> <error-code>405</error-code> <location>/</location> </error-page> 
+		<error-page> <error-code>500</error-code> <location>/</location> </error-page> -->
 </web-app>
