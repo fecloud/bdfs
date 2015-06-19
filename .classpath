@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="libs/log4j-1.2.17.jar"/>
 	<classpathentry kind="lib" path="libs/servlet-api.jar"/>
 	<classpathentry kind="lib" path="libs/mysql-connector-java-5.1.9.jar"/>
+	<classpathentry kind="lib" path="libs/json.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
