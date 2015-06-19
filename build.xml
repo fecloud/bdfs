@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="bdpcs" basedir="." default="zip-release">
+
+	<property name="src.dir" location="src" />
+	<property name="libs.dir" location="libs" />
+	<property name="web.dir" location="web" />
+	<property name="build.dir" location="build" />
+	<property name="dest.dir" location="${build.dir}/classes" />
+	<property name="build.bin.dir" location="build/bin" />
+	<property name="package.jar" value="${build.dir}/${ant.project.name}.jar" />
+	<property name="bdpcs-run.jar" value="${build.dir}/${ant.project.name}-run.jar" />
+	<property name="bdpcs-release.zip" location="${build.dir}/${ant.project.name}-release.zip" />
+	<property name="bdpcs.war" location="${build.dir}/ROOT.war" />
+	<property name="java-main" value="com.yuncore.bdfs.client.Main" />
+
+	<!--编译相关参数-->
+	<property name="java.encoding" value="UTF-8" />
+	<property name="verbose" value="false" />
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<target name="-build-clean">
+		<delete dir="${build.bin.dir}">
+		</delete>
+		<delete dir="${build.config.dir}">
+		</delete>
+	</target>
+
+	<target name="-pre-compiler" depends="clean">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${dest.dir}" />
+	</target>
+
+	<target name="compiler" depends="-pre-compiler">
+		<echo level="info">compiler start</echo>
+		<javac srcdir="${src.dir}" destdir="${dest.dir}" encoding="${java.encoding}" includeantruntime="false" verbose="${verbose}" debug="true">
+			<classpath>
+				<fileset dir="${libs.dir}">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+		<echo level="info">compiler finish</echo>
+	</target>
+
+	<target name="package-jar" depends="compiler">
+		<echo level="info">package jar start</echo>
+		<jar destfile="${package.jar}" basedir="${dest.dir}">
+			<manifest>
+				<attribute name="Main-class" value="${java-main}" />
+			</manifest>
+			<zipfileset file="${src.dir}/log4j.properties" />
+		</jar>
+		<echo level="info">package jar finish</echo>
+		<delete dir="${dest.dir}" description="delete compile dir" />
+	</target>
+
+	<target name="makeSuperJar" depends="package-jar">
+		<jar destfile="${bdpcs-run.jar}">
+			<zipfileset src="${package.jar}" />
+			<!-- <zipfileset src="${libs.dir}/commons-codec-1.9.jar" /> -->
+			<zipfileset src="${libs.dir}/commons-logging-1.2.jar" />
+			<zipfileset src="${libs.dir}/log4j-1.2.17.jar" />
+			<!-- <zipfileset src="${libs.dir}/sqlite-jdbc-3.8.10.1-arm.jar" /> -->
+			<manifest>
+				<attribute name="Main-class" value="${java-main}" />
+			</manifest>
+		</jar>
+		<delete file="${package.jar}" />
+		<move tofile="${package.jar}" file="${bdpcs-run.jar}" />
+	</target>
+
+	<target name="zip-release" depends="makeSuperJar">
+	</target>
+	<target name="scp" depends="zip-release">
+		<exec executable="scp" failonerror="true">
+			<arg value="build/${ant.project.name}.jar" />
+			<arg value="linaro@ct.yuncore.cn:/tmp/${ant.project.name}.jar" />
+		</exec>
+	</target>
+	<target name="war" depends="package-jar">
+		<war destfile="${bdpcs.war}" webxml="${web.dir}/WEB-INF/web.xml">
+			<lib dir="${libs.dir}">
+				<exclude name="servlet-api.jar"/>
+				<exclude name="sqlite-jdbc-3.8.10.1*.jar"/>
+			</lib>
+			<lib file="${package.jar}"></lib>
+			<fileset dir="${web.dir}">
+			</fileset>
+		</war>
+	</target>
+
+</project>
