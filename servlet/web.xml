@@ -21,8 +21,8 @@
 	</description>
 
 	<servlet>
-		<servlet-name>LoadServlet</servlet-name>
-		<servlet-class>com.yuncore.bdfs.servlet.LoadServlet</servlet-class>
+		<servlet-name>BDFSServlet</servlet-name>
+		<servlet-class>com.yuncore.bdfs.servlet.BDFSServlet</servlet-class>
 		<load-on-startup>5</load-on-startup>
 		<init-param>
 			<param-name>libserver</param-name>
@@ -30,19 +30,9 @@
 		</init-param>
 	</servlet>
 
-	<servlet>
-		<servlet-name>BDFSServlet</servlet-name>
-		<servlet-class>com.yuncore.bdfs.server.servlet.BDFSServlet</servlet-class>
-	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>BDFSServlet</servlet-name>
 		<url-pattern>/bdfs</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>LoadServlet</servlet-name>
-		<url-pattern>/load</url-pattern>
 	</servlet-mapping>
 	<!-- <error-page> <error-code>404</error-code> <location>/</location> </error-page> 
 		<error-page> <error-code>405</error-code> <location>/</location> </error-page> 

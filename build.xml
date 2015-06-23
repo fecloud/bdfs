@@ -83,4 +83,7 @@
 		</war>
 	</target>
 
+	<target name="all" depends="clean,server,servlet">
+	</target>
+
 </project>
