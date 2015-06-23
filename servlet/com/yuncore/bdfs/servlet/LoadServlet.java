@@ -5,7 +5,9 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -21,6 +23,8 @@ public class LoadServlet extends HttpServlet {
 	protected URL[] liburls;
 
 	private static final long serialVersionUID = 1L;
+
+	private String version;
 
 	protected void getLibsURL() {
 		try {
@@ -41,8 +45,7 @@ public class LoadServlet extends HttpServlet {
 
 				liburls = new URL[list.size()];
 				for (int i = 0; i < list.size(); i++) {
-					System.out.println(LoadServlet.class.getName()
-							+ " found lib:" + list.get(i));
+					i(LoadServlet.class.getName() + " found lib:" + list.get(i));
 					liburls[i] = new URL(list.get(i));
 				}
 			}
@@ -55,7 +58,7 @@ public class LoadServlet extends HttpServlet {
 
 	@Override
 	public void init() throws ServletException {
-		System.out.println(LoadServlet.class.getName() + " init");
+		i(LoadServlet.class.getName() + " init");
 		loadLibs();
 		super.init();
 	}
@@ -63,7 +66,7 @@ public class LoadServlet extends HttpServlet {
 	protected void loadLibs() {
 		getLibsURL();
 		loadServlet();
-		System.out.println(LoadServlet.class.getName() + " load jars");
+		i(LoadServlet.class.getName() + " load jars");
 	}
 
 	protected void loadServlet() {
@@ -76,10 +79,11 @@ public class LoadServlet extends HttpServlet {
 					.loadClass("com.yuncore.bdfs.server.Version");
 			final Method method = loadClass.getMethod("version");
 			final Object object = loadClass.newInstance();
-			final Object result = method.invoke(object);
-			System.out.println(LoadServlet.class.getName() + " version "
-					+ result);
+			version = method.invoke(object).toString();
+
+			i(LoadServlet.class.getName() + " version " + version);
 			loadLibs = true;
+			classLoader.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -98,8 +102,9 @@ public class LoadServlet extends HttpServlet {
 			throws ServletException, IOException {
 		resp.setContentType("application/json;charset=UTF-8");
 		final String ip = getRemortIP(req);
-		final String result = String.format("{\"ip\":\"%s\",\"load\":%s}", ip,
-				loadLibs);
+		final String result = String.format(
+				"{\"ip\":\"%s\",\"load\":%s,\"version\":\"%s\"}", ip, loadLibs,
+				version);
 		resp.getWriter().println(result);
 	}
 
@@ -107,6 +112,15 @@ public class LoadServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		doGet(req, resp);
+	}
+
+	public void i(String msg) {
+		final StringBuilder builder = new StringBuilder();
+		final SimpleDateFormat format = new SimpleDateFormat(
+				"yyyy-MM-dd HH:mm:ss,SSS");
+		builder.append(format.format(new Date())).append(" ");
+		builder.append(msg);
+		System.out.println(builder.toString());
 	}
 
 }

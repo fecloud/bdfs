@@ -32,7 +32,7 @@
 
 	<servlet>
 		<servlet-name>BDFSServlet</servlet-name>
-		<servlet-class>com.yuncore.bdfs.server.BDFSServlet</servlet-class>
+		<servlet-class>com.yuncore.bdfs.server.servlet.BDFSServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
