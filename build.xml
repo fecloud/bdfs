@@ -7,6 +7,10 @@
 	<property name="dist.dir" location="${build.dir}/dist" />
 	<property name="dest.dir" location="${build.dir}/classes" />
 
+	<property name="src.com.dir" location="com" />
+	<property name="dest.com.dir" location="${dest.dir}/com" />
+	<property name="dist.com" location="${dist.dir}/com.jar" />
+
 	<property name="src.server.dir" location="server" />
 	<property name="dest.server.dir" location="${dest.dir}/server" />
 	<property name="dist.server" location="${dist.dir}/server.jar" />
@@ -28,6 +32,26 @@
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${dist.dir}" />
 		<mkdir dir="${dest.dir}" />
+	</target>
+
+	<target name="compiler-com" depends="-pre-compiler">
+		<mkdir dir="${dest.com.dir}" />
+		<echo level="info">compiler start</echo>
+		<javac srcdir="${src.com.dir}" destdir="${dest.com.dir}" encoding="${java.encoding}" includeantruntime="false" verbose="${verbose}" debug="true">
+			<classpath>
+				<fileset dir="${libs.dir}">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+		<echo level="info">compiler finish</echo>
+	</target>
+
+	<target name="com" depends="compiler-com">
+		<echo level="info">package jar start</echo>
+		<jar destfile="${dist.com}" basedir="${dest.com.dir}">
+		</jar>
+		<echo level="info">package jar finish</echo>
 	</target>
 
 	<target name="compiler-server" depends="-pre-compiler">
