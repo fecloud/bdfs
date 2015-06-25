@@ -1,13 +1,12 @@
 package com.yuncore.bdfs.entity;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.json.JSONObject;
 
-import com.yuncore.bdfs.tools.Util;
-
 public class BDFSHistory implements EntityJSON {
-	
+
 	private long id;
 
 	private Date time;
@@ -54,8 +53,14 @@ public class BDFSHistory implements EntityJSON {
 	public JSONObject toJSONObject() {
 		final JSONObject object = new JSONObject();
 		object.put("id", id);
-		object.put("time", Util.formatTime(time.getTime()));
+		object.put("time", formatTime(time.getTime()));
 		return object;
 	}
-	
+
+	private final static String formatTime(long time) {
+		final SimpleDateFormat format = new SimpleDateFormat(
+				"yyyy-MM-dd HH:mm:ss");
+		return format.format(new Date(time));
+	}
+
 }

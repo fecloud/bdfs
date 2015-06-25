@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.json.JSONObject;
 
-import com.yuncore.bdfs.tools.Util;
+import com.yuncore.bdfs.util.MD5;
 
 public class BDFSFile implements EntityJSON {
 
@@ -97,21 +97,6 @@ public class BDFSFile implements EntityJSON {
 		this.fId = fId;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof LocalFile) {
-			final LocalFile task = (LocalFile) obj;
-			if (task.getType() == task.getType()) {
-				return task.getfId() == getfId();
-			}
-		}
-		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		return (dir + File.separator + name).hashCode();
-	}
 
 	@Override
 	public String toString() {
@@ -120,7 +105,7 @@ public class BDFSFile implements EntityJSON {
 	}
 
 	public String toFid() {
-		return Util.md5(toString());
+		return MD5.md5(toString());
 	}
 
 	/*
