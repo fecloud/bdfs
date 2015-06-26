@@ -5,7 +5,7 @@ import java.util.Date;
 
 import org.json.JSONObject;
 
-public class BDFSHistory implements EntityJSON {
+public class History implements EntityJSON {
 
 	private long id;
 
