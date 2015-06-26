@@ -10,5 +10,9 @@ public class DateUtil {
 				"yyyy-MM-dd HH:mm:ss");
 		return format.format(new Date(time));
 	}
-	
+
+	public static long current_time_ss() {
+		return System.currentTimeMillis() / 1000;
+	}
+
 }

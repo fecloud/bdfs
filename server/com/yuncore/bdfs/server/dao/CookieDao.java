@@ -42,14 +42,14 @@ public class CookieDao extends BaseDao {
 			// stopwatch.start();
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement(String.format(
-							"REPLACE INTO %s (id,cookie) values(1,?)",
+							"REPLACE INTO %s (id,cookie) VALUES (1,?)",
 							getTableName()));
 
 			prepareStatement.setString(1, cookie);
 
 			connection.setAutoCommit(false);
 
-			final boolean result = prepareStatement.execute();
+			final boolean result = prepareStatement.executeUpdate() > 0;
 			prepareStatement.close();
 
 			connection.commit();

@@ -87,6 +87,8 @@ public class BDFSServlet extends HttpServlet {
 			object.put("code", 200);
 		} else if (action.equals("uploadlocal")) {
 			dispathUploadLocal(req, resp, object);
+		} else if (action.equals("uploadcookie")) {
+			dispathUploadCookie(req, resp, object);
 		} else if (action.equals("env")) {
 			printEnv(object);
 		} else if (action.equals("account")) {
@@ -122,6 +124,33 @@ public class BDFSServlet extends HttpServlet {
 		}
 		resp.setContentType("application/json;charset=UTF-8");
 		resp.getOutputStream().write(Gzip.gzip(object.toString().getBytes()));
+	}
+
+	private void dispathUploadCookie(HttpServletRequest req,
+			HttpServletResponse resp, JSONObject object) {
+		final int contentLength = req.getContentLength();
+		if (req.getMethod().equalsIgnoreCase("POST") && contentLength != -1) {
+			try {
+				final String cookie = Gzip.readToStringByGzip(
+						req.getInputStream(), "UTF-8");
+				if (cookie != null) {
+					if (new CookieDao().saveCookie(cookie)) {
+						object.put("code", 200);
+					} else {
+						object.put("code", 500);
+						object.put("msg", "save cookie fail");
+					}
+				} else {
+					object.put("code", 400);
+					object.put("msg", "not support get or not data");
+				}
+			} catch (IOException e) {
+				object.put("code", 500);
+			}
+		} else {
+			object.put("code", 400);
+			object.put("msg", "not support get or not data");
+		}
 	}
 
 	private void localHistory(HttpServletRequest req, JSONObject object) {
@@ -209,7 +238,7 @@ public class BDFSServlet extends HttpServlet {
 		final String jsString = new CookieDao().getCookie();
 		object.put("code", 200);
 		if (null != jsString)
-			object.put("data", jsString);
+			object.put("data", new JSONObject(jsString));
 	}
 
 	private void delCloudDelete(HttpServletRequest req, JSONObject object) {

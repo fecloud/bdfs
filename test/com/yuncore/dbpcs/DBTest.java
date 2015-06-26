@@ -1,10 +1,10 @@
 package com.yuncore.dbpcs;
 
-import com.yuncore.bdfs.db.CloudFileDeleteDao;
-import com.yuncore.bdfs.db.DBHelper;
-import com.yuncore.bdfs.db.DownloadDao;
-import com.yuncore.bdfs.db.UploadDao;
-import com.yuncore.bdfs.entity.LocalFile;
+import com.yuncore.bdfs.entity.BDFSFile;
+import com.yuncore.bdfs.server.dao.CloudFileDeleteDao;
+import com.yuncore.bdfs.server.dao.DownloadDao;
+import com.yuncore.bdfs.server.dao.UploadDao;
+import com.yuncore.bdfs.server.db.DBHelper;
 
 public class DBTest extends PCSTestCase {
 
@@ -34,7 +34,7 @@ public class DBTest extends PCSTestCase {
 
 	public void testCloudDownload() {
 
-		LocalFile query = new DownloadDao().query();
+		BDFSFile query = new DownloadDao().query();
 		assertNotNull(query);
 
 		boolean delete = new DownloadDao().delete(query);
@@ -44,17 +44,17 @@ public class DBTest extends PCSTestCase {
 
 	public void testUpload() {
 
-		LocalFile query = new UploadDao().query();
+		BDFSFile query = new UploadDao().query();
 		assertNotNull(query);
 
 		boolean delete = new UploadDao().delete(query);
 
 		assertEquals(delete, true);
 	}
-	
+
 	public void testCloudDelete() {
 
-		LocalFile query = new CloudFileDeleteDao().query();
+		BDFSFile query = new CloudFileDeleteDao().query();
 		assertNotNull(query);
 
 		boolean delete = new CloudFileDeleteDao().delete(query);

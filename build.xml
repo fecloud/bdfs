@@ -10,6 +10,10 @@
 	<property name="src.com.dir" location="com" />
 	<property name="dest.com.dir" location="${dest.dir}/com" />
 
+	<property name="src.client.dir" location="client" />
+	<property name="dest.client.dir" location="${dest.dir}/client" />
+	<property name="dist.client" location="${dist.dir}/client.jar" />
+
 	<property name="src.server.dir" location="server" />
 	<property name="dest.server.dir" location="${dest.dir}/server" />
 	<property name="dist.server" location="${dist.dir}/server.jar" />
@@ -45,7 +49,30 @@
 	<target name="com" depends="compiler-com">
 	</target>
 
-	<target name="compiler-server" depends="-pre-compiler">
+	<target name="compiler-client" depends="com">
+		<mkdir dir="${dest.client.dir}" />
+		<echo level="info">compiler start</echo>
+		<javac srcdir="${src.client.dir}" destdir="${dest.client.dir}" encoding="${java.encoding}" includeantruntime="false" verbose="${verbose}" debug="true">
+			<classpath>
+				<fileset dir="${libs.dir}">
+					<include name="**/*.jar" />
+				</fileset>
+				<path location="${dest.com.dir}" />
+			</classpath>
+		</javac>
+		<echo level="info">compiler finish</echo>
+	</target>
+
+	<target name="client" depends="compiler-client">
+		<echo level="info">package jar start</echo>
+		<jar destfile="${dist.client}" basedir="${dest.client.dir}">
+			<fileset dir="${dest.com.dir}" />
+			<zipfileset src="${libs.dir}/json.jar" />
+		</jar>
+		<echo level="info">package jar finish</echo>
+	</target>
+
+	<target name="compiler-server" depends="com">
 		<mkdir dir="${dest.server.dir}" />
 		<echo level="info">compiler start</echo>
 		<javac srcdir="${src.server.dir}" destdir="${dest.server.dir}" encoding="${java.encoding}" includeantruntime="false" verbose="${verbose}" debug="true">
@@ -79,7 +106,7 @@
 		</war>
 	</target>
 
-	<target name="all" depends="clean,server">
+	<target name="all" depends="clean,client,server">
 	</target>
 
 </project>

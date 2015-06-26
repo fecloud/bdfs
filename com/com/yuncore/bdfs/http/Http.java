@@ -15,17 +15,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
-
 import com.yuncore.bdfs.http.cookie.Cookie;
 import com.yuncore.bdfs.http.cookie.CookieContainer;
 import com.yuncore.bdfs.http.cookie.HttpCookieContainer;
+import com.yuncore.bdfs.http.log.HttpLog;
+import com.yuncore.bdfs.http.log.HttpLogLoader;
 import com.yuncore.bdfs.util.Gzip;
 import com.yuncore.bdfs.util.TextUtil;
 
 public class Http {
-
-	protected Logger logger = Logger.getLogger(Http.class.getName());
 
 	public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36";
 
@@ -44,6 +42,8 @@ public class Http {
 	private Hashtable<String, String> requestHeader = new Hashtable<String, String>();
 
 	private final boolean DEBUG = false;
+
+	private HttpLog httpLog = HttpLogLoader.getInstance();
 
 	public enum Method {
 		GET, POST
@@ -68,9 +68,9 @@ public class Http {
 
 	public boolean http() throws MalformedURLException, IOException {
 		if (DEBUG) {
-			logger.debug(String.format("url:%s", url));
-			logger.debug(String.format("method:%s",
-					method == Method.GET ? "GET" : "POST"));
+			httpLog.log(String.format("url:%s", url));
+			httpLog.log(String.format("method:%s", method == Method.GET ? "GET"
+					: "POST"));
 		}
 		final String proxyString = System.getProperty("http_proxy");
 		if (null != proxyString && proxyString.split(":").length == 2) {
@@ -149,10 +149,10 @@ public class Http {
 
 	public long getContentLength() {
 		long clen = conn.getContentLength();
-		if(clen == -1){
-			try{
+		if (clen == -1) {
+			try {
 				clen = Long.parseLong(conn.getHeaderField("Content-Length"));
-			}catch (Exception e) {
+			} catch (Exception e) {
 			}
 		}
 		return clen;
@@ -161,7 +161,7 @@ public class Http {
 	public HttpURLConnection getConnet() {
 		return conn;
 	}
-	
+
 	public String result() throws IOException {
 		if (execResult() && null == result) {
 			final String contentEncoding = conn
@@ -171,7 +171,8 @@ public class Http {
 				this.result = Gzip.readToStringByGzip(conn.getInputStream(),
 						"UTF-8");
 			} else {
-				this.result = TextUtil.readToString(conn.getInputStream(), "UTF-8");
+				this.result = TextUtil.readToString(conn.getInputStream(),
+						"UTF-8");
 			}
 		}
 		return result;
@@ -198,10 +199,10 @@ public class Http {
 
 		if (null != list) {
 			if (DEBUG)
-				logger.debug("Set-Cookie list:" + list);
+				httpLog.log("Set-Cookie list:" + list);
 			for (String c : list) {
 				if (DEBUG)
-					logger.debug("Set-Cookie one:" + c);
+					httpLog.log("Set-Cookie one:" + c);
 				if (null != c)
 					container.addCookieOrUpdate(c.trim());
 			}
@@ -212,24 +213,24 @@ public class Http {
 	private void printRequestHead() {
 		final Map<String, List<String>> headerFields = conn
 				.getRequestProperties();
-		logger.debug("");
-		logger.debug("[===============request header ===================]");
+		httpLog.log("");
+		httpLog.log("[===============request header ===================]");
 		for (Entry<String, List<String>> entry : headerFields.entrySet()) {
-			logger.debug(String.format("[%s:%s]", entry.getKey(),
+			httpLog.log(String.format("[%s:%s]", entry.getKey(),
 					entry.getValue()));
 		}
-		logger.debug("");
+		httpLog.log("");
 	}
 
 	private void printResponeHead() {
 		final Map<String, List<String>> headerFields = conn.getHeaderFields();
-		logger.debug("");
-		logger.debug("[===============respone header ===================]");
+		httpLog.log("");
+		httpLog.log("[===============respone header ===================]");
 		for (Entry<String, List<String>> entry : headerFields.entrySet()) {
-			logger.debug(String.format("[%s:%s]", entry.getKey(),
+			httpLog.log(String.format("[%s:%s]", entry.getKey(),
 					entry.getValue()));
 		}
-		logger.debug("");
+		httpLog.log("");
 	}
 
 	private boolean addHost() {

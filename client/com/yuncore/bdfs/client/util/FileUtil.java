@@ -40,4 +40,19 @@ public class FileUtil {
 		return null;
 	}
 
+	public static boolean rmDirFile(String dir) {
+		final File dirFile = new File(dir);
+		if (dirFile.exists()) {
+			final File[] listFiles = dirFile.listFiles();
+			if (listFiles != null) {
+				for (File f : listFiles) {
+					if (!f.delete()) {
+						return false;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
 }
