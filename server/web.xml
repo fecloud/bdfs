@@ -22,12 +22,8 @@
 
 	<servlet>
 		<servlet-name>BDFSServlet</servlet-name>
-		<servlet-class>com.yuncore.bdfs.servlet.BDFSServlet</servlet-class>
+		<servlet-class>com.yuncore.bdfs.server.web.BDFSServlet</servlet-class>
 		<load-on-startup>5</load-on-startup>
-		<init-param>
-			<param-name>libserver</param-name>
-			<param-value>https://github.com/fecloud/bdfs/blob/master/release/server.jar?raw=true</param-value>
-		</init-param>
 	</servlet>
 
 	<servlet-mapping>
