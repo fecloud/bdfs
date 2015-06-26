@@ -9,16 +9,11 @@
 
 	<property name="src.com.dir" location="com" />
 	<property name="dest.com.dir" location="${dest.dir}/com" />
-	<property name="dist.com" location="${dist.dir}/com.jar" />
 
 	<property name="src.server.dir" location="server" />
 	<property name="dest.server.dir" location="${dest.dir}/server" />
 	<property name="dist.server" location="${dist.dir}/server.jar" />
-
-	<property name="src.servlet.dir" location="servlet" />
-	<property name="dest.servlet.dir" location="${dest.dir}/servlet" />
-	<property name="dist.servlet" location="${dist.dir}/servlet.jar" />
-	<property name="dist.servlet.war" location="${dist.dir}/ROOT.war" />
+	<property name="dist.server.war" location="${dist.dir}/ROOT.war" />
 
 
 	<!--编译相关参数 -->
@@ -48,10 +43,6 @@
 	</target>
 
 	<target name="com" depends="compiler-com">
-		<echo level="info">package jar start</echo>
-		<jar destfile="${dist.com}" basedir="${dest.com.dir}">
-		</jar>
-		<echo level="info">package jar finish</echo>
 	</target>
 
 	<target name="compiler-server" depends="-pre-compiler">
@@ -62,52 +53,33 @@
 				<fileset dir="${libs.dir}">
 					<include name="**/*.jar" />
 				</fileset>
+				<path location="${dest.com.dir}" />
 			</classpath>
 		</javac>
 		<echo level="info">compiler finish</echo>
 	</target>
 
-	<target name="server" depends="compiler-server">
+	<target name="server" depends="com,compiler-server">
 		<echo level="info">package jar start</echo>
 		<jar destfile="${dist.server}" basedir="${dest.server.dir}">
+			<fileset dir="${dest.com.dir}" />
+			<zipfileset file="${src.server.dir}/log4j.properties" />
 		</jar>
 		<echo level="info">package jar finish</echo>
-	</target>
 
-	<target name="compiler-servlet">
-		<mkdir dir="${dest.servlet.dir}" />
-		<echo level="info">compiler start</echo>
-		<javac srcdir="${src.servlet.dir}" destdir="${dest.servlet.dir}" encoding="${java.encoding}" includeantruntime="false" verbose="${verbose}" debug="true">
-			<classpath>
-				<fileset dir="${libs.dir}">
-					<include name="**/*.jar" />
-				</fileset>
-			</classpath>
-		</javac>
-		<echo level="info">compiler finish</echo>
-	</target>
-
-	<target name="package-servlet" depends="compiler-servlet">
-		<echo level="info">package jar start</echo>
-		<jar destfile="${dist.servlet}" basedir="${dest.servlet.dir}">
-		</jar>
-		<echo level="info">package jar finish</echo>
-	</target>
-
-	<target name="servlet" depends="package-servlet">
-		<war destfile="${dist.servlet.war}" webxml="${src.servlet.dir}/web.xml">
+		<war destfile="${dist.server.war}" webxml="${src.server.dir}/web.xml">
 			<lib dir="${libs.dir}">
 				<exclude name="servlet-api.jar" />
 			</lib>
-			<lib file="${dist.servlet}">
+			<lib file="${dist.server}">
 			</lib>
-			<fileset dir="${src.servlet.dir}">
+			<fileset dir="${src.server.dir}">
 				<include name="index.html" />
 			</fileset>
 		</war>
 	</target>
 
-	<target name="all" depends="clean,server,servlet">
+	<target name="all" depends="clean,server">
 	</target>
 
 </project>
