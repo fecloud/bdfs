@@ -6,11 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.GZIPOutputStream;
 
-import org.apache.log4j.Logger;
-
 public class FileZip {
 
-	Logger logger = Logger.getLogger(FileZip.class.getSimpleName());
+	static final String TAG = "FileZip";
 
 	private String src;
 
@@ -33,7 +31,7 @@ public class FileZip {
 				final GZIPOutputStream out = new GZIPOutputStream(
 						new FileOutputStream(destFile));
 				final FileInputStream in = new FileInputStream(file);
-			
+
 				final byte[] buffer = new byte[1024 * 100];
 				int len = -1;
 
@@ -45,7 +43,7 @@ public class FileZip {
 				out.close();
 				return true;
 			} catch (IOException e) {
-				logger.error("", e);
+				Log.e(TAG, "", e);
 			}
 
 		}

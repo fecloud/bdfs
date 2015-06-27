@@ -143,7 +143,7 @@ public class DBHelper {
 		executeSQL("CREATE TABLE cloudfile (id VARCHAR(36) PRIMARY KEY, dir VARCHAR(2048) ,name VARCHAR(2048), length BIGINT,type BIGINT,fid varchar(32),session BIGINT);");
 		executeSQL("CREATE TABLE clouddelete (id VARCHAR(36) PRIMARY KEY,dir VARCHAR(2048) ,name VARCHAR(2048), length BIGINT,type BIGINT,fid varchar(32),session BIGINT);");
 		executeSQL("CREATE TABLE clouddownload (id VARCHAR(36) PRIMARY KEY,dir VARCHAR(2048) ,name VARCHAR(2048), length BIGINT,type BIGINT,fid varchar(32),session BIGINT);");
-		
+
 		executeSQL("CREATE TABLE cloudhistory (id int PRIMARY KEY AUTO_INCREMENT, time VARCHAR(36));");
 		executeSQL("CREATE TABLE localhistory (id int PRIMARY KEY AUTO_INCREMENT, time VARCHAR(36));");
 

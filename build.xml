@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="bdfs" basedir=".">
+<project name="bdfs" basedir="." default="all">
 
 	<property name="src.dir" location="src" />
 	<property name="libs.dir" location="libs" />
@@ -39,7 +39,7 @@
 		<javac srcdir="${src.com.dir}" destdir="${dest.com.dir}" encoding="${java.encoding}" includeantruntime="false" verbose="${verbose}" debug="true">
 			<classpath>
 				<fileset dir="${libs.dir}">
-					<include name="**/*.jar" />
+					<include name="json.jar" />
 				</fileset>
 			</classpath>
 		</javac>
@@ -55,7 +55,7 @@
 		<javac srcdir="${src.client.dir}" destdir="${dest.client.dir}" encoding="${java.encoding}" includeantruntime="false" verbose="${verbose}" debug="true">
 			<classpath>
 				<fileset dir="${libs.dir}">
-					<include name="**/*.jar" />
+					<include name="json.jar" />
 				</fileset>
 				<path location="${dest.com.dir}" />
 			</classpath>
@@ -68,6 +68,9 @@
 		<jar destfile="${dist.client}" basedir="${dest.client.dir}">
 			<fileset dir="${dest.com.dir}" />
 			<zipfileset src="${libs.dir}/json.jar" />
+			<manifest>
+				<attribute name="Main-class" value="com.yuncore.bdfs.client.ClientMain" />
+			</manifest>
 		</jar>
 		<echo level="info">package jar finish</echo>
 	</target>
@@ -91,13 +94,22 @@
 		<jar destfile="${dist.server}" basedir="${dest.server.dir}">
 			<fileset dir="${dest.com.dir}" />
 			<zipfileset file="${src.server.dir}/log4j.properties" />
+			<manifest>
+				<attribute name="Main-class" value="com.yuncore.bdfs.server.BDFSServer" />
+			</manifest>
+			<zipfileset src="${libs.dir}/commons-logging-1.2.jar" />
+			<zipfileset src="${libs.dir}/json.jar" />
+			<zipfileset src="${libs.dir}/log4j-1.2.17.jar" />
+			<zipfileset src="${libs.dir}/mysql-connector-java-5.1.9.jar" />
 		</jar>
 		<echo level="info">package jar finish</echo>
 
 		<war destfile="${dist.server.war}" webxml="${src.server.dir}/web.xml">
+			<!-- 
 			<lib dir="${libs.dir}">
 				<exclude name="servlet-api.jar" />
 			</lib>
+			-->
 			<lib file="${dist.server}">
 			</lib>
 			<fileset dir="${src.server.dir}">

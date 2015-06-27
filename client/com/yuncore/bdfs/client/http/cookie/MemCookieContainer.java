@@ -17,8 +17,6 @@ public class MemCookieContainer extends AppCookieContainer {
 
 	static final String TAG = "MemCookieContainer";
 
-	private volatile boolean load;
-
 	@Override
 	public boolean save() {
 		return true;
@@ -26,6 +24,8 @@ public class MemCookieContainer extends AppCookieContainer {
 
 	@Override
 	public boolean read() {
+		boolean load = Boolean.getBoolean(System.getProperty("CookieLoader",
+				"false"));
 		if (!load) {
 
 			final String result = fromServerCookie();
@@ -44,6 +44,7 @@ public class MemCookieContainer extends AppCookieContainer {
 
 					}
 					load = true;
+					System.getProperty("CookieLoader", "true");
 				}
 			}
 		}

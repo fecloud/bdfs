@@ -29,13 +29,14 @@ import org.json.JSONObject;
 import com.yuncore.bdfs.entity.Account;
 import com.yuncore.bdfs.entity.BDFSFile;
 import com.yuncore.bdfs.entity.History;
+import com.yuncore.bdfs.server.BDFSServer;
 import com.yuncore.bdfs.server.dao.AccountDao;
 import com.yuncore.bdfs.server.dao.CloudFileDeleteDao;
 import com.yuncore.bdfs.server.dao.CloudHistoryDao;
 import com.yuncore.bdfs.server.dao.CookieDao;
 import com.yuncore.bdfs.server.dao.DownloadDao;
 import com.yuncore.bdfs.server.dao.LocalHistoryDao;
-import com.yuncore.bdfs.server.localflle.UploadLocalFile;
+import com.yuncore.bdfs.server.files.local.UploadLocalFile;
 import com.yuncore.bdfs.util.DateUtil;
 import com.yuncore.bdfs.util.Gzip;
 
@@ -48,6 +49,14 @@ public class BDFSServlet extends HttpServlet {
 	Logger logger = Logger.getLogger(BDFSServlet.class.getSimpleName());
 
 	private static UploadLocalFile uploadLocalFile = new UploadLocalFile();
+
+	private BDFSServer bdfsServer = new BDFSServer();
+
+	@Override
+	public void init() throws ServletException {
+		bdfsServer.start();
+		super.init();
+	}
 
 	/**
 	 * 
@@ -64,14 +73,14 @@ public class BDFSServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		logger.debug("doPost");
+		// logger.debug("doPost");
 		doGet(req, resp);
 	}
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		logger.debug("doGet");
+		// logger.debug("doGet");
 		resp.setHeader("Content-Encoding", "gzip");
 		if (checkAction(req, resp)) {
 			dispath(req, resp);

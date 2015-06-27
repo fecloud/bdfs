@@ -1,4 +1,4 @@
-package com.yuncore.bdfs.client.api.imple;
+package com.yuncore.bdfs.api;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

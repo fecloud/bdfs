@@ -125,17 +125,17 @@ public class LocalCompareDao extends BaseDao {
 
 				final PreparedStatement prepareStatement = connection
 						.prepareStatement(sql.toString());
-				Stopwatch stopwatch = new Stopwatch();
-				stopwatch.start();
+//				Stopwatch stopwatch = new Stopwatch();
+//				stopwatch.start();
 
 				connection.setAutoCommit(false);
 				final int executeBatch = prepareStatement.executeUpdate();
-				logger.debug(String.format("delete count:%s", executeBatch));
+				//logger.debug(String.format("delete count:%s", executeBatch));
 				connection.commit();
 				connection.setAutoCommit(true);
 				connection.close();
 				
-				stopwatch.stop(getTag() + " deleteAll");
+//				stopwatch.stop(getTag() + " deleteAll");
 
 				return executeBatch > 0;
 
@@ -238,8 +238,8 @@ public class LocalCompareDao extends BaseDao {
 		try {
 			final List<String> list = new ArrayList<String>();
 
-			Stopwatch stopwatch = new Stopwatch();
-			stopwatch.start();
+//			Stopwatch stopwatch = new Stopwatch();
+//			stopwatch.start();
 			final String sql = String.format("SELECT fid FROM %s LIMIT %s,%s",
 					getSameTableName(), start, count);
 			final Connection connection = getDB();
@@ -250,7 +250,7 @@ public class LocalCompareDao extends BaseDao {
 			while (resultSet.next()) {
 				list.add(buildLocalFile(resultSet));
 			}
-			stopwatch.stop(getTag() + " getLocalCompareSame");
+//			stopwatch.stop(getTag() + " getLocalCompareSame");
 			resultSet.close();
 			prepareStatement.close();
 			connection.close();

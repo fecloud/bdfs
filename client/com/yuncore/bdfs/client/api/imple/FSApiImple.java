@@ -11,6 +11,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import org.json.JSONObject;
 
+import com.yuncore.bdfs.api.BDFSURL;
 import com.yuncore.bdfs.app.Context;
 import com.yuncore.bdfs.client.Const;
 import com.yuncore.bdfs.client.api.FSApi;

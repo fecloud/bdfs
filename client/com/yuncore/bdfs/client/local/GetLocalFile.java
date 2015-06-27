@@ -5,15 +5,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import com.yuncore.bdfs.client.util.FileListWrite;
+import com.yuncore.bdfs.client.util.Log;
 import com.yuncore.bdfs.task.TaskExecute;
 import com.yuncore.bdfs.task.TaskService;
 
 public class GetLocalFile extends TaskService {
 
-	Logger logger = Logger.getLogger(GetLocalFile.class.getSimpleName());
+	static final String TAG = "GetLocalFile";
 
 	public static final String LOCALLIST_SESSION = "locallist_session";
 
@@ -38,7 +37,7 @@ public class GetLocalFile extends TaskService {
 			}
 			fileListWrite = new FileListWrite(outFilename, false);
 		} catch (IOException e) {
-			logger.error("", e);
+			Log.e(TAG, "", e);
 		}
 	}
 

@@ -1,16 +1,14 @@
-package com.yuncore.bdfs.client.app;
+package com.yuncore.bdfs.server.app;
 
 import java.util.Map;
 
 import com.yuncore.bdfs.app.imple.AppContext;
-import com.yuncore.bdfs.client.api.FSApi;
-import com.yuncore.bdfs.client.api.imple.FSApiImple;
 import com.yuncore.bdfs.exception.ApiException;
 import com.yuncore.bdfs.exception.BDFSException;
+import com.yuncore.bdfs.server.api.FSApi;
+import com.yuncore.bdfs.server.api.imple.FSApiImple;
 
-public class ClientContext extends AppContext {
-
-	static final String TAG = "ClientContext";
+public class ServerContext extends AppContext {
 
 	@Override
 	public boolean load() throws BDFSException {
@@ -24,8 +22,7 @@ public class ClientContext extends AppContext {
 					properties.putAll(diskHomePage);
 					return true;
 				} else {
-					System.setProperty("CookieLoader", "false");
-					return false;
+
 				}
 			} catch (ApiException e) {
 				throw new BDFSException("load diskHomePage error", e);

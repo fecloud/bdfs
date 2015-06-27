@@ -42,7 +42,9 @@ public class CloudFileDao extends BaseDao {
 					.prepareStatement(String
 							.format("INSERT INTO %s (id,dir,name,length,type,fid,session) VALUES(UUID(),?,?,?,?,?,?)",
 									getTableName()));
+			final long session = Long.parseLong(System.getProperty("cloudlist_session", "0"));
 			for (CloudFile f : files) {
+				f.setSession(session);
 				prepareStatement.setString(1, f.getDir());
 				prepareStatement.setString(2, f.getName());
 				prepareStatement.setLong(3, f.getLength());

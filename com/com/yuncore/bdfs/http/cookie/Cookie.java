@@ -6,14 +6,11 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import com.yuncore.bdfs.entity.EntityJSON;
 
 public class Cookie implements EntityJSON {
-
-	protected Logger logger = Logger.getLogger(Cookie.class.getName());
 
 	private String name;
 
@@ -167,7 +164,6 @@ public class Cookie implements EntityJSON {
 
 				return true;
 			} catch (Exception e) {
-				logger.error("parseCookie fail", e);
 			}
 		}
 		return false;

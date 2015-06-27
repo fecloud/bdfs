@@ -18,6 +18,8 @@ public class DBCookieContainer extends AppCookieContainer {
 
 	Logger logger = Logger.getLogger(DBCookieContainer.class.getSimpleName());
 
+	private volatile boolean load;
+
 	private CookieDao cookieDao = new CookieDao();
 
 	/*
@@ -37,25 +39,25 @@ public class DBCookieContainer extends AppCookieContainer {
 	 */
 	@Override
 	public boolean read() {
-
-		final String jsons = cookieDao.getCookie();
-		if (null != jsons && jsons.trim().length() > 0) {
-			final JSONArray array = new JSONArray(jsons);
-			if (array != null && array.length() > 0) {
-				Cookie cookie = null;
-				for (int i = 0; i < array.length(); i++) {
-					cookie = new Cookie();
-					cookie.formJOSN(array.getJSONObject(i));
-					cookies.add(cookie);
+		if (!load) {
+			final String jsons = cookieDao.getCookie();
+			if (null != jsons && jsons.trim().length() > 0) {
+				final JSONArray array = new JSONArray(jsons);
+				if (array != null && array.length() > 0) {
+					Cookie cookie = null;
+					for (int i = 0; i < array.length(); i++) {
+						cookie = new Cookie();
+						cookie.formJOSN(array.getJSONObject(i));
+						cookies.add(cookie);
+					}
+					load = true;
 				}
-
+			} else {
+				logger.debug("from db cookie null");
+				load = false;
 			}
-		} else {
-			logger.debug("from db cookie null");
-			return false;
 		}
-
-		return true;
+		return load;
 	}
 
 }
