@@ -14,7 +14,7 @@
 ## Fill in name of program here.
 PROG="bdsync"
 PROG_PATH="/data/app/$PROG" #::# Not need, but sometimes helpful (if $PROG resides in /opt for example).
-PROG_ARGS="sync"
+PROG_ARGS="sync /hdd"
 PID_PATH="$PROG_PATH/$PROG.pid"
 LOG_PATH="/var/log/$PROG"
 MSG_PREFIX=" *"
@@ -38,7 +38,7 @@ start() {
         echo "$MSG_PREFIX $PROG is currently running..."
     else
         ## Change from /dev/null to something like /var/log/$PROG if you want to save output.
-        $PROG_PATH/$PROG $PROG_ARGS 2>&1 >$LOG_PATH &
+        $PROG_PATH/bin/$PROG $PROG_ARGS 2>&1 >$LOG_PATH &
         echo "$MSG_PREFIX $PROG started"
     fi
 }
