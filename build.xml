@@ -12,7 +12,9 @@
 
 	<property name="src.client.dir" location="client" />
 	<property name="dest.client.dir" location="${dest.dir}/client" />
-	<property name="dist.client" location="${dist.dir}/client.jar" />
+	<property name="dist.client.jar" value="client.jar" />
+	<property name="dist.client" location="${dist.dir}/${dist.client.jar}" />
+	<property name="dist.client.zip" location="${dist.dir}/client.zip" />
 
 	<property name="src.server.dir" location="server" />
 	<property name="dest.server.dir" location="${dest.dir}/server" />
@@ -75,6 +77,22 @@
 		<echo level="info">package jar finish</echo>
 	</target>
 
+	<target name="client-release" depends="client">
+		<echo level="info">client-release start</echo>
+		<mkdir dir="${dist.dir}/client" />
+		<mkdir dir="${dist.dir}/client/bin" />
+		<mkdir dir="${dist.dir}/client/lib" />
+		<copy tofile="${dist.dir}/client/lib/${dist.client.jar}" file="${dist.client}" />
+		<copy tofile="${dist.dir}/client/bin/bdsync" file="${src.client.dir}/bdsyncrun" />
+		<copy tofile="${dist.dir}/client/bdsync" file="${src.client.dir}/bdsync" />
+		<copy tofile="${dist.dir}/client/install" file="${src.client.dir}/install" />
+		<copy tofile="${dist.dir}/client/linaro_bdsync" file="${src.client.dir}/linaro_bdsync" />
+		<zip destfile="${dist.client.zip}" basedir="${dist.dir}/client">
+		</zip>
+		<delete dir="${dist.dir}/client" />
+		<echo level="info">client-release finish</echo>
+	</target>
+
 	<target name="compiler-server" depends="com">
 		<mkdir dir="${dest.server.dir}" />
 		<echo level="info">compiler start</echo>
@@ -118,7 +136,7 @@
 		</war>
 	</target>
 
-	<target name="all" depends="clean,client,server">
+	<target name="all" depends="clean,client-release,server">
 	</target>
 
 </project>
