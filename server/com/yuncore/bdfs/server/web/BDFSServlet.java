@@ -247,7 +247,7 @@ public class BDFSServlet extends HttpServlet {
 		final String jsString = new CookieDao().getCookie();
 		object.put("code", 200);
 		if (null != jsString)
-			object.put("data", new JSONObject(jsString));
+			object.put("data", new JSONArray(jsString));
 	}
 
 	private void delCloudDelete(HttpServletRequest req, JSONObject object) {
