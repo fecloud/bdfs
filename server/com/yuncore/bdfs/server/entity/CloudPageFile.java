@@ -19,8 +19,9 @@ public class CloudPageFile implements EntityJSON {
 		if (object.has("errno")) {
 			errno = object.getInt("errno");
 		}
+		
+		list = new ArrayList<CloudFile>();
 		if (object.has("list")) {
-			list = new ArrayList<CloudFile>();
 			final JSONArray array = object.getJSONArray("list");
 			CloudFile file = null;
 			for (int i = 0; i < array.length(); i++) {
