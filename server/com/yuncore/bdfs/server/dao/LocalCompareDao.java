@@ -305,6 +305,14 @@ public class LocalCompareDao extends BaseDao {
 	}
 
 	/**
+	 * 复制表数据sql
+	 * @return
+	 */
+	protected String getCopyTableDataSql() {
+		return "INSERT INTO %s SELECT id,dir,name,length,type,fid,session FROM %s";
+	}
+	
+	/**
 	 * 复制本地数据到上传或者下载表
 	 * 
 	 * @return
@@ -312,7 +320,7 @@ public class LocalCompareDao extends BaseDao {
 	public synchronized boolean copyTableData(String src, String dest,
 			String srcWhere) {
 		String sql = String
-				.format("INSERT INTO %s SELECT id,dir,name,length,type,fid,session FROM %s",
+				.format(getCopyTableDataSql(),
 						dest, src);
 		if (null != srcWhere) {
 			sql += String.format(" WHERE ", srcWhere);

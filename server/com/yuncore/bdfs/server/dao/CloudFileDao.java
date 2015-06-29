@@ -40,7 +40,7 @@ public class CloudFileDao extends BaseDao {
 			final Connection connection = getDB();
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement(String
-							.format("INSERT INTO %s (id,dir,name,length,type,fid,session) VALUES(UUID(),?,?,?,?,?,?)",
+							.format("INSERT INTO %s (id,dir,name,length,type,fid,md5,session) VALUES(UUID(),?,?,?,?,?,?,?)",
 									getTableName()));
 			final long session = Long.parseLong(System.getProperty("cloudlist_session", "0"));
 			for (CloudFile f : files) {
@@ -50,7 +50,8 @@ public class CloudFileDao extends BaseDao {
 				prepareStatement.setLong(3, f.getLength());
 				prepareStatement.setLong(4, f.getType());
 				prepareStatement.setString(5, f.toFid());
-				prepareStatement.setLong(6, f.getSession());
+				prepareStatement.setString(6, f.getMd5());
+				prepareStatement.setLong(7, f.getSession());
 				prepareStatement.addBatch();
 			}
 

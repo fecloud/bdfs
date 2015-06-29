@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 
 public class DBHelper {
 
-	Logger logger = Logger.getLogger(DBHelper.class.getName());
+	Logger logger = Logger.getLogger(DBHelper.class.getSimpleName());
 
 	private static final int DB_VERSION = 1;
 
@@ -43,9 +43,9 @@ public class DBHelper {
 	public synchronized Connection getConnection() {
 		try {
 
-			final String url = "jdbc:mysql://rds6v2uvvrennaa.mysql.rds.aliyuncs.com:3306/db7k81jhgfm13wla?user=db7k81jhgfm13wla&password=ouyangfeng";
-			// final String url =
-			// "jdbc:mysql://localhost:3306/fcloud?user=root&password=root&useUnicode=true&characterEncoding=UTF-8";
+//			final String url = "jdbc:mysql://rds6v2uvvrennaa.mysql.rds.aliyuncs.com:3306/db7k81jhgfm13wla?user=db7k81jhgfm13wla&password=ouyangfeng";
+			 final String url =
+			 "jdbc:mysql://localhost:3306/fcloud?user=root&password=root&useUnicode=true&characterEncoding=UTF-8";
 			// final String url =
 			// "jdbc:mysql://10.0.0.8:3306/bdfs?user=root&password=fcloud&useUnicode=true&characterEncoding=UTF-8";
 			final Connection conn = DriverManager.getConnection(url);
@@ -140,9 +140,9 @@ public class DBHelper {
 		executeSQL("CREATE TABLE localdelete (id VARCHAR(36) PRIMARY KEY, dir VARCHAR(2048) ,name VARCHAR(2048), length BIGINT,type BIGINT,fid varchar(32),session BIGINT);");// 本地被删除了
 		executeSQL("CREATE TABLE localupload (id VARCHAR(36) PRIMARY KEY, dir VARCHAR(2048) ,name VARCHAR(2048), length BIGINT,type BIGINT,fid varchar(32),session BIGINT);");// 本地要被上传的
 
-		executeSQL("CREATE TABLE cloudfile (id VARCHAR(36) PRIMARY KEY, dir VARCHAR(2048) ,name VARCHAR(2048), length BIGINT,type BIGINT,fid varchar(32),session BIGINT);");
-		executeSQL("CREATE TABLE clouddelete (id VARCHAR(36) PRIMARY KEY,dir VARCHAR(2048) ,name VARCHAR(2048), length BIGINT,type BIGINT,fid varchar(32),session BIGINT);");
-		executeSQL("CREATE TABLE clouddownload (id VARCHAR(36) PRIMARY KEY,dir VARCHAR(2048) ,name VARCHAR(2048), length BIGINT,type BIGINT,fid varchar(32),session BIGINT);");
+		executeSQL("CREATE TABLE cloudfile (id VARCHAR(36) PRIMARY KEY, dir VARCHAR(2048) ,name VARCHAR(2048), length BIGINT,type BIGINT,fid varchar(32),md5 varchar(32),session BIGINT);");
+		executeSQL("CREATE TABLE clouddelete (id VARCHAR(36) PRIMARY KEY,dir VARCHAR(2048) ,name VARCHAR(2048), length BIGINT,type BIGINT,fid varchar(32),md5 varchar(32),session BIGINT);");
+		executeSQL("CREATE TABLE clouddownload (id VARCHAR(36) PRIMARY KEY,dir VARCHAR(2048) ,name VARCHAR(2048), length BIGINT,type BIGINT,fid varchar(32),md5 varchar(32),session BIGINT);");
 
 		executeSQL("CREATE TABLE cloudhistory (id int PRIMARY KEY AUTO_INCREMENT, time VARCHAR(36));");
 		executeSQL("CREATE TABLE localhistory (id int PRIMARY KEY AUTO_INCREMENT, time VARCHAR(36));");

@@ -73,5 +73,10 @@ public class CloudCompareDao extends LocalCompareDao {
 	protected String getTag() {
 		return this.getClass().getSimpleName();
 	}
+	
+	@Override
+	protected String getCopyTableDataSql() {
+		return "INSERT INTO %s SELECT id,dir,name,length,type,fid,md5,session FROM %s";
+	}
 
 }
