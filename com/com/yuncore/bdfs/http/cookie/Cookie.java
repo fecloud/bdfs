@@ -186,21 +186,29 @@ public class Cookie implements EntityJSON {
 		return null;
 	}
 
-	public void update(Cookie cookie) {
-		this.name = cookie.getName();
-		this.domain = cookie.getDomain();
-		this.value = cookie.getValue();
-		this.path = cookie.getPath();
-		this.max_age = cookie.getMax_age();
-		this.expires = cookie.getExpires();
-		this.httponly = cookie.isHttponly();
+	public boolean update(Cookie cookie) {
+		if (cookie != null && !cookie.toString().equals(this.toString())) {
+			this.name = cookie.getName();
+			this.domain = cookie.getDomain();
+			this.value = cookie.getValue();
+			this.path = cookie.getPath();
+			this.max_age = cookie.getMax_age();
+			this.expires = cookie.getExpires();
+			this.httponly = cookie.isHttponly();
+			return true;
+		} else {
+			return false;
+		}
 	}
+
+	
 
 	@Override
 	public String toString() {
-		return "[name=" + name + ", value=" + value + ", domain=" + domain
-				+ ", path=" + path + ", max_age=" + max_age + ", expires="
-				+ expires + ", httponly=" + httponly + "]";
+		return "[name=" + name + ", value=" + value + ", domain="
+				+ domain + ", path=" + path + ", max_age=" + max_age
+				+ ", expires=" + expires + ", version=" + version
+				+ ", httponly=" + httponly + "]";
 	}
 
 	/*

@@ -18,12 +18,12 @@ public abstract class AppCookieContainer implements CookieContainer {
 			Cookie findCookie = findCookie(cookie);
 
 			if (null != findCookie) {
-				findCookie.update(findCookie);
-				result = true;
+				result = findCookie.update(cookie);
 			} else {
 				result = cookies.add(cookie);
 			}
-			save();
+			if(result)
+				save();
 		}
 
 		return result;
