@@ -12,7 +12,7 @@ public class TaskContainer {
 		stacks = new Stack<Task>();
 	}
 
-	public Task getTask() {
+	public synchronized Task getTask() {
 		if (stacks.isEmpty()) {
 			return null;
 		}
