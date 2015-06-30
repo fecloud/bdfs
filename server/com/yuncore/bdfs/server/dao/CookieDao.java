@@ -8,16 +8,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.yuncore.bdfs.server.util.Stopwatch;
+
 /**
  * @author ouyangfeng
  * 
  */
 public class CookieDao extends BaseDao {
 
-	private Connection connection;
-
 	public CookieDao() {
-		connection = getDB();
 	}
 
 	/*
@@ -38,8 +37,9 @@ public class CookieDao extends BaseDao {
 	 */
 	public synchronized boolean saveCookie(String cookie) {
 		try {
-			// Stopwatch stopwatch = new Stopwatch();
-			// stopwatch.start();
+			 Stopwatch stopwatch = new Stopwatch();
+			 stopwatch.start();
+			final Connection connection = getDB();
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement(String.format(
 							"REPLACE INTO %s (id,cookie) VALUES (1,?)",
@@ -54,7 +54,8 @@ public class CookieDao extends BaseDao {
 
 			connection.commit();
 			connection.setAutoCommit(true);
-			// stopwatch.stop("CookieDao saveCookie");
+			connection.close();
+			 stopwatch.stop("CookieDao saveCookie");
 			return result;
 		} catch (SQLException e) {
 			logger.error("", e);
@@ -69,8 +70,9 @@ public class CookieDao extends BaseDao {
 	 */
 	public synchronized String getCookie() {
 		try {
-			// Stopwatch stopwatch = new Stopwatch();
-			// stopwatch.start();
+			 Stopwatch stopwatch = new Stopwatch();
+			 stopwatch.start();
+			final Connection connection = getDB();
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement(String.format(
 							"SELECT id,cookie FROM %s LIMIT 0,1",
@@ -82,8 +84,8 @@ public class CookieDao extends BaseDao {
 				result = resultSet.getString("cookie");
 			}
 			prepareStatement.close();
-
-			// stopwatch.stop("CookieDao getCookie");
+			connection.close();
+			 stopwatch.stop("CookieDao getCookie");
 			return result;
 		} catch (SQLException e) {
 			logger.error("", e);

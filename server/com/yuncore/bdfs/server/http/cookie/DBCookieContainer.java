@@ -21,6 +21,8 @@ public class DBCookieContainer extends AppCookieContainer {
 	private volatile boolean load;
 
 	private CookieDao cookieDao = new CookieDao();
+	
+	private String preString;
 
 	/*
 	 * (non-Javadoc)
@@ -29,6 +31,12 @@ public class DBCookieContainer extends AppCookieContainer {
 	 */
 	@Override
 	public boolean save() {
+		if(preString != null) {
+			final String c = toJSON();
+			System.out.println(c.equals(preString));
+			
+		}
+		preString = toJSON();
 		return cookieDao.saveCookie(toJSON());
 	}
 
