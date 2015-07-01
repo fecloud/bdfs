@@ -4,8 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -16,61 +14,69 @@ public class LocalFileDao extends BaseDao {
 
 	Logger logger = Logger.getLogger(BaseDao.class.getSimpleName());
 
-	private List<BDFSFile> caches = new ArrayList<BDFSFile>();
+	private StringBuilder insert;
+
+	private int size;
+
+	private static final int CACHE_SIZE = 5000;
 
 	@Override
 	public String getTableName() {
 		return "localfile";
 	}
 
-	public synchronized boolean insertAllCacahe(List<BDFSFile> files) {
-		if (caches.size() < 10000) {
-			return caches.addAll(files);
-		} else {
-			caches.addAll(files);
-			return insertAllCacaheFlush();
+	private boolean add(BDFSFile f) {
+		if (size == 0) {
+			insert = new StringBuilder(
+					String.format(
+							"INSERT INTO %s (id,dir,name,length,type,fid,session) VALUES ",
+							getTableName()));
 		}
+		if (size != 0) {
+			insert.append(",");
+		}
+//		insert.append(String.format("(UUID(),\"%s\",\"%s\",%s,%s,\"%s\",%s)", f
+//				.getDir().replace("\\", "\\\\"), f.getName(), f.getLength(), f
+//				.getType(), f.getfId(), f.getSession()));
+		insert.append(String.format("(UUID(),\"%s\",\"%s\",%s,%s,\"%s\",%s)", f
+				.getDir(), f.getName(), f.getLength(), f
+				.getType(), f.getfId(), f.getSession()));
+		size++;
+		return true;
 	}
 
 	public synchronized boolean insertAllCacaheFlush() {
-		final boolean result = insertAll(caches);
-		caches.clear();
-		return result;
+		if (size != 0) {
+			final boolean result = insertAll();
+			size = 0;
+			insert = null;
+			return result;
+		} else {
+			return true;
+		}
 	}
 
 	public synchronized boolean insertCache(BDFSFile file) {
-		if (caches.size() < 10000) {
-			return caches.add(file);
+		if (size < CACHE_SIZE) {
+			return add(file);
 		} else {
-			caches.add(file);
+			add(file);
 			return insertAllCacaheFlush();
 		}
 	}
 
-	public synchronized boolean insertAll(List<BDFSFile> files) {
+	public synchronized boolean insertAll() {
 		try {
 
 			Stopwatch stopwatch = new Stopwatch();
 			stopwatch.start();
 			final Connection connection = getDB();
-			final PreparedStatement prepareStatement = connection
-					.prepareStatement(String
-							.format("INSERT INTO %s (id,dir,name,length,type,fid,session) VALUES(UUID(),?,?,?,?,?,?)",
-									getTableName()));
-			for (BDFSFile f : files) {
-				prepareStatement.setString(1, f.getDir());
-				prepareStatement.setString(2, f.getName());
-				prepareStatement.setLong(3, f.getLength());
-				prepareStatement.setLong(4, f.getType());
-				prepareStatement.setString(5, f.getfId());
-				prepareStatement.setLong(6, f.getSession());
-				prepareStatement.addBatch();
-			}
 
+			final PreparedStatement prepareStatement = connection
+					.prepareStatement(insert.toString());
 			connection.setAutoCommit(false);
 
-			final boolean result = prepareStatement.executeBatch().length == caches
-					.size();
+			final boolean result = prepareStatement.executeUpdate() == size;
 			connection.commit();
 			prepareStatement.clearBatch();
 			prepareStatement.close();
@@ -78,7 +84,7 @@ public class LocalFileDao extends BaseDao {
 			connection.setAutoCommit(true);
 			connection.close();
 
-			stopwatch.stop("LocalFileDao insertAll");
+			stopwatch.stop("LocalFileDao insertAll " + size);
 			return result;
 		} catch (SQLException e) {
 			logger.error("", e);

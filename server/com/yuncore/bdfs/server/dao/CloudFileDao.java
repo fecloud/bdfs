@@ -4,11 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.yuncore.bdfs.server.Const;
 import com.yuncore.bdfs.server.entity.CloudFile;
 import com.yuncore.bdfs.server.util.Stopwatch;
 
@@ -16,57 +16,73 @@ public class CloudFileDao extends BaseDao {
 
 	Logger logger = Logger.getLogger(BaseDao.class.getSimpleName());
 
-	private List<CloudFile> caches = new ArrayList<CloudFile>();
+	private StringBuilder insert;
+
+	private int size;
+
+	private static final int CACHE_SIZE = 5000;
 
 	public synchronized boolean insertAllCacahe(List<CloudFile> files) {
-		if (caches.size() < 10000) {
-			return caches.addAll(files);
+		if (size < CACHE_SIZE) {
+			return addAll(files);
 		} else {
-			caches.addAll(files);
+			addAll(files);
 			return insertAllCacaheFlush();
 		}
 	}
 
-	public synchronized boolean insertAllCacaheFlush() {
-		final boolean result = insertAll(caches);
-		caches.clear();
-		return result;
+	private boolean addAll(List<CloudFile> files) {
+		if (size == 0) {
+			insert = new StringBuilder(
+					String.format(
+							"INSERT INTO %s (id,dir,name,length,type,fid,md5,session) VALUES ",
+							getTableName()));
+		}
+		final long session = Long.parseLong(System.getProperty(Const.CLOUDLIST_SESSION, "0"));
+		for (CloudFile f : files) {
+			f.setSession(session);
+			if (size != 0) {
+				insert.append(",");
+			}
+			insert.append(String.format(
+					"(UUID(),\"%s\",\"%s\",%s,%s,\"%s\",\"%s\",%s)",
+					f.getDir(), f.getName(), f.getLength(), f.getType(),
+					f.toFid(), f.getMd5() == null ? "" : f.getMd5(),
+					f.getSession()));
+			size++;
+		}
+		return true;
 	}
 
-	public synchronized boolean insertAll(List<CloudFile> files) {
+	public synchronized boolean insertAllCacaheFlush() {
+		if (size != 0) {
+			final boolean result = insertAll();
+			size = 0;
+			insert = null;
+			return result;
+		} else {
+			return true;
+		}
+	}
+
+	public synchronized boolean insertAll() {
 		try {
 			Stopwatch stopwatch = new Stopwatch();
 			stopwatch.start();
 			final Connection connection = getDB();
-			final PreparedStatement prepareStatement = connection
-					.prepareStatement(String
-							.format("INSERT INTO %s (id,dir,name,length,type,fid,md5,session) VALUES(UUID(),?,?,?,?,?,?,?)",
-									getTableName()));
-			final long session = Long.parseLong(System.getProperty("cloudlist_session", "0"));
-			for (CloudFile f : files) {
-				f.setSession(session);
-				prepareStatement.setString(1, f.getDir());
-				prepareStatement.setString(2, f.getName());
-				prepareStatement.setLong(3, f.getLength());
-				prepareStatement.setLong(4, f.getType());
-				prepareStatement.setString(5, f.toFid());
-				prepareStatement.setString(6, f.getMd5());
-				prepareStatement.setLong(7, f.getSession());
-				prepareStatement.addBatch();
-			}
 
+			final PreparedStatement prepareStatement = connection
+					.prepareStatement(insert.toString());
 			connection.setAutoCommit(false);
 
-			final boolean result = prepareStatement.executeBatch().length == caches
-					.size();
-			prepareStatement.clearBatch();
+			final boolean result = prepareStatement.executeUpdate() == size;
+			connection.commit();
 			prepareStatement.close();
 
-			connection.commit();
 			connection.setAutoCommit(true);
 			connection.close();
 
-			stopwatch.stop("CloudFileDao insertAll");
+			stopwatch.stop("CloudFileDao insertAll " + size);
 			return result;
 		} catch (SQLException e) {
 			logger.error("", e);

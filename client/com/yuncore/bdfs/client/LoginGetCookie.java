@@ -8,8 +8,8 @@ import com.yuncore.bdfs.client.api.FSApi;
 import com.yuncore.bdfs.client.api.ServerApi;
 import com.yuncore.bdfs.client.api.imple.FSApiImple;
 import com.yuncore.bdfs.client.api.imple.ServerApiImple;
-import com.yuncore.bdfs.client.util.FileZip;
 import com.yuncore.bdfs.exception.ApiException;
+import com.yuncore.bdfs.util.FileGzip;
 
 public class LoginGetCookie {
 
@@ -65,8 +65,8 @@ public class LoginGetCookie {
 	private boolean uploadCookie() {
 		try {
 			final String file = filename + ".gzip";
-			FileZip fileZip = new FileZip(filename, file);
-			if (fileZip.zip()) {
+			final FileGzip fileZip = new FileGzip(filename, file);
+			if (fileZip.gzip()) {
 				return serverApi.uploadCookie(file);
 			}
 		} catch (Exception e) {

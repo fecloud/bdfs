@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.zip.GZIPInputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -38,6 +37,7 @@ import com.yuncore.bdfs.server.dao.DownloadDao;
 import com.yuncore.bdfs.server.dao.LocalHistoryDao;
 import com.yuncore.bdfs.server.files.local.UploadLocalFile;
 import com.yuncore.bdfs.util.DateUtil;
+import com.yuncore.bdfs.util.FileGzip;
 import com.yuncore.bdfs.util.Gzip;
 
 /**
@@ -458,19 +458,33 @@ public class BDFSServlet extends HttpServlet {
 	private boolean saveFileAndCompare(HttpServletRequest req) {
 		try {
 			logger.debug("saveFileAndCompare");
-			final GZIPInputStream in = new GZIPInputStream(req.getInputStream());
+			final InputStream in = req.getInputStream();
 			final String filename = System.getProperty("java.io.tmpdir")
-					+ File.separator + System.currentTimeMillis() + ".txt";
+					+ File.separator + System.currentTimeMillis() + ".gzip";
 			logger.debug(filename);
 			final FileOutputStream out = new FileOutputStream(filename);
 			final byte[] buffer = new byte[102400];
 			int len = -1;
+			int sum = 0;
 			while (-1 != (len = in.read(buffer))) {
+				sum += len;
 				out.write(buffer, 0, len);
 			}
 			out.flush();
 			out.close();
-			uploadLocalFile.addTask(filename);
+
+			final int contentLength = req.getContentLength();
+			if (contentLength == sum) {
+				final String target = filename + ".txt";
+				final FileGzip fileGzip = new FileGzip(filename, target);
+				if (fileGzip.unGzip()) {
+					uploadLocalFile.addTask(target);
+				}
+			} else {
+				logger.info("recevie file not intact");
+			}
+
+			new File(filename).delete();
 			logger.debug("saveFileAndCompare end");
 		} catch (IOException e) {
 			logger.error("", e);

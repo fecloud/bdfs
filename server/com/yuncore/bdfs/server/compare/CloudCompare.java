@@ -3,6 +3,7 @@
  */
 package com.yuncore.bdfs.server.compare;
 
+import com.yuncore.bdfs.server.Const;
 import com.yuncore.bdfs.server.dao.CloudCompareDao;
 
 /**
@@ -22,6 +23,6 @@ public class CloudCompare extends LocalCompare {
 	 */
 	@Override
 	protected long getSession() {
-		return Long.parseLong(System.getProperty("cloudlist_session"));
+		return Long.parseLong(System.getProperty(Const.CLOUDLIST_SESSION, "0"));
 	}
 }

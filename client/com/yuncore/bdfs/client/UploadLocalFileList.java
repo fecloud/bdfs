@@ -6,9 +6,9 @@ import java.util.List;
 import com.yuncore.bdfs.client.api.ServerApi;
 import com.yuncore.bdfs.client.api.imple.ServerApiImple;
 import com.yuncore.bdfs.client.local.GetLocalFile;
-import com.yuncore.bdfs.client.util.FileZip;
 import com.yuncore.bdfs.client.util.Log;
 import com.yuncore.bdfs.client.util.Stopwatch;
+import com.yuncore.bdfs.util.FileGzip;
 
 public class UploadLocalFileList extends Thread {
 
@@ -35,7 +35,7 @@ public class UploadLocalFileList extends Thread {
 				Log.e(TAG, "", e);
 			}
 			try {
-				Thread.sleep(100000);
+				Thread.sleep(60000);
 			} catch (InterruptedException e) {
 				Log.e(TAG, "", e);
 			}
@@ -54,8 +54,8 @@ public class UploadLocalFileList extends Thread {
 
 		stopwatch.start();
 		final String zipname = listFiles.getOutFilename() + ".gzip";
-		final FileZip fileZip = new FileZip(listFiles.getOutFilename(), zipname);
-		final boolean fileZipResult = fileZip.zip();
+		final FileGzip fileZip = new FileGzip(listFiles.getOutFilename(), zipname);
+		final boolean fileZipResult = fileZip.gzip();
 		stopwatch.stop("UploadLocalFileList FileZip");
 		if (fileZipResult) {
 			stopwatch.start();
@@ -65,7 +65,7 @@ public class UploadLocalFileList extends Thread {
 				if (serverApi.uploadlocal(zipname)) {
 					break;
 				} else {
-					Log.w(TAG, zipname + " fail");
+					Log.w(TAG, "upload "+ zipname + " fail");
 				}
 				i--;
 			}

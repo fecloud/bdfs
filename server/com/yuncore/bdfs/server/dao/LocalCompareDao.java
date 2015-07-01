@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.yuncore.bdfs.server.Const;
 import com.yuncore.bdfs.server.util.Stopwatch;
 
 public class LocalCompareDao extends BaseDao {
@@ -47,7 +48,7 @@ public class LocalCompareDao extends BaseDao {
 	}
 
 	public String getSession() {
-		return "locallist_session";
+		return Const.LOCALLIST_SESSION;
 	}
 
 	protected String getTag() {
@@ -125,17 +126,17 @@ public class LocalCompareDao extends BaseDao {
 
 				final PreparedStatement prepareStatement = connection
 						.prepareStatement(sql.toString());
-//				Stopwatch stopwatch = new Stopwatch();
-//				stopwatch.start();
+				// Stopwatch stopwatch = new Stopwatch();
+				// stopwatch.start();
 
 				connection.setAutoCommit(false);
 				final int executeBatch = prepareStatement.executeUpdate();
-				//logger.debug(String.format("delete count:%s", executeBatch));
+				// logger.debug(String.format("delete count:%s", executeBatch));
 				connection.commit();
 				connection.setAutoCommit(true);
 				connection.close();
-				
-//				stopwatch.stop(getTag() + " deleteAll");
+
+				// stopwatch.stop(getTag() + " deleteAll");
 
 				return executeBatch > 0;
 
@@ -238,8 +239,8 @@ public class LocalCompareDao extends BaseDao {
 		try {
 			final List<String> list = new ArrayList<String>();
 
-//			Stopwatch stopwatch = new Stopwatch();
-//			stopwatch.start();
+			// Stopwatch stopwatch = new Stopwatch();
+			// stopwatch.start();
 			final String sql = String.format("SELECT fid FROM %s LIMIT %s,%s",
 					getSameTableName(), start, count);
 			final Connection connection = getDB();
@@ -250,7 +251,7 @@ public class LocalCompareDao extends BaseDao {
 			while (resultSet.next()) {
 				list.add(buildLocalFile(resultSet));
 			}
-//			stopwatch.stop(getTag() + " getLocalCompareSame");
+			// stopwatch.stop(getTag() + " getLocalCompareSame");
 			resultSet.close();
 			prepareStatement.close();
 			connection.close();
@@ -306,12 +307,13 @@ public class LocalCompareDao extends BaseDao {
 
 	/**
 	 * 复制表数据sql
+	 * 
 	 * @return
 	 */
 	protected String getCopyTableDataSql() {
 		return "INSERT INTO %s SELECT id,dir,name,length,type,fid,session FROM %s";
 	}
-	
+
 	/**
 	 * 复制本地数据到上传或者下载表
 	 * 
@@ -319,9 +321,7 @@ public class LocalCompareDao extends BaseDao {
 	 */
 	public synchronized boolean copyTableData(String src, String dest,
 			String srcWhere) {
-		String sql = String
-				.format(getCopyTableDataSql(),
-						dest, src);
+		String sql = String.format(getCopyTableDataSql(), dest, src);
 		if (null != srcWhere) {
 			sql += String.format(" WHERE ", srcWhere);
 		}

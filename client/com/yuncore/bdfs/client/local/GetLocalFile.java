@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.yuncore.bdfs.client.Const;
 import com.yuncore.bdfs.client.util.FileListWrite;
 import com.yuncore.bdfs.client.util.Log;
 import com.yuncore.bdfs.task.TaskExecute;
@@ -13,9 +14,6 @@ import com.yuncore.bdfs.task.TaskService;
 public class GetLocalFile extends TaskService {
 
 	static final String TAG = "GetLocalFile";
-
-	public static final String LOCALLIST_SESSION = "locallist_session";
-
 	private File dir;
 
 	private LocalFileExclude exclude;
@@ -54,7 +52,7 @@ public class GetLocalFile extends TaskService {
 
 	public synchronized boolean list() {
 		if (dir.exists()) {
-			System.setProperty(LOCALLIST_SESSION,
+			System.setProperty(Const.LOCALLIST_SESSION,
 					"" + System.currentTimeMillis());
 			taskContainer.addTask(new GetLocalFileTask(dir.getAbsolutePath()));
 			waitTaskFinish();

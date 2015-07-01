@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import org.apache.log4j.Logger;
 
 import com.yuncore.bdfs.entity.BDFSFile;
+import com.yuncore.bdfs.server.Const;
 import com.yuncore.bdfs.server.compare.LocalCompare;
 import com.yuncore.bdfs.server.dao.LocalFileDao;
 import com.yuncore.bdfs.server.dao.LocalHistoryDao;
@@ -101,7 +102,7 @@ public class UploadLocalFileExecute extends TaskExecute {
 	}
 
 	private void setLocalfileSession(long session) {
-		System.setProperty("locallist_session", "" + session);
+		System.setProperty(Const.LOCALLIST_SESSION, "" + session);
 	}
 
 	private boolean compare() {

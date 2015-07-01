@@ -3,6 +3,7 @@
  */
 package com.yuncore.bdfs.server.files.cloud;
 
+import com.yuncore.bdfs.server.Const;
 import com.yuncore.bdfs.server.dao.CloudFileDao;
 import com.yuncore.bdfs.server.util.Stopwatch;
 import com.yuncore.bdfs.task.TaskExecute;
@@ -13,8 +14,6 @@ import com.yuncore.bdfs.task.TaskService;
  * 
  */
 public class GetCloudFile extends TaskService {
-
-	public static final String CLOUDLIST_SESSION = "cloudlist_session";
 
 	private String dir;
 
@@ -29,7 +28,7 @@ public class GetCloudFile extends TaskService {
 	public synchronized boolean list() {
 		Stopwatch stopwatch = new Stopwatch();
 		stopwatch.start();
-		System.setProperty(CLOUDLIST_SESSION, "" + System.currentTimeMillis());
+		System.setProperty(Const.CLOUDLIST_SESSION, "" + System.currentTimeMillis());
 		taskContainer.addTask(new GetCloudFileTask(dir));
 		waitTaskFinish();
 		cloudFileDao.insertAllCacaheFlush();

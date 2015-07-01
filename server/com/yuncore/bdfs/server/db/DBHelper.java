@@ -44,10 +44,8 @@ public class DBHelper {
 		try {
 
 			final String url = "jdbc:mysql://rds6v2uvvrennaa.mysql.rds.aliyuncs.com:3306/db7k81jhgfm13wla?user=db7k81jhgfm13wla&password=ouyangfeng";
-//			 final String url =
-//			 "jdbc:mysql://localhost:3306/fcloud?user=root&password=root&useUnicode=true&characterEncoding=UTF-8";
-			// final String url =
-			// "jdbc:mysql://10.0.0.8:3306/bdfs?user=root&password=fcloud&useUnicode=true&characterEncoding=UTF-8";
+//			 final String url = "jdbc:mysql://localhost:3306/fcloud?user=root&password=root&useUnicode=true&characterEncoding=UTF-8";
+			// final String url = "jdbc:mysql://10.0.0.8:3306/bdfs?user=root&password=fcloud&useUnicode=true&characterEncoding=UTF-8";
 			final Connection conn = DriverManager.getConnection(url);
 			return conn;
 		} catch (Exception e) {

@@ -2,6 +2,7 @@ package com.yuncore.bdfs.server.compare;
 
 import java.util.List;
 
+import com.yuncore.bdfs.server.Const;
 import com.yuncore.bdfs.server.dao.LocalCompareDao;
 
 public class LocalCompare {
@@ -13,7 +14,7 @@ public class LocalCompare {
 	}
 
 	protected long getSession() {
-		return Long.parseLong(System.getProperty("locallist_session"));
+		return Long.parseLong(System.getProperty(Const.LOCALLIST_SESSION, "0"));
 	}
 
 	/**

@@ -3,6 +3,8 @@
  */
 package com.yuncore.bdfs.server.dao;
 
+import com.yuncore.bdfs.server.Const;
+
 /**
  * @author ouyangfeng
  * 
@@ -61,7 +63,7 @@ public class CloudCompareDao extends LocalCompareDao {
 
 	@Override
 	public String getSession() {
-		return "cloudlist_session";
+		return Const.CLOUDLIST_SESSION;
 	}
 
 	/*

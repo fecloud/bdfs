@@ -24,7 +24,7 @@ public class MemCookieContainer extends AppCookieContainer {
 
 	@Override
 	public boolean read() {
-		boolean load = Boolean.getBoolean(System.getProperty("CookieLoader",
+		boolean load = Boolean.parseBoolean(System.getProperty("CookieLoader",
 				"false"));
 		if (!load) {
 
@@ -44,7 +44,7 @@ public class MemCookieContainer extends AppCookieContainer {
 
 					}
 					load = true;
-					System.getProperty("CookieLoader", "true");
+					System.setProperty("CookieLoader", "true");
 				}
 			}
 		}

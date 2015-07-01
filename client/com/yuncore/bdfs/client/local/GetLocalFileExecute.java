@@ -2,6 +2,7 @@ package com.yuncore.bdfs.client.local;
 
 import java.util.List;
 
+import com.yuncore.bdfs.client.Const;
 import com.yuncore.bdfs.client.util.FileListWrite;
 import com.yuncore.bdfs.client.util.FileUtil;
 import com.yuncore.bdfs.entity.BDFSFile;
@@ -26,8 +27,8 @@ public class GetLocalFileExecute extends TaskExecute {
 
 	protected void analysisDIRFiles(GetLocalFileTask task) {
 
-		final List<BDFSFile> listFiles = FileUtil.listFiles(task.getDir(),
-				Long.parseLong(System.getProperty("locallist_session")));
+		final List<BDFSFile> listFiles = FileUtil.listFiles(task.getDir(), Long
+				.parseLong(System.getProperty(Const.LOCALLIST_SESSION, "0")));
 		if (listFiles != null) {
 			compare(listFiles, task.getDir());
 		}
