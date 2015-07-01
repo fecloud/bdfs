@@ -280,7 +280,9 @@ public class BDFSServlet extends HttpServlet {
 		object.put("code", 200);
 		final BDFSFile file = new CloudFileDeleteDao().query();
 		if (null != file) {
-			object.put("data", file.toJSON());
+			final JSONObject fileoObject = new JSONObject();
+			file.toJSON(fileoObject);
+			object.put("data", fileoObject);
 		}
 	}
 
@@ -309,7 +311,9 @@ public class BDFSServlet extends HttpServlet {
 		object.put("code", 200);
 		final BDFSFile file = new DownloadDao().query();
 		if (null != file) {
-			object.put("data", file.toJSON());
+			final JSONObject fileoObject = new JSONObject();
+			file.toJSON(fileoObject);
+			object.put("data", fileoObject);
 		}
 	}
 
