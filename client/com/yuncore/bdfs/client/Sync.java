@@ -56,12 +56,12 @@ public class Sync implements Runnable {
 			uploadLocalFileList = new UploadLocalFileList(excludeFiles);
 			uploadLocalFileList.start();
 		}
-		if (null == cloudDownLoad) {
-			cloudDownLoad = new CloudDownLoad(
-					System.getProperty(Const.SYNCDIR),
-					System.getProperty(Const.TMP));
-			cloudDownLoad.start();
-		}
+//		if (null == cloudDownLoad) {
+//			cloudDownLoad = new CloudDownLoad(
+//					System.getProperty(Const.SYNCDIR),
+//					System.getProperty(Const.TMP));
+//			cloudDownLoad.start();
+//		}
 	}
 
 	public void start() {

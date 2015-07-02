@@ -35,10 +35,11 @@ public class CloudFileDao extends BaseDao {
 		if (size == 0) {
 			insert = new StringBuilder(
 					String.format(
-							"INSERT INTO %s (id,dir,name,length,type,fid,md5,session) VALUES ",
+							"INSERT INTO %s (id,path,length,isdir,fid,md5,session) VALUES ",
 							getTableName()));
 		}
-		final long session = Long.parseLong(System.getProperty(Const.CLOUDLIST_SESSION, "0"));
+		final long session = Long.parseLong(System.getProperty(
+				Const.CLOUDLIST_SESSION, "0"));
 		for (CloudFile f : files) {
 			f.setSession(session);
 			if (size != 0) {
@@ -46,9 +47,8 @@ public class CloudFileDao extends BaseDao {
 			}
 			insert.append(String.format(
 					"(UUID(),\"%s\",\"%s\",%s,%s,\"%s\",\"%s\",%s)",
-					f.getDir(), f.getName(), f.getLength(), f.getType(),
-					f.toFid(), f.getMd5() == null ? "" : f.getMd5(),
-					f.getSession()));
+					f.getPath(), f.getLength(), f.isDir() ? 1 : 0, f.toFid(),
+					f.getMd5() == null ? "" : f.getMd5(), f.getSession()));
 			size++;
 		}
 		return true;
@@ -96,11 +96,9 @@ public class CloudFileDao extends BaseDao {
 			final Connection connection = getDB();
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement(String.format(
-							"DELETE FROM %s WHERE dir=? and name=?",
-							getTableName()));
+							"DELETE FROM %s WHERE path=?", getTableName()));
 			for (CloudFile f : files) {
-				prepareStatement.setString(1, f.getDir());
-				prepareStatement.setString(2, f.getName());
+				prepareStatement.setString(1, f.getPath());
 				prepareStatement.addBatch();
 			}
 			connection.setAutoCommit(false);
@@ -121,10 +119,9 @@ public class CloudFileDao extends BaseDao {
 			throws SQLException {
 		final CloudFile file = new CloudFile();
 		file.setId(resultSet.getString("id"));
-		file.setDir(resultSet.getString("dir"));
-		file.setName(resultSet.getString("name"));
+		file.setPath(resultSet.getString("path"));
 		file.setLength(resultSet.getLong("length"));
-		file.setType(resultSet.getInt("type"));
+		file.setDir(resultSet.getBoolean("isdir"));
 		file.setSession(resultSet.getLong("session"));
 		return file;
 	}

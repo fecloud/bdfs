@@ -88,14 +88,14 @@ public class UploadLocalFileExecute extends TaskExecute {
 		if (null != line && line.trim().length() > 0) {
 			final String[] strings = line.trim().split("\\|");
 			if (null != strings && strings.length == 6) {
-				final BDFSFile file = new BDFSFile();
-				file.setDir(strings[0]);
-				file.setName(strings[1]);
-				file.setLength(Long.parseLong(strings[2]));
-				file.setType(Integer.parseInt(strings[3]));
-				file.setfId(strings[4]);
-				file.setSession(Long.parseLong(strings[5]));
-				return file;
+//				final BDFSFile file = new BDFSFile();
+//				file.setDir(strings[0]);
+//				file.setName(strings[1]);
+//				file.setLength(Long.parseLong(strings[2]));
+//				file.setType(Integer.parseInt(strings[3]));
+//				file.setfId(strings[4]);
+//				file.setSession(Long.parseLong(strings[5]));
+//				return file;
 			}
 		}
 		return null;

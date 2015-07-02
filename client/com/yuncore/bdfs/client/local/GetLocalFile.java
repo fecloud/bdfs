@@ -57,6 +57,12 @@ public class GetLocalFile extends TaskService {
 			taskContainer.addTask(new GetLocalFileTask(dir.getAbsolutePath()));
 			waitTaskFinish();
 			fileListWrite.insertAllCacaheFlush();
+			try {
+				fileListWrite.flush();
+				fileListWrite.close();
+			} catch (IOException e) {
+				Log.e(TAG, "", e);
+			}
 			return true;
 		}
 		return false;

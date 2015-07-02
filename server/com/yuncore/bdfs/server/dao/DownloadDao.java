@@ -108,7 +108,7 @@ public class DownloadDao extends BaseDao {
 				file.setfId(resultSet.getString("fid"));
 				file.setDir(resultSet.getString("dir"));
 				file.setName(resultSet.getString("name"));
-				file.setType(resultSet.getInt("type"));
+				file.setType(resultSet.getbo("type"));
 				file.setSession(resultSet.getLong("session"));
 				file.setLength(resultSet.getLong("length"));
 				list.add(file);

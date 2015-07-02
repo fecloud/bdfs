@@ -42,15 +42,16 @@ public class CloudDownLoad extends Thread {
 
 	@Override
 	public void run() {
+		setName(CloudDownLoad.class.getSimpleName());
 		Log.i(TAG,
 				String.format("CloudDownLoad root:%s tmpDir:%s", root, tmpDir));
 		falg = true;
 		BDFSFile cloudFile;
-		boolean downloaded = false;
+		boolean downloaded = true;
 		while (falg) {
 			cloudFile = getDownLoad();
 			if (cloudFile != null) {
-				downloaded = downloadFile(cloudFile);
+//				downloaded = downloadFile(cloudFile);
 				if (downloaded) {
 					delDownLoad(cloudFile);
 				}

@@ -5,7 +5,7 @@ import org.json.JSONObject;
 import com.yuncore.bdfs.entity.BDFSFile;
 
 public class CloudFile extends BDFSFile {
-	
+
 	private String md5;
 
 	public String getMd5() {
@@ -16,40 +16,24 @@ public class CloudFile extends BDFSFile {
 		this.md5 = md5;
 	}
 
-	public String getAbsolutePath() {
-		if (getDir().endsWith("/")) {
-			return getDir() + getName();
-		}
-		return getDir() + "/" + getName();
-	}
-
 	@Override
 	public boolean formJOSN(JSONObject object) {
 		if (null != object) {
-			if (object.has("server_filename")) {
-				setName(object.getString("server_filename"));
-			}
 
 			if (object.has("size")) {
-				setLength(object.getLong("size"));
+				this.length = object.getLong("size");
 			}
-
 			if (object.has("isdir")) {
-				setType(object.getInt("isdir"));
+				this.isdir = object.getBoolean("isdir");
 			}
 
 			if (object.has("path")) {
-				String path = object.getString("path");
-				path = getUnixPath(path);
-				setDir(path);
+				this.path = object.getString("path");
 			}
 
-			if(object.has("md5")){
+			if (object.has("md5")) {
 				md5 = object.getString("md5");
 			}
-			// if (object.has("dir_empty")) {
-			// dirEmpty = object.getInt("dir_empty");
-			// }
 
 			return true;
 		}

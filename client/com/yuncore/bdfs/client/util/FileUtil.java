@@ -23,12 +23,11 @@ public class FileUtil {
 				BDFSFile localFile = null;
 				for (File f : listFiles) {
 					localFile = new BDFSFile();
-					localFile.setDir(f.getParent());
+					localFile.setPath(f.getPath());
 					if (f.isFile()) {
 						localFile.setLength(f.length());
 					}
-					localFile.setName(f.getName());
-					localFile.setType(f.isFile() ? 0 : 1);
+					localFile.setType((byte) (f.isFile() ? 0x0 : 0x1));
 					localFile.setSession(session);
 					localFile.setfId(localFile.toFid());
 					list.add(localFile);

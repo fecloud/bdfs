@@ -1,29 +1,25 @@
 package com.yuncore.bdfs.entity;
 
-import java.io.File;
-
 import org.json.JSONObject;
 
 import com.yuncore.bdfs.util.MD5;
 
 public class BDFSFile implements EntityJSON {
 
-	private String id;
+	protected String id;
 
-	private String dir;
+	protected String path;
 
-	private String name;
+	protected long length;
 
-	private long length;
+	protected String fId;
 
-	private String fId;
-
-	private long session;
+	protected long session;
 
 	/**
 	 * 0文件 1文件夹
 	 */
-	private int type;
+	protected boolean isdir;
 
 	public String getId() {
 		return id;
@@ -31,22 +27,6 @@ public class BDFSFile implements EntityJSON {
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public String getDir() {
-		return dir;
-	}
-
-	public void setDir(String dir) {
-		this.dir = dir;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public long getLength() {
@@ -57,20 +37,12 @@ public class BDFSFile implements EntityJSON {
 		this.length = length;
 	}
 
-	public int getType() {
-		return type;
+	public boolean isDir() {
+		return isdir;
 	}
 
-	public void setType(int type) {
-		this.type = type;
-	}
-
-	public boolean isFile() {
-		return this.type == 0;
-	}
-
-	public boolean isDirectory() {
-		return this.type == 1;
+	public void setDir(boolean isdir) {
+		this.isdir = isdir;
 	}
 
 	public long getSession() {
@@ -82,10 +54,7 @@ public class BDFSFile implements EntityJSON {
 	}
 
 	public String getAbsolutePath() {
-		if (dir.endsWith(File.separator)) {
-			return dir + name;
-		}
-		return dir + File.separator + name;
+		return path;
 
 	}
 
@@ -97,12 +66,14 @@ public class BDFSFile implements EntityJSON {
 		this.fId = fId;
 	}
 
-
-	@Override
-	public String toString() {
-		return "[dir=" + dir + ", name=" + name + ", length=" + length
-				+ ", type=" + type + "]";
+	public String getPath() {
+		return path;
 	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
 
 	public String toFid() {
 		return MD5.md5(toString());
@@ -128,29 +99,32 @@ public class BDFSFile implements EntityJSON {
 	public boolean formJOSN(JSONObject object) {
 		if (null != object) {
 			if (object.has("id")) {
-				setId(object.getString("id"));
+				this.id = object.getString("id");
 			}
-			if (object.has("dir")) {
-				setDir(object.getString("dir"));
-			}
-			if (object.has("name")) {
-				setName(object.getString("name"));
+			if (object.has("path")) {
+				this.path = object.getString("dir");
 			}
 			if (object.has("length")) {
-				setLength(object.getLong("length"));
+				this.length = object.getLong("length");
 			}
-			if (object.has("type")) {
-				setType(object.getInt("type"));
+			if (object.has("isdir")) {
+				this.isdir = object.getBoolean("isdir");
 			}
 			if (object.has("fId")) {
-				setfId(object.getString("fId"));
+				this.fId = object.getString("fId");
 			}
 			if (object.has("session")) {
-				setSession(object.getLong("session"));
+				this.session = object.getLong("session");
 			}
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return "[path=" + path + ", length=" + length + ", isdir="
+				+ isdir + "]";
 	}
 
 	/*
@@ -168,10 +142,9 @@ public class BDFSFile implements EntityJSON {
 	@Override
 	public void toJSON(JSONObject object) {
 		object.put("id", id);
-		object.put("dir", dir);
-		object.put("name", name);
+		object.put("path", path);
 		object.put("length", length);
-		object.put("type", type);
+		object.put("isdir", isdir);
 		object.put("fId", fId);
 		object.put("session", session);
 	}

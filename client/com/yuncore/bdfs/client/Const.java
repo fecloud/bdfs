@@ -18,6 +18,6 @@ public final class Const {
 	
 	public static final String LOCALLIST_SESSION = "locallist_session";
 
-	public static final String SERVER_ADD = "http://yuncore.aliapp.com/bdfs";
-//	public static final String SERVER_ADD = "http://localhost:8080/bdfs/bdfs";
+//	public static final String SERVER_ADD = "http://yuncore.aliapp.com/bdfs";
+	public static final String SERVER_ADD = "http://localhost:8080/bdfs/bdfs";
 }
