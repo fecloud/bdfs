@@ -74,6 +74,13 @@ public class BDFSFile implements EntityJSON {
 		this.path = path;
 	}
 
+	public boolean isDirectory() {
+		return isdir;
+	}
+
+	public boolean isFile() {
+		return !isdir;
+	}
 
 	public String toFid() {
 		return MD5.md5(toString());
@@ -123,8 +130,8 @@ public class BDFSFile implements EntityJSON {
 
 	@Override
 	public String toString() {
-		return "[path=" + path + ", length=" + length + ", isdir="
-				+ isdir + "]";
+		return "[path=" + path + ", length=" + length + ", isdir=" + isdir
+				+ "]";
 	}
 
 	/*

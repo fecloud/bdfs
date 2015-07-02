@@ -12,7 +12,7 @@ import com.yuncore.bdfs.entity.BDFSFile;
 public class FileListWrite extends FileOutputStream {
 
 	private List<BDFSFile> caches = new ArrayList<BDFSFile>();
-	
+
 	private static final int PAGE_SIZE = 5000;
 
 	public FileListWrite(String file, boolean append) throws IOException {
@@ -41,16 +41,17 @@ public class FileListWrite extends FileOutputStream {
 		for (BDFSFile f : files) {
 			buffer.clear();
 			bs = f.getPath().getBytes();
-			buffer.putShort((short) bs.length).put(bs).putLong(f.getLength()).put(f.getType());
+			buffer.putShort((short) bs.length).put(bs).putLong(f.getLength())
+					.put((byte) (f.isDir() ? 0x1 : 0x0));
 			buffer.flip();
 			out.write(buffer.array(), 0, buffer.limit());
 		}
 		try {
-			//size
+			// size
 			buffer.clear();
 			buffer.putInt(out.size());
 			buffer.flip();
-			
+
 			write(buffer.array(), 0, buffer.limit());
 			write(out.toByteArray());
 			flush();

@@ -106,9 +106,8 @@ public class DownloadDao extends BaseDao {
 				file = new BDFSFile();
 				file.setId(resultSet.getString("id"));
 				file.setfId(resultSet.getString("fid"));
-				file.setDir(resultSet.getString("dir"));
-				file.setName(resultSet.getString("name"));
-				file.setType(resultSet.getbo("type"));
+				file.setDir(resultSet.getBoolean("isdir"));
+				file.setPath(resultSet.getString("path"));
 				file.setSession(resultSet.getLong("session"));
 				file.setLength(resultSet.getLong("length"));
 				list.add(file);

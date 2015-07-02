@@ -35,12 +35,13 @@ public class LocalFileDao extends BaseDao {
 		if (size != 0) {
 			insert.append(",");
 		}
-//		insert.append(String.format("(UUID(),\"%s\",\"%s\",%s,%s,\"%s\",%s)", f
-//				.getDir().replace("\\", "\\\\"), f.getName(), f.getLength(), f
-//				.getType(), f.getfId(), f.getSession()));
-		insert.append(String.format("(UUID(),\"%s\",\"%s\",%s,%s,\"%s\",%s)", f
-				.getDir(), f.getName(), f.getLength(), f
-				.getType(), f.getfId(), f.getSession()));
+		// insert.append(String.format("(UUID(),\"%s\",\"%s\",%s,%s,\"%s\",%s)",
+		// f
+		// .getDir().replace("\\", "\\\\"), f.getName(), f.getLength(), f
+		// .getType(), f.getfId(), f.getSession()));
+		insert.append(String.format("(UUID(),\"%s\",%s,%s,\"%s\",%s)",
+				f.getPath(), f.getLength(), f.isDir() ? 1 : 0, f.getfId(),
+				f.getSession()));
 		size++;
 		return true;
 	}
@@ -96,10 +97,9 @@ public class LocalFileDao extends BaseDao {
 			throws SQLException {
 		final BDFSFile file = new BDFSFile();
 		file.setId(resultSet.getString("id"));
-		file.setDir(resultSet.getString("dir"));
-		file.setName(resultSet.getString("name"));
+		file.setPath(resultSet.getString("path"));
 		file.setLength(resultSet.getLong("length"));
-		file.setType(resultSet.getInt("type"));
+		file.setDir(resultSet.getBoolean("isdir"));
 		file.setSession(resultSet.getLong("session"));
 		return file;
 	}

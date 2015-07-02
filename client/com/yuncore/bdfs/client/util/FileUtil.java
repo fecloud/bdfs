@@ -27,7 +27,7 @@ public class FileUtil {
 					if (f.isFile()) {
 						localFile.setLength(f.length());
 					}
-					localFile.setType((byte) (f.isFile() ? 0x0 : 0x1));
+					localFile.setDir((f.isFile() ? false : true));
 					localFile.setSession(session);
 					localFile.setfId(localFile.toFid());
 					list.add(localFile);

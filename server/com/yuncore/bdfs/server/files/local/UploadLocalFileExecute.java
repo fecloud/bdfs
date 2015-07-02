@@ -1,9 +1,10 @@
 package com.yuncore.bdfs.server.files.local;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
 import org.apache.log4j.Logger;
 
@@ -23,6 +24,8 @@ public class UploadLocalFileExecute extends TaskExecute {
 	Logger logger = Logger.getLogger(UploadLocalFileExecute.class
 			.getSimpleName());
 
+	private long session = System.currentTimeMillis();
+
 	private LocalFileDao localFileDao;
 
 	public UploadLocalFileExecute(TaskStatus taskStatus,
@@ -34,6 +37,7 @@ public class UploadLocalFileExecute extends TaskExecute {
 	@Override
 	protected void doTask(Task task) {
 		final UploadLocalFileTask uploadLocalFileTask = (UploadLocalFileTask) task;
+		setLocalfileSession();
 		if (readToDB(uploadLocalFileTask.getFilename())) {
 			new LocalHistoryDao().insert();
 			if (compare()) {
@@ -56,25 +60,14 @@ public class UploadLocalFileExecute extends TaskExecute {
 		try {
 			Stopwatch stopwatch = new Stopwatch();
 			stopwatch.start();
-			final BufferedReader reader = new BufferedReader(
-					new InputStreamReader(new FileInputStream(filename)));
-			String line = null;
-			boolean firsetLine = true;
-			BDFSFile localFile = null;
-			while (null != (line = reader.readLine())) {
-				localFile = parseLine(line);
-				if (null == localFile)
-					break;
-
-				if (firsetLine) {
-					setLocalfileSession(localFile.getSession());
-					firsetLine = false;
-				}
-
-				localFileDao.insertCache(localFile);
-
+			final FileInputStream in = new FileInputStream(filename);
+			final FileChannel fileChannel = in.getChannel();
+			final ByteBuffer buffer = ByteBuffer.allocate(4);
+			while (fileChannel.read(buffer) == 4) {
+				buffer.flip();
+				pareOnce(fileChannel, buffer.getInt());
 			}
-			reader.close();
+			in.close();
 			localFileDao.insertAllCacaheFlush();
 			stopwatch.stop("readToDB " + filename);
 			return true;
@@ -84,24 +77,26 @@ public class UploadLocalFileExecute extends TaskExecute {
 		return false;
 	}
 
-	private final static BDFSFile parseLine(String line) {
-		if (null != line && line.trim().length() > 0) {
-			final String[] strings = line.trim().split("\\|");
-			if (null != strings && strings.length == 6) {
-//				final BDFSFile file = new BDFSFile();
-//				file.setDir(strings[0]);
-//				file.setName(strings[1]);
-//				file.setLength(Long.parseLong(strings[2]));
-//				file.setType(Integer.parseInt(strings[3]));
-//				file.setfId(strings[4]);
-//				file.setSession(Long.parseLong(strings[5]));
-//				return file;
+	private void pareOnce(FileChannel fileChannel, int length)
+			throws IOException {
+		final ByteBuffer buffer = ByteBuffer.allocate(length);
+		if (fileChannel.read(buffer) == length) {
+			buffer.flip();
+			short len = 0;
+			BDFSFile file = null;
+			while (buffer.hasRemaining()) {
+				file = new BDFSFile();
+				len = buffer.getShort();
+				file.setPath(new String(buffer.array(), buffer.position(), len));
+				buffer.position(buffer.position() + len);
+				file.setLength(buffer.getLong());
+				file.setDir(buffer.get() == 0x1 ? true : false);
+				localFileDao.insertCache(file);
 			}
 		}
-		return null;
 	}
 
-	private void setLocalfileSession(long session) {
+	private void setLocalfileSession() {
 		System.setProperty(Const.LOCALLIST_SESSION, "" + session);
 	}
 
