@@ -87,7 +87,7 @@ public class Http {
 		conn.setInstanceFollowRedirects(false);
 		conn.setRequestMethod(method == Method.GET ? "GET" : "POST");
 		conn.addRequestProperty("User-Agent", USER_AGENT);
-		conn.addRequestProperty("Connection", "close");
+		//conn.addRequestProperty("Connection", "close");
 		addHost();
 		conn.addRequestProperty("Accept", "*/*");
 		addRequestProperty();
