@@ -83,7 +83,8 @@ public class BDFSFile implements EntityJSON {
 	}
 
 	public String toFid() {
-		return MD5.md5(toString());
+		this.fId = MD5.md5(toString());
+		return fId;
 	}
 
 	/*
@@ -109,7 +110,7 @@ public class BDFSFile implements EntityJSON {
 				this.id = object.getString("id");
 			}
 			if (object.has("path")) {
-				this.path = object.getString("dir");
+				this.path = object.getString("path");
 			}
 			if (object.has("length")) {
 				this.length = object.getLong("length");
