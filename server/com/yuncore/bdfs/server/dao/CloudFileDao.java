@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -46,8 +47,8 @@ public class CloudFileDao extends BaseDao {
 				insert.append(",");
 			}
 			insert.append(String.format(
-					"(UUID(),\"%s\",\"%s\",%s,%s,\"%s\",\"%s\",%s)",
-					f.getPath(), f.getLength(), f.isDir() ? 1 : 0, f.toFid(),
+					"(UUID(),\"%s\",%s,%s,\"%s\",\"%s\",%s)", f.getPath(),
+					f.getLength(), f.isDir() ? 1 : 0, f.toFid(),
 					f.getMd5() == null ? "" : f.getMd5(), f.getSession()));
 			size++;
 		}
@@ -71,11 +72,11 @@ public class CloudFileDao extends BaseDao {
 			stopwatch.start();
 			final Connection connection = getDB();
 
-			final PreparedStatement prepareStatement = connection
-					.prepareStatement(insert.toString());
+			final Statement prepareStatement = connection.createStatement();
 			connection.setAutoCommit(false);
 
-			final boolean result = prepareStatement.executeUpdate() == size;
+			final boolean result = prepareStatement.executeUpdate(insert
+					.toString()) == size;
 			connection.commit();
 			prepareStatement.close();
 

@@ -311,7 +311,7 @@ public class LocalCompareDao extends BaseDao {
 	 * @return
 	 */
 	protected String getCopyTableDataSql() {
-		return "INSERT INTO %s SELECT id,dir,name,length,type,fid,session FROM %s";
+		return "INSERT INTO %s SELECT id,path,length,isdir,fid,session FROM %s";
 	}
 
 	/**

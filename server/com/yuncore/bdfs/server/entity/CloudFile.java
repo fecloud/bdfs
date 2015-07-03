@@ -24,7 +24,7 @@ public class CloudFile extends BDFSFile {
 				this.length = object.getLong("size");
 			}
 			if (object.has("isdir")) {
-				this.isdir = object.getBoolean("isdir");
+				this.isdir = object.getInt("isdir") == 1 ? true : false;
 			}
 
 			if (object.has("path")) {

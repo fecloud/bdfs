@@ -36,6 +36,7 @@ public class DBTest extends PCSTestCase {
 
 		BDFSFile query = new DownloadDao().query();
 		assertNotNull(query);
+		System.out.println(query.toJSON());
 
 		boolean delete = new DownloadDao().delete(query);
 

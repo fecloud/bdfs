@@ -134,13 +134,13 @@ public class DBHelper {
 	protected synchronized void onCreateDB() {
 		logger.info("onCreateDB");
 
-		executeSQL("CREATE TABLE localfile (id varchar(36) PRIMARY KEY,path VARCHAR(2048), length BIGINT, type BIGINT, fid varchar(32), session BIGINT);"); // 本地文件记录
-		executeSQL("CREATE TABLE localdelete (id VARCHAR(36) PRIMARY KEY, path VARCHAR(2048) , length BIGINT, type BIGINT, fid varchar(32), session BIGINT);");// 本地被删除了
-		executeSQL("CREATE TABLE localupload (id VARCHAR(36) PRIMARY KEY, path VARCHAR(2048) , length BIGINT, type BIGINT, fid varchar(32), session BIGINT);");// 本地要被上传的
+		executeSQL("CREATE TABLE localfile (id varchar(36) PRIMARY KEY,path VARCHAR(2048), length BIGINT, isdir Tinyint, fid varchar(32), session BIGINT);"); // 本地文件记录
+		executeSQL("CREATE TABLE localdelete (id VARCHAR(36) PRIMARY KEY, path VARCHAR(2048) , length BIGINT, isdir Tinyint, fid varchar(32), session BIGINT);");// 本地被删除了
+		executeSQL("CREATE TABLE localupload (id VARCHAR(36) PRIMARY KEY, path VARCHAR(2048) , length BIGINT, isdir Tinyint, fid varchar(32), session BIGINT);");// 本地要被上传的
 
-		executeSQL("CREATE TABLE cloudfile (id VARCHAR(36) PRIMARY KEY, path VARCHAR(2048) , length BIGINT, type BIGINT, fid varchar(32), md5 varchar(32), session BIGINT);");
-		executeSQL("CREATE TABLE clouddelete (id VARCHAR(36) PRIMARY KEY,path VARCHAR(2048) , length BIGINT, type BIGINT, fid varchar(32), md5 varchar(32), session BIGINT);");
-		executeSQL("CREATE TABLE clouddownload (id VARCHAR(36) PRIMARY KEY,path VARCHAR(2048) , length BIGINT, type BIGINT, fid varchar(32), md5 varchar(32), session BIGINT);");
+		executeSQL("CREATE TABLE cloudfile (id VARCHAR(36) PRIMARY KEY, path VARCHAR(2048) , length BIGINT, isdir Tinyint, fid varchar(32), md5 varchar(32), session BIGINT);");
+		executeSQL("CREATE TABLE clouddelete (id VARCHAR(36) PRIMARY KEY,path VARCHAR(2048) , length BIGINT, isdir Tinyint, fid varchar(32), md5 varchar(32), session BIGINT);");
+		executeSQL("CREATE TABLE clouddownload (id VARCHAR(36) PRIMARY KEY,path VARCHAR(2048) , length BIGINT, isdir Tinyint, fid varchar(32), md5 varchar(32), session BIGINT);");
 
 		executeSQL("CREATE TABLE cloudhistory (id int PRIMARY KEY AUTO_INCREMENT, time BIGINT );");
 		executeSQL("CREATE TABLE localhistory (id int PRIMARY KEY AUTO_INCREMENT, time BIGINT );");

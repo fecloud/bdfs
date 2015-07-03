@@ -24,9 +24,9 @@ public class UploadLocalFileExecute extends TaskExecute {
 	Logger logger = Logger.getLogger(UploadLocalFileExecute.class
 			.getSimpleName());
 
-	private long session = System.currentTimeMillis();
-
 	private LocalFileDao localFileDao;
+	
+	private long session;
 
 	public UploadLocalFileExecute(TaskStatus taskStatus,
 			TaskContainer taskContainer, LocalFileDao localFileDao) {
@@ -66,6 +66,7 @@ public class UploadLocalFileExecute extends TaskExecute {
 			while (fileChannel.read(buffer) == 4) {
 				buffer.flip();
 				pareOnce(fileChannel, buffer.getInt());
+				buffer.clear();
 			}
 			in.close();
 			localFileDao.insertAllCacaheFlush();
@@ -91,13 +92,17 @@ public class UploadLocalFileExecute extends TaskExecute {
 				buffer.position(buffer.position() + len);
 				file.setLength(buffer.getLong());
 				file.setDir(buffer.get() == 0x1 ? true : false);
+				file.toFid();
+				file.setSession(session);
 				localFileDao.insertCache(file);
 			}
 		}
 	}
 
 	private void setLocalfileSession() {
-		System.setProperty(Const.LOCALLIST_SESSION, "" + session);
+		session = System.currentTimeMillis();
+		System.setProperty(Const.LOCALLIST_SESSION,
+				"" + session);
 	}
 
 	private boolean compare() {

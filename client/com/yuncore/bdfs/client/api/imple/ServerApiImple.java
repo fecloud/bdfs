@@ -54,7 +54,7 @@ public class ServerApiImple implements ServerApi {
 							&& object.getInt("code") == HttpURLConnection.HTTP_OK
 							&& object.has("data")) {
 						final BDFSFile cloudFile = new BDFSFile();
-						cloudFile.formJOSN(object.getString("data"));
+						cloudFile.formJOSN(object.getJSONObject("data"));
 						return cloudFile;
 					}
 				}

@@ -78,7 +78,7 @@ public class CloudCompareDao extends LocalCompareDao {
 	
 	@Override
 	protected String getCopyTableDataSql() {
-		return "INSERT INTO %s SELECT id,dir,name,length,type,fid,md5,session FROM %s";
+		return "INSERT INTO %s SELECT id,path,length,isdir,fid,md5,session FROM %s";
 	}
 
 }

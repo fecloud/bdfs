@@ -1,9 +1,9 @@
 package com.yuncore.bdfs.server.dao;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 
@@ -29,7 +29,7 @@ public class LocalFileDao extends BaseDao {
 		if (size == 0) {
 			insert = new StringBuilder(
 					String.format(
-							"INSERT INTO %s (id,dir,name,length,type,fid,session) VALUES ",
+							"INSERT INTO %s (id,path,length,isdir,fid,session) VALUES ",
 							getTableName()));
 		}
 		if (size != 0) {
@@ -73,13 +73,12 @@ public class LocalFileDao extends BaseDao {
 			stopwatch.start();
 			final Connection connection = getDB();
 
-			final PreparedStatement prepareStatement = connection
-					.prepareStatement(insert.toString());
+			final Statement prepareStatement = connection
+					.createStatement();
 			connection.setAutoCommit(false);
 
-			final boolean result = prepareStatement.executeUpdate() == size;
+			final boolean result = prepareStatement.executeUpdate(insert.toString()) == size;
 			connection.commit();
-			prepareStatement.clearBatch();
 			prepareStatement.close();
 
 			connection.setAutoCommit(true);
