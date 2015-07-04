@@ -47,8 +47,8 @@ public class GetCloudFileExecute extends TaskExecute {
 		try {
 			final CloudPageFile listFiles = new FSApiImple().list(fileTask
 					.getDir());
-			if (listFiles != null && listFiles.getErrno() == 0) {
-				if (!listFiles.getList().isEmpty()) {
+			if (listFiles != null) {
+				if (listFiles.getErrno() == 0 && !listFiles.getList().isEmpty()) {
 					cloudFileDao.insertAllCacahe(listFiles.getList());
 					for (CloudFile f : listFiles.getList()) {
 						if (f.isDirectory()) {
@@ -57,12 +57,17 @@ public class GetCloudFileExecute extends TaskExecute {
 									.getAbsolutePath()));
 						}
 					}
+				} else if (listFiles.getErrno() == -9) {
+					logger.warn("dir:" + fileTask.getDir() + " is not exits"); // 目录不存在了
+				} else {
+					logger.warn("CloudPageFile listFiles error:"
+							+ listFiles.getErrno());
+					// 因为某种原因没有取得成功
+					taskContainer.addTask(task);
 				}
 
 			} else {
-				logger.warn("CloudPageFile listFiles erro:" + listFiles != null ? listFiles
-						.getErrno() : "null" );
-				logger.warn("dir:" + fileTask.getDir());
+				logger.warn("CloudPageFile listFiles null");
 				// 因为某种原因没有取得成功
 				taskContainer.addTask(task);
 			}
