@@ -48,7 +48,7 @@ public class GetCloudFileExecute extends TaskExecute {
 			final CloudPageFile listFiles = new FSApiImple().list(fileTask
 					.getDir());
 			if (listFiles != null) {
-				if (listFiles.getErrno() == 0 && !listFiles.getList().isEmpty()) {
+				if (listFiles.getErrno() == 0 && listFiles.getList() != null) {
 					cloudFileDao.insertAllCacahe(listFiles.getList());
 					for (CloudFile f : listFiles.getList()) {
 						if (f.isDirectory()) {
