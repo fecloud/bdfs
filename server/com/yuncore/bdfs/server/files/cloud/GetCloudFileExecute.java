@@ -61,7 +61,8 @@ public class GetCloudFileExecute extends TaskExecute {
 
 			} else {
 				logger.warn("CloudPageFile listFiles erro:" + listFiles != null ? listFiles
-						.getErrno() : "null");
+						.getErrno() : "null" );
+				logger.warn("dir:" + fileTask.getDir());
 				// 因为某种原因没有取得成功
 				taskContainer.addTask(task);
 			}
