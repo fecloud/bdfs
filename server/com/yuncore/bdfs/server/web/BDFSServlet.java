@@ -36,6 +36,7 @@ import com.yuncore.bdfs.server.dao.CloudHistoryDao;
 import com.yuncore.bdfs.server.dao.CookieDao;
 import com.yuncore.bdfs.server.dao.DownloadDao;
 import com.yuncore.bdfs.server.dao.LocalHistoryDao;
+import com.yuncore.bdfs.server.dao.UploadDao;
 import com.yuncore.bdfs.server.device.DeviceList;
 import com.yuncore.bdfs.server.files.local.UploadLocalFile;
 import com.yuncore.bdfs.util.DateUtil;
@@ -112,7 +113,11 @@ public class BDFSServlet extends HttpServlet {
 			getDownLoad(object);
 		} else if (action.equals("deldownload")) {
 			delDownLoad(req, object);
-		} else if (action.equals("getclouddelete")) {
+		} else if (action.equals("getupload")){
+			getUpLoad(object);
+		} else if (action.equals("deldownload")) {
+			delUpLoad(req, object);
+		}else if (action.equals("getclouddelete")) {
 			getCloudDelete(object);
 		} else if (action.equals("delclouddelete")) {
 			delCloudDelete(req, object);
@@ -294,6 +299,19 @@ public class BDFSServlet extends HttpServlet {
 			final boolean delete = new DownloadDao().delete(id);
 			object.put("code", 200);
 			object.put("data", delete);
+			
+		}
+	}
+	
+	private void delUpLoad(HttpServletRequest req, JSONObject object) {
+		final String id = req.getParameter("id");
+		if (id == null) {
+			object.put("code", 500);
+			object.put("msg", "not found id");
+		} else {
+			final boolean delete = new UploadDao().delete(id);
+			object.put("code", 200);
+			object.put("data", delete);
 
 		}
 	}
@@ -332,6 +350,19 @@ public class BDFSServlet extends HttpServlet {
 	private void getDownLoad(JSONObject object) {
 		object.put("code", 200);
 		final BDFSFile file = new DownloadDao().query();
+		if (null != file) {
+			final JSONObject fileoObject = new JSONObject();
+			file.toJSON(fileoObject);
+			object.put("data", fileoObject);
+		}
+	}
+	
+	/**
+	 * 取一个下载任务
+	 */
+	private void getUpLoad(JSONObject object) {
+		object.put("code", 200);
+		final BDFSFile file = new UploadDao().query();
 		if (null != file) {
 			final JSONObject fileoObject = new JSONObject();
 			file.toJSON(fileoObject);
