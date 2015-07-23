@@ -27,6 +27,7 @@ import org.json.JSONObject;
 
 import com.yuncore.bdfs.entity.Account;
 import com.yuncore.bdfs.entity.BDFSFile;
+import com.yuncore.bdfs.entity.Device;
 import com.yuncore.bdfs.entity.History;
 import com.yuncore.bdfs.server.BDFSServer;
 import com.yuncore.bdfs.server.dao.AccountDao;
@@ -35,6 +36,7 @@ import com.yuncore.bdfs.server.dao.CloudHistoryDao;
 import com.yuncore.bdfs.server.dao.CookieDao;
 import com.yuncore.bdfs.server.dao.DownloadDao;
 import com.yuncore.bdfs.server.dao.LocalHistoryDao;
+import com.yuncore.bdfs.server.device.DeviceList;
 import com.yuncore.bdfs.server.files.local.UploadLocalFile;
 import com.yuncore.bdfs.util.DateUtil;
 import com.yuncore.bdfs.util.FileGzip;
@@ -127,14 +129,34 @@ public class BDFSServlet extends HttpServlet {
 			cloudHistory(req, object);
 		} else if (action.equals("localhistory")) {
 			localHistory(req, object);
+		} else if (action.equals("devices")) {
+			/*devices(req, object);*/
 		} else {
 			object.put("code", 500);
 			object.put("msg", "not support");
 		}
 		resp.setContentType("application/json;charset=UTF-8");
-		resp.getOutputStream().write(Gzip.gzip(object.toString().getBytes()));
+		resp.getOutputStream().write(Gzip.gzip(object.toString().getBytes("UTF-8")));
 	}
 
+	/**
+	 * 取在线的设备
+	 * 
+	 * @param req
+	 * @param object
+	 
+	private void devices(HttpServletRequest req, JSONObject object) {
+		final JSONArray array = new JSONArray();
+		final List<Device> list = DeviceList.getAll();
+		JSONObject jsonObject = null;
+		for (Device s : list) {
+			jsonObject = new JSONObject();
+			s.toJSON(jsonObject);
+			array.put(jsonObject);
+		}
+		object.put("data", array);
+	}
+*/
 	private void dispathUploadCookie(HttpServletRequest req,
 			HttpServletResponse resp, JSONObject object) {
 		final int contentLength = req.getContentLength();
