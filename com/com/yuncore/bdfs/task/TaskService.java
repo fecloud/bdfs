@@ -65,7 +65,7 @@ public abstract class TaskService implements ContainerListener, OnStatusChange {
 
 	@Override
 	public synchronized void onSame(int taskSize, int status) {
-		if (taskSize == threads && status == 0) {
+		if (taskSize <= threads && status == 0) {
 			notifyAll();
 		}
 	}
