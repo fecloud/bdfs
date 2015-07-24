@@ -1,16 +1,20 @@
 package com.yuncore.bdfs.server.db;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
 public class DBHelper {
 
+	protected Properties properties = new Properties();
+	
 	Logger logger = Logger.getLogger(DBHelper.class.getSimpleName());
 
 	private static final int DB_VERSION = 1;
@@ -18,9 +22,14 @@ public class DBHelper {
 	public DBHelper() {
 
 		try {
+			properties.load(getClass().getResourceAsStream("/jdbc.properties"));
+			final String url = properties.getProperty("url");
+			logger.debug("DBHelper getConnection url:" + url);
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
 			logger.error("DBHelper Class.forName(\"com.mysql.jdbc.Driver\")", e);
+		} catch (IOException e) {
+			logger.error("DBHelper load jdbc.properties error)", e);
 		}
 
 		try {
@@ -42,10 +51,7 @@ public class DBHelper {
 
 	public synchronized Connection getConnection() {
 		try {
-
-			final String url = "jdbc:mysql://rds6v2uvvrennaa.mysql.rds.aliyuncs.com:3306/db7k81jhgfm13wla?user=db7k81jhgfm13wla&password=ouyangfeng";
-//			 final String url = "jdbc:mysql://localhost:3306/fcloud?user=root&password=root&useUnicode=true&characterEncoding=UTF-8";
-			// final String url = "jdbc:mysql://10.0.0.8:3306/bdfs?user=root&password=fcloud&useUnicode=true&characterEncoding=UTF-8";
+			final String url = properties.getProperty("url");
 			final Connection conn = DriverManager.getConnection(url);
 			return conn;
 		} catch (Exception e) {

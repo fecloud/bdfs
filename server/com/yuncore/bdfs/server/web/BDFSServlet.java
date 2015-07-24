@@ -115,7 +115,7 @@ public class BDFSServlet extends HttpServlet {
 			delDownLoad(req, object);
 		} else if (action.equals("getupload")){
 			getUpLoad(object);
-		} else if (action.equals("deldownload")) {
+		} else if (action.equals("delupload")) {
 			delUpLoad(req, object);
 		}else if (action.equals("getclouddelete")) {
 			getCloudDelete(object);

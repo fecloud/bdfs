@@ -6,6 +6,7 @@ package com.yuncore.bdfs.server.files.cloud;
 import org.apache.log4j.Logger;
 
 import com.yuncore.bdfs.exception.ApiException;
+import com.yuncore.bdfs.http.cookie.AppCookieContainer;
 import com.yuncore.bdfs.server.api.imple.FSApiImple;
 import com.yuncore.bdfs.server.dao.CloudFileDao;
 import com.yuncore.bdfs.server.entity.CloudFile;
@@ -60,6 +61,11 @@ public class GetCloudFileExecute extends TaskExecute {
 				} else if (listFiles.getErrno() == -9) {
 					logger.warn("dir:" + fileTask.getDir() + " is not exits"); // 目录不存在了
 				} else {
+					if (listFiles.getErrno() == -6) {
+						logger.warn("cookie problem"); // cookie有错误
+						System.setProperty(AppCookieContainer.COOKIE_LOAD,
+								"false");
+					}
 					logger.warn("CloudPageFile listFiles error:"
 							+ listFiles.getErrno());
 					// 因为某种原因没有取得成功
