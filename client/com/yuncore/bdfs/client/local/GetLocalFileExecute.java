@@ -3,6 +3,7 @@ package com.yuncore.bdfs.client.local;
 import java.util.List;
 
 import com.yuncore.bdfs.client.Const;
+import com.yuncore.bdfs.client.util.FileExclude;
 import com.yuncore.bdfs.client.util.FileListWrite;
 import com.yuncore.bdfs.client.util.FileUtil;
 import com.yuncore.bdfs.entity.BDFSFile;

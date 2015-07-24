@@ -68,10 +68,10 @@ public class ServerApiImple implements ServerApi {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.yuncore.bdfs.api.ServerApi#deldownload(java.lang.String)
+	 * @see com.yuncore.bdfs.api.ServerApi#delDownload(java.lang.String)
 	 */
 	@Override
-	public boolean deldownload(String id) throws ServerApiException {
+	public boolean delDownload(String id) throws ServerApiException {
 		try {
 			Http http = new Http(String.format("%s?action=%s&id=%s",
 					Const.SERVER_ADD, "deldownload", id), Method.GET);
@@ -87,7 +87,7 @@ public class ServerApiImple implements ServerApi {
 				}
 			}
 		} catch (Exception e) {
-			throw new ServerApiException("deldownload error", e);
+			throw new ServerApiException("delDownload error", e);
 		}
 		return false;
 	}
@@ -110,6 +110,52 @@ public class ServerApiImple implements ServerApi {
 			}
 		} catch (Exception e) {
 			throw new ServerApiException("uploadlocal error", e);
+		}
+		return false;
+	}
+
+	@Override
+	public BDFSFile getUpload() throws ServerApiException {
+		try {
+			Http http = new Http(String.format("%s?action=%s",
+					Const.SERVER_ADD, "getupload"), Method.GET);
+			if (http.http()) {
+				final String result = http.result();
+				if (null != result) {
+					final JSONObject object = new JSONObject(result);
+					if (object.has("code")
+							&& object.getInt("code") == HttpURLConnection.HTTP_OK
+							&& object.has("data")) {
+						final BDFSFile cloudFile = new BDFSFile();
+						cloudFile.formJOSN(object.getJSONObject("data"));
+						return cloudFile;
+					}
+				}
+			}
+		} catch (Exception e) {
+			throw new ServerApiException("getUpload error", e);
+		}
+		return null;
+	}
+
+	@Override
+	public boolean delUpload(String id) throws ServerApiException {
+		try {
+			Http http = new Http(String.format("%s?action=%s&id=%s",
+					Const.SERVER_ADD, "delupload", id), Method.GET);
+			if (http.http()) {
+				final String result = http.result();
+				if (null != result) {
+					final JSONObject object = new JSONObject(result);
+					if (object.has("code")
+							&& object.getInt("code") == HttpURLConnection.HTTP_OK
+							&& object.has("data")) {
+						return object.getBoolean("data");
+					}
+				}
+			}
+		} catch (Exception e) {
+			throw new ServerApiException("delUpload error", e);
 		}
 		return false;
 	}

@@ -1,7 +1,9 @@
 package com.yuncore.bdfs.client.api.imple;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URLEncoder;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -20,9 +22,12 @@ import com.yuncore.bdfs.client.util.Log;
 import com.yuncore.bdfs.entity.BDFSFile;
 import com.yuncore.bdfs.exception.ApiException;
 import com.yuncore.bdfs.http.Http.Method;
+import com.yuncore.bdfs.http.cookie.HttpCookieContainer;
 import com.yuncore.bdfs.http.Http;
+import com.yuncore.bdfs.http.HttpFormOutput;
 import com.yuncore.bdfs.http.HttpInput;
 import com.yuncore.bdfs.util.DateUtil;
+import com.yuncore.bdfs.util.MD5;
 
 public class FSApiImple implements FSApi {
 
@@ -137,6 +142,8 @@ public class FSApiImple implements FSApi {
 
 	@Override
 	public boolean login(String username, String password) throws ApiException {
+		Log.w(TAG,
+				String.format("use name:%s pwd:%s login", username, password));
 		// 1.判断是否登录
 		if (islogin()) {
 			return true;
@@ -195,8 +202,10 @@ public class FSApiImple implements FSApi {
 		}
 		if (DEBUG)
 			Log.d(TAG, "loginresult :" + loginresult);
-
-		return true;
+		if (loginresult.contains("err_no=0")) {
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -321,6 +330,67 @@ public class FSApiImple implements FSApi {
 			}
 		} catch (IOException e) {
 			throw new ApiException("search error", e);
+		}
+		return false;
+	}
+
+	@Override
+	public boolean upload(String filename, String dir) throws ApiException {
+		try {
+			if (context.load()) {
+				final String BDUSS = HttpCookieContainer.getInstance()
+						.getCookie("BDUSS").getValue();
+				final String url = BDFSURL.getuploadfile(
+						URLEncoder.encode(dir, "UTF-8"),
+						new File(filename).getName(), BDUSS);
+
+				final HttpFormOutput http = new HttpFormOutput(url, filename);
+				if (http.http()) {
+					Log.i(TAG, String.format("upload result:%s", http.result()));
+					final String resultString = http.result();
+					final JSONObject object = new JSONObject(resultString);
+					if (object.has("md5")) {
+						return true;
+					}
+
+				}
+
+			}
+		} catch (Exception e) {
+			throw new ApiException("upload error", e);
+		}
+		return false;
+	}
+
+	@Override
+	public boolean secondUpload(String filename, String dir)
+			throws ApiException {
+		try {
+			if (context.load()) {
+				final String BDUSS = HttpCookieContainer.getInstance()
+						.getCookie("BDUSS").getValue();
+				final String bdstoken = context.getProperty("MYBDSTOKEN", "");
+				final File file = new File(filename);
+				final String content_md5 = MD5.md5File(filename);
+				final String slice_md5 = MD5.md5File(filename, RAPIDUPLOAD);
+				final String url = BDFSURL.getsecondupload(
+						URLEncoder.encode(dir, "UTF-8"), file.getName(),
+						file.length(), content_md5, slice_md5, BDUSS, bdstoken);
+
+				final HttpFormOutput http = new HttpFormOutput(url, filename);
+				if (http.http()) {
+					Log.i(TAG, String.format("upload result:%s", http.result()));
+					final String resultString = http.result();
+					final JSONObject object = new JSONObject(resultString);
+					if (object.has("md5")) {
+						return true;
+					}
+
+				}
+
+			}
+		} catch (Exception e) {
+			throw new ApiException("upload error", e);
 		}
 		return false;
 	}

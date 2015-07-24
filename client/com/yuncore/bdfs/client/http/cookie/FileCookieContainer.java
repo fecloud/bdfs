@@ -12,7 +12,6 @@ import com.yuncore.bdfs.http.cookie.Cookie;
 
 public class FileCookieContainer extends AppCookieContainer {
 
-	private volatile boolean load;
 
 	private String filename = System.getProperty("java.io.tmpdir")
 			+ File.separator + "cookie.json";
@@ -77,16 +76,13 @@ public class FileCookieContainer extends AppCookieContainer {
 	}
 
 	@Override
-	public boolean save() {
+	public boolean saveTo() {
 		return saveToFile();
 	}
-
+	
 	@Override
-	public boolean read() {
-		if (!load) {
-			load = formFile();
-		}
-		return load;
+	protected boolean readForm() {
+		return formFile();
 	}
 
 }

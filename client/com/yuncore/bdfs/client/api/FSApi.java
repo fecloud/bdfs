@@ -9,6 +9,10 @@ import com.yuncore.bdfs.exception.ApiException;
 public interface FSApi {
 
 	/**
+	 * 分块上传块大小
+	 */
+	int RAPIDUPLOAD = (256 * 1024);
+	/**
 	 * 登录
 	 * 
 	 * @param username
@@ -47,5 +51,23 @@ public interface FSApi {
 	 * @return
 	 */
 	public Map<String, String> diskHomePage() throws ApiException;
+	
+	/**
+	 * 上传文件
+	 * @param filename 本地文件路径
+	 * @param dir 服务器路径
+	 * @return
+	 * @throws ApiException
+	 */
+	public boolean upload(String filename,String dir)throws ApiException;
+	
+	/**
+	 * 秒传
+	 * @param filename 本地文件路径
+	 * @param dir 服务器路径
+	 * @return
+	 * @throws ApiException
+	 */
+	public boolean secondUpload(String filename,String dir)throws ApiException;
 
 }

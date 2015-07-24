@@ -35,7 +35,7 @@ public class UploadLocalFileList extends Thread {
 				Log.e(TAG, "", e);
 			}
 			try {
-				Thread.sleep(60000);
+				Thread.sleep(300000);
 			} catch (InterruptedException e) {
 				Log.e(TAG, "", e);
 			}

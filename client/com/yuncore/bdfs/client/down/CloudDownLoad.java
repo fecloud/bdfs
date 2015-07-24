@@ -2,11 +2,14 @@ package com.yuncore.bdfs.client.down;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.yuncore.bdfs.client.api.FSApi;
 import com.yuncore.bdfs.client.api.ServerApi;
 import com.yuncore.bdfs.client.api.imple.FSApiImple;
 import com.yuncore.bdfs.client.api.imple.ServerApiImple;
+import com.yuncore.bdfs.client.util.BDFSFileExclude;
 import com.yuncore.bdfs.client.util.DownloadInputStream;
 import com.yuncore.bdfs.client.util.FileMV;
 import com.yuncore.bdfs.client.util.Log;
@@ -18,6 +21,8 @@ public class CloudDownLoad extends Thread {
 	static final String TAG = "CloudDownLoad";
 
 	private volatile boolean falg;
+
+	private BDFSFileExclude exclude;
 
 	private ServerApi serverApi;
 
@@ -37,7 +42,24 @@ public class CloudDownLoad extends Thread {
 		if (!file.exists()) {
 			file.mkdirs();
 		}
+		exclude = new CloudDownFileExclude();
+	}
 
+	/**
+	 * 添加要过滤的目录或者文件
+	 * 
+	 * @param file
+	 */
+	public synchronized void addExclude(List<String> files) {
+		final List<String> list = new ArrayList<String>();
+		String filename = null;
+		for (String f : files) {
+			filename = "/" + f;
+			if (!list.contains(filename)) {
+				list.add(filename);
+			}
+		}
+		exclude.addExclude(list);
 	}
 
 	@Override
@@ -51,7 +73,14 @@ public class CloudDownLoad extends Thread {
 		while (falg) {
 			cloudFile = getDownLoad();
 			if (cloudFile != null) {
-//				downloaded = downloadFile(cloudFile);
+				Log.i(TAG, "getDownLoad " + cloudFile.getAbsolutePath());
+				// 检查是否是排除下载的目录
+				if (isExclude(cloudFile)) {
+					downloaded = true;
+				} else {
+					downloaded = downloadFile(cloudFile);
+				}
+				// 删除下载任务
 				if (downloaded) {
 					delDownLoad(cloudFile);
 				}
@@ -69,18 +98,18 @@ public class CloudDownLoad extends Thread {
 		try {
 			return serverApi.getDownload();
 		} catch (ServerApiException e) {
-			Log.e(TAG, "CloudDownLoad getDownLoad error", e);
+			Log.e(TAG, "getDownLoad error", e);
 		}
 		return null;
 	}
 
 	private void delDownLoad(BDFSFile cloudFile) {
 		try {
-			if (serverApi.deldownload(cloudFile.getId())) {
+			if (serverApi.delDownload(cloudFile.getId())) {
 				Log.i(TAG, "delDownLoad " + cloudFile.getAbsolutePath());
 			}
 		} catch (ServerApiException e) {
-			Log.e(TAG, "CloudDownLoad getDownLoad error", e);
+			Log.e(TAG, "delDownload error", e);
 		}
 	}
 
@@ -97,8 +126,10 @@ public class CloudDownLoad extends Thread {
 			if (targetFile.isFile()) {
 				if (cloudFile.isFile()
 						&& cloudFile.getLength() == targetFile.length()) {
+					Log.i(TAG, "file local exists");
 					return true;
 				} else {
+					Log.i(TAG, "file local exists but length not equals");
 					targetFile.delete();
 					return false;
 				}
@@ -208,6 +239,18 @@ public class CloudDownLoad extends Thread {
 		} else {
 			return -1;
 		}
+	}
+
+	/**
+	 * 检查并排除目录
+	 * 
+	 * @param files
+	 */
+	private boolean isExclude(BDFSFile f) {
+		if (exclude.rmExclude(f.getAbsolutePath())) {
+			return true;
+		}
+		return false;
 	}
 
 }

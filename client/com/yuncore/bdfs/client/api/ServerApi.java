@@ -38,6 +38,25 @@ public interface ServerApi {
 	 * @return
 	 * @throws ServerApiException
 	 */
-	boolean deldownload(String id) throws ServerApiException;
+	boolean delDownload(String id) throws ServerApiException;
+	
+	/**
+	 * 取一个本地上传的文件
+	 * 
+	 * @return
+	 * @throws ServerApiException
+	 */
+	BDFSFile getUpload() throws ServerApiException;
+
+	/**
+	 * 删除一个本地上传的文件
+	 * 
+	 * @param id
+	 * @return
+	 * @throws ServerApiException
+	 */
+	boolean delUpload(String id) throws ServerApiException;
+	
+	
 
 }

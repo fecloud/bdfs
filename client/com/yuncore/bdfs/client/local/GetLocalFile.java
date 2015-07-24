@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.yuncore.bdfs.client.Const;
+import com.yuncore.bdfs.client.util.BDFSFileExclude;
 import com.yuncore.bdfs.client.util.FileListWrite;
 import com.yuncore.bdfs.client.util.Log;
 import com.yuncore.bdfs.task.TaskExecute;
@@ -16,7 +17,7 @@ public class GetLocalFile extends TaskService {
 	static final String TAG = "GetLocalFile";
 	private File dir;
 
-	private LocalFileExclude exclude;
+	private BDFSFileExclude exclude;
 
 	private String outFilename = System.getProperty("java.io.tmpdir")
 			+ File.separator + "localfiles";
@@ -25,7 +26,7 @@ public class GetLocalFile extends TaskService {
 
 	public GetLocalFile(int threads, String dir) {
 		this.threads = threads;
-		exclude = new LocalFileExclude();
+		exclude = new BDFSFileExclude();
 		this.dir = new File(dir);
 
 		try {

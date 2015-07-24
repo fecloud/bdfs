@@ -7,6 +7,7 @@ import java.util.List;
 import com.yuncore.bdfs.client.app.ClientContext;
 import com.yuncore.bdfs.client.down.CloudDownLoad;
 import com.yuncore.bdfs.client.http.cookie.MemCookieContainer;
+import com.yuncore.bdfs.client.upload.LocalUpload;
 import com.yuncore.bdfs.client.util.Log;
 
 public class Sync implements Runnable {
@@ -15,11 +16,15 @@ public class Sync implements Runnable {
 
 	private Thread pcsSyncThread;
 
-	private List<String> excludeFiles = new ArrayList<String>();
+	private List<String> localExcludeFiles = new ArrayList<String>();
+	
+	private List<String> cloudExcludeFiles = new ArrayList<String>();
 
 	private UploadLocalFileList uploadLocalFileList;
 
 	private CloudDownLoad cloudDownLoad;
+	
+	private LocalUpload localUpload;
 
 	public Sync(String[] args) {
 		syncdir = args[1];
@@ -27,10 +32,17 @@ public class Sync implements Runnable {
 	}
 
 	private void addExcludeFiles(String[] args) {
-		excludeFiles.add(Const.TMP_DIR);
-		if (args.length > 2) {
-			for (int i = 1; i < args.length; i++) {
-				excludeFiles.add(args[i]);
+		localExcludeFiles.add(Const.TMP_DIR);
+		if (args.length > 3) {
+			List<String> to = null;
+			for (int i = 2; i < args.length; i++) {
+				if (args[i].equals("-l")) {
+					to = localExcludeFiles;
+				} else if (args[i].equals("-c")) {
+					to = cloudExcludeFiles;
+				} else {
+					to.add(args[i]);
+				}
 			}
 		}
 	}
@@ -54,16 +66,25 @@ public class Sync implements Runnable {
 	}
 
 	private void startCoreService() {
+		
 		if (null == uploadLocalFileList) {
-			uploadLocalFileList = new UploadLocalFileList(excludeFiles);
+			uploadLocalFileList = new UploadLocalFileList(localExcludeFiles);
 			uploadLocalFileList.start();
 		}
 		if (null == cloudDownLoad) {
 			cloudDownLoad = new CloudDownLoad(
 					System.getProperty(Const.SYNCDIR),
 					System.getProperty(Const.TMP));
+			cloudDownLoad.addExclude(cloudExcludeFiles);
 			cloudDownLoad.start();
 		}
+		
+		if(null == localUpload){
+			localUpload = new LocalUpload(System.getProperty(Const.SYNCDIR),
+					System.getProperty(Const.TMP));
+			localUpload.start();
+		}
+		
 	}
 
 	public void start() {

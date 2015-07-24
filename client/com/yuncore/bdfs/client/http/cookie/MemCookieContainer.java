@@ -17,40 +17,6 @@ public class MemCookieContainer extends AppCookieContainer {
 
 	static final String TAG = "MemCookieContainer";
 
-	@Override
-	public boolean save() {
-		return true;
-	}
-
-	@Override
-	public boolean read() {
-		boolean load = Boolean.parseBoolean(System.getProperty("CookieLoader",
-				"false"));
-		if (!load) {
-
-			final String result = fromServerCookie();
-			if (result != null) {
-				final JSONObject object = new JSONObject(result);
-				if (object.has("code")
-						&& object.getInt("code") == HttpURLConnection.HTTP_OK) {
-					final JSONArray cookies = object.getJSONArray("data");
-					if (cookies != null && cookies.length() > 0) {
-						Cookie cookie = null;
-						for (int i = 0; i < cookies.length(); i++) {
-							cookie = new Cookie();
-							cookie.formJOSN(cookies.getJSONObject(i));
-							this.cookies.add(cookie);
-						}
-
-					}
-					load = true;
-					System.setProperty("CookieLoader", "true");
-				}
-			}
-		}
-		return load;
-	}
-
 	private String fromServerCookie() {
 		String result = null;
 		try {
@@ -83,6 +49,33 @@ public class MemCookieContainer extends AppCookieContainer {
 			Log.e(TAG, "fromServerCookie error");
 		}
 		return result;
+	}
+
+	@Override
+	protected boolean readForm() {
+		final String result = fromServerCookie();
+		if (result != null) {
+			final JSONObject object = new JSONObject(result);
+			if (object.has("code")
+					&& object.getInt("code") == HttpURLConnection.HTTP_OK) {
+				final JSONArray cookies = object.getJSONArray("data");
+				if (cookies != null && cookies.length() > 0) {
+					Cookie cookie = null;
+					for (int i = 0; i < cookies.length(); i++) {
+						cookie = new Cookie();
+						cookie.formJOSN(cookies.getJSONObject(i));
+						this.cookies.add(cookie);
+					}
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	@Override
+	protected boolean saveTo() {
+		return true;
 	}
 
 }

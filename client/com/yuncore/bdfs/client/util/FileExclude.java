@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.yuncore.bdfs.client.local;
+package com.yuncore.bdfs.client.util;
 
 import java.util.List;
 
