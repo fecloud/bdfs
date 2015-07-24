@@ -7,6 +7,30 @@ import java.security.MessageDigest;
 public class MD5 {
 
 	/**
+	 * 字节数组转换为 十六进制数组
+	 * 
+	 * @param bytes
+	 * @return
+	 */
+	private static final String bytes2String(byte[] bytes) {
+		if (bytes == null) {
+			return "";
+		}
+		final StringBuilder hexString = new StringBuilder();
+		String shaHex = null;
+		int one = 0x0;
+		for (int i = 0; i < bytes.length; i++) {
+			one = bytes[i] & 0xFF;
+			if (one <= 0x10) {
+				hexString.append("0");
+			}
+			shaHex = Integer.toHexString(one);
+			hexString.append(shaHex);
+		}
+		return hexString.toString();
+	}
+
+	/**
 	 * md5加密
 	 * 
 	 * @param s
@@ -16,19 +40,12 @@ public class MD5 {
 		try {
 			byte[] btInput = s.getBytes();
 			// 获得MD5摘要算法的 MessageDigest 对象
-			MessageDigest mdInst = MessageDigest.getInstance("MD5");
+			MessageDigest digest = MessageDigest.getInstance("MD5");
 			// 使用指定的字节更新摘要
-			mdInst.update(btInput);
+			digest.update(btInput);
 			// 获得密文
-			byte[] md = mdInst.digest();
-			final StringBuilder hexString = new StringBuilder();
-			// 字节数组转换为 十六进制 数
-			String shaHex = null;
-			for (int i = 0; i < md.length; i++) {
-				shaHex = Integer.toHexString(md[i] & 0xFF);
-				hexString.append(shaHex);
-			}
-			return hexString.toString();
+			final byte[] md = digest.digest();
+			return bytes2String(md);
 		} catch (Exception e) {
 			return null;
 		}
@@ -56,14 +73,7 @@ public class MD5 {
 
 				// 获得密文
 				final byte[] md = digest.digest();
-				final StringBuilder hexString = new StringBuilder();
-				// 字节数组转换为 十六进制 数
-				String shaHex = null;
-				for (int i = 0; i < md.length; i++) {
-					shaHex = Integer.toHexString(md[i] & 0xFF);
-					hexString.append(shaHex);
-				}
-				return hexString.toString();
+				return bytes2String(md);
 			} catch (Exception e) {
 			}
 		}
@@ -94,19 +104,15 @@ public class MD5 {
 						digest.update(buffer, 0, unRead);
 					}
 					unRead -= len;
+					if (unRead <= 0) {
+						break;
+					}
 				}
 				in.close();
 
 				// 获得密文
 				final byte[] md = digest.digest();
-				final StringBuilder hexString = new StringBuilder();
-				// 字节数组转换为 十六进制 数
-				String shaHex = null;
-				for (int i = 0; i < md.length; i++) {
-					shaHex = Integer.toHexString(md[i] & 0xFF);
-					hexString.append(shaHex);
-				}
-				return hexString.toString();
+				return bytes2String(md);
 			} catch (Exception e) {
 			}
 		}

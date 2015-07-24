@@ -22,7 +22,7 @@ public class LocalHistoryDao extends BaseDao {
 	}
 
 	public synchronized boolean insert() {
-		String sql = String.format("INSERT INTO %S (time) VALUES (?)",
+		String sql = String.format("INSERT INTO %s (time) VALUES (?)",
 				getTableName());
 		try {
 			final Connection connection = getDB();

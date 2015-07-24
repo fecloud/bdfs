@@ -27,7 +27,7 @@ import org.json.JSONObject;
 
 import com.yuncore.bdfs.entity.Account;
 import com.yuncore.bdfs.entity.BDFSFile;
-import com.yuncore.bdfs.entity.Device;
+//import com.yuncore.bdfs.entity.Device;
 import com.yuncore.bdfs.entity.History;
 import com.yuncore.bdfs.server.BDFSServer;
 import com.yuncore.bdfs.server.dao.AccountDao;
@@ -37,7 +37,7 @@ import com.yuncore.bdfs.server.dao.CookieDao;
 import com.yuncore.bdfs.server.dao.DownloadDao;
 import com.yuncore.bdfs.server.dao.LocalHistoryDao;
 import com.yuncore.bdfs.server.dao.UploadDao;
-import com.yuncore.bdfs.server.device.DeviceList;
+//import com.yuncore.bdfs.server.device.DeviceList;
 import com.yuncore.bdfs.server.files.local.UploadLocalFile;
 import com.yuncore.bdfs.util.DateUtil;
 import com.yuncore.bdfs.util.FileGzip;

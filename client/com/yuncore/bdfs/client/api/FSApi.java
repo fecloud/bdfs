@@ -75,7 +75,7 @@ public interface FSApi {
 	 * @return
 	 * @throws ApiException
 	 */
-	public boolean secondUpload(String filename,String dir)throws ApiException;
+	public boolean secondUpload(String localpath, String cloudpath)throws ApiException;
 	
 	/**
 	 * 

@@ -370,23 +370,25 @@ public class FSApiImple implements FSApi {
 	}
 
 	@Override
-	public boolean secondUpload(String filename, String dir)
+	public boolean secondUpload(String localpath, String cloudpath)
 			throws ApiException {
 		try {
 			if (context.load()) {
 				final String BDUSS = HttpCookieContainer.getInstance()
 						.getCookie("BDUSS").getValue();
 				final String bdstoken = context.getProperty(BDSTOKEN, "");
-				final File file = new File(filename);
-				final String content_md5 = MD5.md5File(filename);
-				final String slice_md5 = MD5.md5File(filename, RAPIDUPLOAD);
+				final File file = new File(localpath);
+				final BDFSFile cloudFile = new BDFSFile(cloudpath);
+				final String content_md5 = MD5.md5File(localpath);
+				final String slice_md5 = MD5.md5File(localpath, RAPIDUPLOAD);
 				final String url = BDFSURL.getsecondupload(
-						URLEncoder.encode(dir, "UTF-8"), file.getName(),
+						URLEncoder.encode(cloudFile.getParentPath(), "UTF-8"), URLEncoder.encode(cloudFile.getName(), "UTF-8"),
 						file.length(), content_md5, slice_md5, BDUSS, bdstoken);
 
-				final HttpFormOutput http = new HttpFormOutput(url, filename);
+				final Http http = new Http(url, Method.GET);
 				if (http.http()) {
-					Log.i(TAG, String.format("upload result:%s", http.result()));
+					if (DEBUG)
+						Log.i(TAG, String.format("upload result:%s", http.result()));
 					final String resultString = http.result();
 					final JSONObject object = new JSONObject(resultString);
 					if (object.has("md5")) {

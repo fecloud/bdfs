@@ -57,7 +57,7 @@ public class GetLocalFile extends TaskService {
 		if (dir.exists()) {
 			System.setProperty(Const.LOCALLIST_SESSION,
 					"" + System.currentTimeMillis());
-			taskContainer.addTask(new GetLocalFileTask("/"));
+			taskContainer.addTask(new GetLocalFileTask(""));
 			waitTaskFinish();
 			fileListWrite.insertAllCacaheFlush();
 			try {
@@ -93,7 +93,7 @@ public class GetLocalFile extends TaskService {
 		final List<String> list = new ArrayList<String>();
 		String filename = null;
 		for (String f : files) {
-			filename = System.getProperty("syncdir") + File.separator + f;
+			filename = "/" + f;
 			if (!list.contains(filename)) {
 				list.add(filename);
 			}

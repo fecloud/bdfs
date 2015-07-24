@@ -114,7 +114,12 @@ public class LocalUpload extends Thread {
 		final long fileLen = file.getLength();
 		// 判断是否大小分块上传的单块数,可以用秒传试一下
 		if (fileLen > FSApi.RAPIDUPLOAD) {
-			return norMalFileContext(file);
+			if(secondFileContext(file)){
+				Log.d(TAG, "secondFileContext ok");
+				return true;
+			}else {
+				return norMalFileContext(file);
+			}
 		} else {
 			return norMalFileContext(file);
 		}
@@ -127,6 +132,7 @@ public class LocalUpload extends Thread {
 	 * @return
 	 */
 	private boolean norMalFileContext(BDFSFile file) {
+		Log.d(TAG, "norMalFileContext");
 		try {
 			final String localpath = String.format("%s/%s", root,
 					file.getAbsolutePath());
@@ -135,6 +141,25 @@ public class LocalUpload extends Thread {
 		} catch (ApiException e) {
 			Log.e(TAG,
 					String.format("uploadFileContext file:%s error",
+							file.getAbsolutePath()), e);
+		}
+		return false;
+	}
+	
+	/**
+	 * 秒传文件的方式
+	 * @param file
+	 * @return
+	 */
+	private boolean secondFileContext(BDFSFile file) {
+		try {
+			final String localpath = String.format("%s/%s", root,
+					file.getAbsolutePath());
+			final String cloudpath = file.getAbsolutePath();
+			return api.secondUpload(localpath, cloudpath);
+		} catch (ApiException e) {
+			Log.e(TAG,
+					String.format("secondFileContext file:%s error",
 							file.getAbsolutePath()), e);
 		}
 		return false;
@@ -161,9 +186,9 @@ public class LocalUpload extends Thread {
 				} else if (file.isDir() && fileExists.isDir()) {
 					Log.d(TAG, String.format("%s exists cloud isdir", file.getAbsolutePath()));
 					return true;
-				}else {
-					Log.d(TAG, String.format("%s not exists cloud", file.getAbsolutePath()));
 				}
+			}else {
+				Log.d(TAG, String.format("%s not exists cloud", file.getAbsolutePath()));
 			}
 		} catch (ApiException e) {
 			Log.e(TAG, "fileExists error", e);

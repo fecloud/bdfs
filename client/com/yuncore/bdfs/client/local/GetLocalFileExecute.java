@@ -1,5 +1,6 @@
 package com.yuncore.bdfs.client.local;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.yuncore.bdfs.client.Const;
@@ -19,8 +20,8 @@ public class GetLocalFileExecute extends TaskExecute {
 	private FileExclude exclude;
 
 	private String root;
-	
-	public GetLocalFileExecute(String root,TaskStatus taskStatus,
+
+	public GetLocalFileExecute(String root, TaskStatus taskStatus,
 			TaskContainer taskContainer, FileExclude exclude,
 			FileListWrite fileListWrite) {
 		super(taskStatus, taskContainer);
@@ -31,8 +32,9 @@ public class GetLocalFileExecute extends TaskExecute {
 
 	protected void getDirFiles(GetLocalFileTask task) {
 
-		final List<BDFSFile> listFiles = FileUtil.listFiles(root,task.getDir(), Long
-				.parseLong(System.getProperty(Const.LOCALLIST_SESSION, "0")));
+		final List<BDFSFile> listFiles = FileUtil.listFiles(root,
+				task.getDir(), Long.parseLong(System.getProperty(
+						Const.LOCALLIST_SESSION, "0")));
 		if (listFiles != null) {
 			excute(listFiles, task.getDir());
 		}
@@ -40,10 +42,10 @@ public class GetLocalFileExecute extends TaskExecute {
 
 	protected void excute(List<BDFSFile> files, String dir) {
 
+		checkExcludeAndAddTask(files);
+
 		// 把最新本地结果放入数据库
 		fileListWrite.insertAllCacahe(files);
-
-		checkExcludeAndAddTask(files);
 
 	}
 
@@ -58,14 +60,19 @@ public class GetLocalFileExecute extends TaskExecute {
 	 * @param files
 	 */
 	private void checkExcludeAndAddTask(List<BDFSFile> files) {
+
+		final List<BDFSFile> deletes = new ArrayList<BDFSFile>();
 		for (BDFSFile f : files) {
 			if (f.isDirectory()) {
-				if (!exclude.rmExclude(f.getAbsolutePath())) {
+				if (exclude.rmExclude(f.getAbsolutePath())) {
+					deletes.add(f);
+				} else {
 					taskContainer.addTask(new GetLocalFileTask(f
 							.getAbsolutePath()));
 				}
 
 			}
 		}
+		files.removeAll(deletes);
 	}
 }

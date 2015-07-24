@@ -24,7 +24,7 @@ public class FileUtil {
 				for (File f : listFiles) {
 					localFile = new BDFSFile();
 //					localFile.setPath(f.getAbsolutePath().substring(root.length()).replace("\\", "/"));
-					localFile.setPath(f.getAbsolutePath().substring(root.length()).replace("\\", "/"));
+					localFile.setPath(f.getAbsolutePath().substring(root.length()));
 					if (f.isFile()) {
 						localFile.setLength(f.length());
 					}

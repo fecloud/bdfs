@@ -9,7 +9,7 @@ public interface FSApi {
 
 	/**
 	 * 列表当前目录的文件(包含文件夹)
-	 * 
+	 * {"errno":-9,"request_id":8897598895336496977} //目录不存在
 	 * @param dir
 	 * @return
 	 */
