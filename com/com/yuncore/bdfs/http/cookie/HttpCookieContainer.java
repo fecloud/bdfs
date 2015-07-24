@@ -11,8 +11,6 @@ import java.util.List;
  */
 public class HttpCookieContainer implements CookieContainer {
 
-	public static final String COOKIECONTAINER = "cookiecontainer";
-
 	private static HttpCookieContainer instance;
 
 	private CookieContainer imple;
@@ -24,9 +22,9 @@ public class HttpCookieContainer implements CookieContainer {
 	private void inStanceCookieContainer() {
 		try {
 			imple = (CookieContainer) Class.forName(
-					System.getProperty(COOKIECONTAINER)).newInstance();
+					System.getProperty(AppCookieContainer.COOKIECONTAINER)).newInstance();
 		} catch (Exception e) {
-			throw new RuntimeException("not set " + COOKIECONTAINER);
+			throw new RuntimeException("not set " + AppCookieContainer.COOKIECONTAINER);
 		}
 	}
 

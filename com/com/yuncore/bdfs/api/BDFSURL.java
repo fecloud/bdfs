@@ -202,4 +202,19 @@ public final class BDFSURL {
 		final String ex_url = "http://c.pcs.baidu.com/rest/2.0/pcs/file?method=upload&app_id=%s&ondup=overwrite&dir=%s&filename=%s&BDUSS=%s";
 		return String.format(ex_url, APPID, dir, filename, BDUSS);
 	}
+	
+	/**
+	 * 秒传文件
+	 * http://c.pcs.baidu.com/rest/2.0/pcs/file?method=upload&app_id=250528&
+	 * ondup=overwrite&dir=%2F&filename=libhttpd-1.4.tar.gz&BDUSS=
+	 * FVOMUZJcy0zSHpaVWVsZExKUTE4YnlUa2U5U0FBQ3hGLUYzVm92Vk5kbX5nNE5WQVFBQUFBJCQAAAAAAAAAAAEAAAApOaIBM2h1aGFpAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAL
+	 * ~2W1W~9ltVV
+	 * 
+	 * @return
+	 */
+	public static String getsecondupload(String dir, String filename, long content_length, String content_md5, String slice_md5 ,String BDUSS,String bdstoken) {
+		final String ex_url = "http://c.pcs.baidu.com/rest/2.0/pcs/file?method=rapidupload&app_id=%s&ondup=newcopy&dir=%s&filename=%s&content-length=%s&content-md5=%s&slice-md5=%s&path=%s&BDUSS=%s&bdstoken=%s";
+		return String.format(ex_url, APPID, dir, filename, content_length, content_md5, slice_md5, String.format("%s%s",dir,filename), BDUSS, bdstoken);
+	}
+	
 }

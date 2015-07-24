@@ -9,6 +9,10 @@ import org.json.JSONObject;
 
 public abstract class AppCookieContainer implements CookieContainer {
 
+	public static final String COOKIECONTAINER = "cookiecontainer";
+
+	public static final String COOKIE_LOAD = "cookie_load";
+
 	public List<Cookie> cookies = new ArrayList<Cookie>();
 
 	public synchronized boolean addCookie(Cookie cookie) {
@@ -22,7 +26,7 @@ public abstract class AppCookieContainer implements CookieContainer {
 			} else {
 				result = cookies.add(cookie);
 			}
-			if(result)
+			if (result)
 				save();
 		}
 
@@ -124,5 +128,36 @@ public abstract class AppCookieContainer implements CookieContainer {
 	public void clear() {
 		cookies.clear();
 	}
+
+	@Override
+	public boolean read() {
+		final boolean load = Boolean.parseBoolean(System.getProperty(
+				COOKIE_LOAD, "false"));
+		if (load) {
+			System.setProperty(COOKIE_LOAD, "true");
+			return true;
+		} else if (readForm()) {
+			System.setProperty(COOKIE_LOAD, "true");
+			return true;
+		} else {
+			System.setProperty(COOKIE_LOAD, "false");
+		}
+		return false;
+	}
+
+	@Override
+	public boolean save() {
+		return saveTo();
+	}
+
+	/**
+	 * 从哪里读取
+	 */
+	protected abstract boolean readForm();
+
+	/**
+	 * 保存到哪里
+	 */
+	protected abstract boolean saveTo();
 
 }
