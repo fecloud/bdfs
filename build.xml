@@ -112,6 +112,7 @@
 		<jar destfile="${dist.server}" basedir="${dest.server.dir}">
 			<fileset dir="${dest.com.dir}" />
 			<zipfileset file="${src.server.dir}/log4j.properties" />
+			<zipfileset file="${src.server.dir}/jdbc.properties" />
 			<manifest>
 				<attribute name="Main-class" value="com.yuncore.bdfs.server.BDFSServer" />
 			</manifest>
