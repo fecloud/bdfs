@@ -14,8 +14,8 @@ public class FileUtil {
 	 * @param dir
 	 * @return
 	 */
-	public static List<BDFSFile> listFiles(String dir, long session) {
-		final File file = new File(dir);
+	public static List<BDFSFile> listFiles(String root, String dir, long session) {
+		final File file = new File(root, dir);
 		if (file.exists() && file.isDirectory()) {
 			File[] listFiles = file.listFiles();
 			if (null != listFiles) {
@@ -23,7 +23,8 @@ public class FileUtil {
 				BDFSFile localFile = null;
 				for (File f : listFiles) {
 					localFile = new BDFSFile();
-					localFile.setPath(f.getPath());
+//					localFile.setPath(f.getAbsolutePath().substring(root.length()).replace("\\", "/"));
+					localFile.setPath(f.getAbsolutePath().substring(root.length()).replace("\\", "/"));
 					if (f.isFile()) {
 						localFile.setLength(f.length());
 					}

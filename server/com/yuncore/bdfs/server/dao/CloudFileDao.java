@@ -9,8 +9,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.yuncore.bdfs.entity.CloudFile;
 import com.yuncore.bdfs.server.Const;
-import com.yuncore.bdfs.server.entity.CloudFile;
 import com.yuncore.bdfs.server.util.Stopwatch;
 
 public class CloudFileDao extends BaseDao {

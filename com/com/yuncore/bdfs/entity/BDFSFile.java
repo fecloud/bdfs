@@ -16,6 +16,13 @@ public class BDFSFile implements EntityJSON {
 
 	protected long session;
 
+	public BDFSFile(){
+		
+	}
+	
+	public BDFSFile(String path) {
+		this.path = path;
+	}
 	/**
 	 * 0文件 1文件夹
 	 */
@@ -85,6 +92,34 @@ public class BDFSFile implements EntityJSON {
 	public String toFid() {
 		this.fId = MD5.md5(toString());
 		return fId;
+	}
+
+	public String getParentPath() {
+		if (isDir()) {
+			return path.substring(0, path.lastIndexOf("/"));
+		} else {
+			String tmpPath = path;
+			if (path.endsWith("/")) {
+				tmpPath = path.substring(0, path.length() - 1);
+			}
+			tmpPath = tmpPath.substring(0, tmpPath.lastIndexOf("/"));
+			if (tmpPath.length() == 0) {
+				return "/";
+			}
+			return tmpPath;
+		}
+	}
+
+	public String getName() {
+		if (isDir()) {
+			return path.substring(path.lastIndexOf("/"));
+		} else {
+			String tmpPath = path;
+			if (path.endsWith("/")) {
+				tmpPath = path.substring(0, path.length() - 1);
+			}
+			return tmpPath.substring(tmpPath.lastIndexOf("/") + 1);
+		}
 	}
 
 	/*

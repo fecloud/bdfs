@@ -6,8 +6,11 @@ import com.yuncore.bdfs.client.api.FSApi;
 import com.yuncore.bdfs.client.api.ServerApi;
 import com.yuncore.bdfs.client.api.imple.FSApiImple;
 import com.yuncore.bdfs.client.api.imple.ServerApiImple;
+import com.yuncore.bdfs.client.entity.MkDirResult;
 import com.yuncore.bdfs.client.util.Log;
 import com.yuncore.bdfs.entity.BDFSFile;
+import com.yuncore.bdfs.entity.CloudFile;
+import com.yuncore.bdfs.exception.ApiException;
 import com.yuncore.bdfs.exception.ServerApiException;
 
 public class LocalUpload extends Thread {
@@ -43,13 +46,13 @@ public class LocalUpload extends Thread {
 				String.format("CloudDownLoad root:%s tmpDir:%s", root, tmpDir));
 		falg = true;
 
-		BDFSFile file;
+		BDFSFile file = null;
 		boolean upload = true;
 		while (falg) {
 			file = getUpload();
 			if (file != null) {
 				Log.i(TAG, "getUpload " + file.getAbsolutePath());
-				// downloaded = downloadFile(cloudFile);
+				upload = uploadFile(file);
 				if (upload) {
 					delUpload(file);
 				}
@@ -82,4 +85,112 @@ public class LocalUpload extends Thread {
 		}
 	}
 
+	/**
+	 * 上传文件
+	 * 
+	 * @param file
+	 * @return
+	 */
+	private boolean uploadFile(BDFSFile file) {
+		if (fileExists(file)) {
+			return true;
+		}
+		if (file.isDirectory()) {
+			return mkdirCloud(file);
+		}
+		if (file.isFile()) {
+			return uploadFileContext(file);
+		}
+		return false;
+	}
+
+	/**
+	 * 上传文件正文
+	 * 
+	 * @param file
+	 * @return
+	 */
+	private boolean uploadFileContext(BDFSFile file) {
+		final long fileLen = file.getLength();
+		// 判断是否大小分块上传的单块数,可以用秒传试一下
+		if (fileLen > FSApi.RAPIDUPLOAD) {
+			return norMalFileContext(file);
+		} else {
+			return norMalFileContext(file);
+		}
+	}
+
+	/**
+	 * 以普通的form上传文件(不可以断点的)
+	 * 
+	 * @param file
+	 * @return
+	 */
+	private boolean norMalFileContext(BDFSFile file) {
+		try {
+			final String localpath = String.format("%s/%s", root,
+					file.getAbsolutePath());
+			final String cloudpath = file.getAbsolutePath();
+			return api.upload(localpath, cloudpath);
+		} catch (ApiException e) {
+			Log.e(TAG,
+					String.format("uploadFileContext file:%s error",
+							file.getAbsolutePath()), e);
+		}
+		return false;
+	}
+
+	/**
+	 * 检查文件在云端是否存在
+	 * 
+	 * @param file
+	 * @return
+	 */
+	private boolean fileExists(BDFSFile file) {
+		try {
+			final CloudFile fileExists = api.fileExists(file.getAbsolutePath());
+			if (fileExists != null) {
+				Log.d(TAG, String.format("%s exists cloud", file.getAbsolutePath()));
+				// 两个都是文件
+				if (file.isFile() && fileExists.isFile()) {
+					// 两个文件长度一样
+					if (file.getLength() == fileExists.getLength()) {
+						Log.d(TAG, String.format("%s exists cloud len equal", file.getAbsolutePath()));
+						return true;
+					}
+				} else if (file.isDir() && fileExists.isDir()) {
+					Log.d(TAG, String.format("%s exists cloud isdir", file.getAbsolutePath()));
+					return true;
+				}else {
+					Log.d(TAG, String.format("%s not exists cloud", file.getAbsolutePath()));
+				}
+			}
+		} catch (ApiException e) {
+			Log.e(TAG, "fileExists error", e);
+		}
+		return false;
+	}
+
+	/**
+	 * 在云端创建目录
+	 * 
+	 * @param file
+	 * @return
+	 */
+	private boolean mkdirCloud(BDFSFile file) {
+		try {
+
+			final MkDirResult mkdir = api.mkdir(file.getAbsolutePath());
+			if (null != mkdir) {
+				if (mkdir.getStatus() == 0) {
+					return true;
+				}
+				Log.w(TAG, "mkdirCloud " + file.getAbsolutePath() + " error:"
+						+ mkdir.getStatus());
+			}
+		} catch (ApiException e) {
+			Log.e(TAG, "mkdirCloud error", e);
+		}
+		return false;
+	}
 }

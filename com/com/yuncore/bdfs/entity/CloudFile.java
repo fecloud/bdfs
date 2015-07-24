@@ -1,4 +1,4 @@
-package com.yuncore.bdfs.server.entity;
+package com.yuncore.bdfs.entity;
 
 import org.json.JSONObject;
 
@@ -47,7 +47,7 @@ public class CloudFile extends BDFSFile {
 	 */
 	@Override
 	public boolean formJOSN(String json) {
-		return false;
+		return formJOSN(new JSONObject(json));
 	}
 
 	/*

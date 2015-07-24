@@ -2,8 +2,10 @@ package com.yuncore.bdfs.client.api;
 
 import java.util.Map;
 
+import com.yuncore.bdfs.client.entity.MkDirResult;
 import com.yuncore.bdfs.client.util.DownloadInputStream;
 import com.yuncore.bdfs.entity.BDFSFile;
+import com.yuncore.bdfs.entity.CloudFile;
 import com.yuncore.bdfs.exception.ApiException;
 
 public interface FSApi {
@@ -12,6 +14,11 @@ public interface FSApi {
 	 * 分块上传块大小
 	 */
 	int RAPIDUPLOAD = (256 * 1024);
+	
+	/**
+	 * bdstoken
+	 */
+	String BDSTOKEN = "MYBDSTOKEN";
 	/**
 	 * 登录
 	 * 
@@ -59,7 +66,7 @@ public interface FSApi {
 	 * @return
 	 * @throws ApiException
 	 */
-	public boolean upload(String filename,String dir)throws ApiException;
+	public boolean upload(String localpath, String cloudpath)throws ApiException;
 	
 	/**
 	 * 秒传
@@ -69,5 +76,21 @@ public interface FSApi {
 	 * @throws ApiException
 	 */
 	public boolean secondUpload(String filename,String dir)throws ApiException;
+	
+	/**
+	 * 
+	 * @param dir
+	 * @return
+	 * @throws ApiException
+	 */
+	public MkDirResult mkdir(String dir) throws ApiException ;
+	
+	/**
+	 * 文件或者目录是否存在
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public CloudFile fileExists(String file) throws ApiException;
 
 }

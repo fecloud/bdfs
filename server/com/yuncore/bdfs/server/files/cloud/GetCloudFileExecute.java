@@ -5,11 +5,11 @@ package com.yuncore.bdfs.server.files.cloud;
 
 import org.apache.log4j.Logger;
 
+import com.yuncore.bdfs.entity.CloudFile;
 import com.yuncore.bdfs.exception.ApiException;
 import com.yuncore.bdfs.http.cookie.AppCookieContainer;
 import com.yuncore.bdfs.server.api.imple.FSApiImple;
 import com.yuncore.bdfs.server.dao.CloudFileDao;
-import com.yuncore.bdfs.server.entity.CloudFile;
 import com.yuncore.bdfs.server.entity.CloudPageFile;
 import com.yuncore.bdfs.task.Task;
 import com.yuncore.bdfs.task.TaskContainer;

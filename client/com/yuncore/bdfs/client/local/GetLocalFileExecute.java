@@ -18,24 +18,27 @@ public class GetLocalFileExecute extends TaskExecute {
 
 	private FileExclude exclude;
 
-	public GetLocalFileExecute(TaskStatus taskStatus,
+	private String root;
+	
+	public GetLocalFileExecute(String root,TaskStatus taskStatus,
 			TaskContainer taskContainer, FileExclude exclude,
 			FileListWrite fileListWrite) {
 		super(taskStatus, taskContainer);
+		this.root = root;
 		this.fileListWrite = fileListWrite;
 		this.exclude = exclude;
 	}
 
-	protected void analysisDIRFiles(GetLocalFileTask task) {
+	protected void getDirFiles(GetLocalFileTask task) {
 
-		final List<BDFSFile> listFiles = FileUtil.listFiles(task.getDir(), Long
+		final List<BDFSFile> listFiles = FileUtil.listFiles(root,task.getDir(), Long
 				.parseLong(System.getProperty(Const.LOCALLIST_SESSION, "0")));
 		if (listFiles != null) {
-			compare(listFiles, task.getDir());
+			excute(listFiles, task.getDir());
 		}
 	}
 
-	protected void compare(List<BDFSFile> files, String dir) {
+	protected void excute(List<BDFSFile> files, String dir) {
 
 		// 把最新本地结果放入数据库
 		fileListWrite.insertAllCacahe(files);
@@ -46,7 +49,7 @@ public class GetLocalFileExecute extends TaskExecute {
 
 	@Override
 	protected void doTask(Task task) {
-		analysisDIRFiles((GetLocalFileTask) task);
+		getDirFiles((GetLocalFileTask) task);
 	}
 
 	/**

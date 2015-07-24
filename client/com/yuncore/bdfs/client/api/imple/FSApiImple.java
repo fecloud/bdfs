@@ -11,21 +11,24 @@ import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.yuncore.bdfs.api.BDFSURL;
 import com.yuncore.bdfs.app.Context;
 import com.yuncore.bdfs.client.Const;
 import com.yuncore.bdfs.client.api.FSApi;
+import com.yuncore.bdfs.client.entity.MkDirResult;
 import com.yuncore.bdfs.client.util.DownloadInputStream;
 import com.yuncore.bdfs.client.util.Log;
 import com.yuncore.bdfs.entity.BDFSFile;
+import com.yuncore.bdfs.entity.CloudFile;
 import com.yuncore.bdfs.exception.ApiException;
-import com.yuncore.bdfs.http.Http.Method;
-import com.yuncore.bdfs.http.cookie.HttpCookieContainer;
 import com.yuncore.bdfs.http.Http;
+import com.yuncore.bdfs.http.Http.Method;
 import com.yuncore.bdfs.http.HttpFormOutput;
 import com.yuncore.bdfs.http.HttpInput;
+import com.yuncore.bdfs.http.cookie.HttpCookieContainer;
 import com.yuncore.bdfs.util.DateUtil;
 import com.yuncore.bdfs.util.MD5;
 
@@ -33,7 +36,7 @@ public class FSApiImple implements FSApi {
 
 	static final String TAG = "FSApiImple";
 
-	private static boolean DEBUG = true;
+	private static boolean DEBUG = false;
 
 	private static Context context;
 
@@ -44,8 +47,9 @@ public class FSApiImple implements FSApi {
 
 	private void inStanceContext() {
 		try {
-			context = (Context) Class
-					.forName(System.getProperty(Const.CONTEXT)).newInstance();
+			if (null == context)
+				context = (Context) Class.forName(
+						System.getProperty(Const.CONTEXT)).newInstance();
 		} catch (Exception e) {
 
 		}
@@ -335,18 +339,21 @@ public class FSApiImple implements FSApi {
 	}
 
 	@Override
-	public boolean upload(String filename, String dir) throws ApiException {
+	public boolean upload(String localpath, String cloudpath)
+			throws ApiException {
 		try {
 			if (context.load()) {
 				final String BDUSS = HttpCookieContainer.getInstance()
 						.getCookie("BDUSS").getValue();
+				final BDFSFile cloudFile = new BDFSFile(cloudpath);
 				final String url = BDFSURL.getuploadfile(
-						URLEncoder.encode(dir, "UTF-8"),
-						new File(filename).getName(), BDUSS);
+						URLEncoder.encode(cloudFile.getParentPath(), "UTF-8"),
+						URLEncoder.encode(cloudFile.getName(), "UTF-8"), BDUSS);
 
-				final HttpFormOutput http = new HttpFormOutput(url, filename);
+				final HttpFormOutput http = new HttpFormOutput(url, localpath);
 				if (http.http()) {
-					Log.i(TAG, String.format("upload result:%s", http.result()));
+					if(DEBUG)
+						Log.i(TAG, String.format("upload result:%s", http.result()));
 					final String resultString = http.result();
 					final JSONObject object = new JSONObject(resultString);
 					if (object.has("md5")) {
@@ -369,7 +376,7 @@ public class FSApiImple implements FSApi {
 			if (context.load()) {
 				final String BDUSS = HttpCookieContainer.getInstance()
 						.getCookie("BDUSS").getValue();
-				final String bdstoken = context.getProperty("MYBDSTOKEN", "");
+				final String bdstoken = context.getProperty(BDSTOKEN, "");
 				final File file = new File(filename);
 				final String content_md5 = MD5.md5File(filename);
 				final String slice_md5 = MD5.md5File(filename, RAPIDUPLOAD);
@@ -393,5 +400,79 @@ public class FSApiImple implements FSApi {
 			throw new ApiException("upload error", e);
 		}
 		return false;
+	}
+
+	@Override
+	public MkDirResult mkdir(String dir) throws ApiException {
+		try {
+			if (context.load()) {
+				final String bdstoken = context.getProperty(BDSTOKEN, "");
+				final String url = BDFSURL.mkdir(bdstoken);
+
+				final String formString = String.format(
+						"path=%s&isdir=1&size=&block_list=%s&method=post",
+						URLEncoder.encode(dir, "UTF-8"),
+						URLEncoder.encode("[]", "UTF-8"));
+				if (DEBUG)
+					Log.d(TAG,
+							String.format("mkdir form string:%s", formString));
+				final Http http = new Http(url, Method.POST, formString);
+				if (http.http()) {
+					if (DEBUG)
+						Log.d(TAG, String.format("mkdir:%s", http.result()));
+					final MkDirResult mkDirResult = new MkDirResult();
+					mkDirResult.formJOSN(http.result());
+					return mkDirResult;
+				}
+
+			}
+		} catch (Exception e) {
+			throw new ApiException("mkdir error", e);
+		}
+		return null;
+	}
+
+	@Override
+	public CloudFile fileExists(String file) throws ApiException {
+
+		try {
+			if (context.load()) {
+
+				final File f = new File(file);
+				final long c_time = DateUtil.current_time_ss();
+				final String url = BDFSURL.getfileexists(c_time, context
+						.getProperty(BDSTOKEN), URLEncoder.encode(f.getParent()
+						.replaceAll("\\\\", "/"), "UTF-8"), URLEncoder.encode(
+						f.getName(), "UTF-8"));
+
+				final Http http = new Http(url, Method.GET);
+				if (http.http()) {
+					if (DEBUG)
+						Log.d(TAG,
+								String.format("fileExists result:%s",
+										http.result()));
+					final String resultString = http.result();
+					final JSONObject object = new JSONObject(resultString);
+					if (object.has("errno") && object.getInt("errno") == 0
+							&& object.has("list")) {
+						JSONArray jsonArray = object.getJSONArray("list");
+						if (jsonArray.length() > 0) {
+							JSONObject jsonObject = jsonArray.getJSONObject(0);
+							final CloudFile pcsFile = new CloudFile();
+							pcsFile.formJOSN(jsonObject.toString());
+							return pcsFile;
+						}
+
+					}
+
+				}
+
+			}
+		} catch (Exception e) {
+			throw new ApiException("fileExists error", e);
+		}
+
+		return null;
+
 	}
 }

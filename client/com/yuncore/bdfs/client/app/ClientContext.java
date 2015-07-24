@@ -20,11 +20,10 @@ public class ClientContext extends AppContext {
 			try {
 				final Map<String, String> diskHomePage = api.diskHomePage();
 				if (null != diskHomePage && !diskHomePage.isEmpty()) {
-					properties.clear();
 					properties.putAll(diskHomePage);
 					return true;
 				} else {
-					System.setProperty("CookieLoader", "false");
+					properties.clear();
 					return false;
 				}
 			} catch (ApiException e) {

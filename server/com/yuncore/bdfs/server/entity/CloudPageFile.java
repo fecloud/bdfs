@@ -6,6 +6,7 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.yuncore.bdfs.entity.CloudFile;
 import com.yuncore.bdfs.entity.EntityJSON;
 
 public class CloudPageFile implements EntityJSON {

@@ -68,7 +68,7 @@ public class CloudDownLoad extends Thread {
 		Log.i(TAG,
 				String.format("CloudDownLoad root:%s tmpDir:%s", root, tmpDir));
 		falg = true;
-		BDFSFile cloudFile;
+		BDFSFile cloudFile = null;
 		boolean downloaded = true;
 		while (falg) {
 			cloudFile = getDownLoad();

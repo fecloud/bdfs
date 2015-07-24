@@ -2,6 +2,7 @@ package com.yuncore.bdfs.api;
 
 import java.util.Map;
 
+import com.yuncore.bdfs.entity.BDFSFile;
 import com.yuncore.bdfs.entity.CloudFile;
 import com.yuncore.bdfs.entity.CloudMkDirResult;
 import com.yuncore.bdfs.entity.CloudPageFile;
@@ -176,10 +177,10 @@ public interface Api {
 	/**
 	 * 文件或者目录是否存在
 	 * 
-	 * @param file
+	 * @param path
 	 * @return
 	 */
-	public CloudFile fileExists(String file) throws ApiException;
+	public BDFSFile fileExists(String path) throws ApiException;
 
 	/**
 	 * 上传文件

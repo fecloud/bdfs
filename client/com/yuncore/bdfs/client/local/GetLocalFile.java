@@ -15,6 +15,7 @@ import com.yuncore.bdfs.task.TaskService;
 public class GetLocalFile extends TaskService {
 
 	static final String TAG = "GetLocalFile";
+
 	private File dir;
 
 	private BDFSFileExclude exclude;
@@ -46,16 +47,17 @@ public class GetLocalFile extends TaskService {
 
 	@Override
 	protected TaskExecute newTaskExecute() {
-		final GetLocalFileExecute GetLocalExecute = new GetLocalFileExecute(
-				taskStatus, taskContainer, exclude, fileListWrite);
-		return GetLocalExecute;
+		final GetLocalFileExecute getLocalExecute = new GetLocalFileExecute(
+				dir.getAbsolutePath(), taskStatus, taskContainer, exclude,
+				fileListWrite);
+		return getLocalExecute;
 	}
 
 	public synchronized boolean list() {
 		if (dir.exists()) {
 			System.setProperty(Const.LOCALLIST_SESSION,
 					"" + System.currentTimeMillis());
-			taskContainer.addTask(new GetLocalFileTask(dir.getAbsolutePath()));
+			taskContainer.addTask(new GetLocalFileTask("/"));
 			waitTaskFinish();
 			fileListWrite.insertAllCacaheFlush();
 			try {
