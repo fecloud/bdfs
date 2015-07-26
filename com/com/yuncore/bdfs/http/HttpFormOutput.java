@@ -83,7 +83,7 @@ public class HttpFormOutput extends Http {
 		out.write(filestart.getBytes("UTF-8"));
 		final FileInputStream in = new FileInputStream(file);
 		int bytes = 0;
-		final byte[] bufferOut = new byte[1024 * 40];
+		final byte[] bufferOut = new byte[1024 * 1024 * 5];
 		while ((bytes = in.read(bufferOut)) != -1) {
 			out.write(bufferOut, 0, bytes);
 			out.flush();
