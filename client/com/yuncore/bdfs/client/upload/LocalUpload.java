@@ -43,7 +43,7 @@ public class LocalUpload extends Thread {
 	public void run() {
 		setName(LocalUpload.class.getSimpleName());
 		Log.i(TAG,
-				String.format("CloudDownLoad root:%s tmpDir:%s", root, tmpDir));
+				String.format("LocalUpload root:%s tmpDir:%s", root, tmpDir));
 		falg = true;
 
 		BDFSFile file = null;
