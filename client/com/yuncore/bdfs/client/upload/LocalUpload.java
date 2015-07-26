@@ -93,7 +93,7 @@ public class LocalUpload extends Thread {
 	 */
 	private boolean uploadFile(BDFSFile file) {
 		if(!checkLocalFile(file)){//本地文件不在了,直接删除任务
-			Log.d(TAG, "local file " +  file.getAbsolutePath() + "is deleted");
+			Log.w(TAG, "local file " +  file.getAbsolutePath() + " is deleted");
 			return true;
 		}
 		if (fileExists(file)) {
