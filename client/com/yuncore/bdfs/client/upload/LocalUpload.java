@@ -92,6 +92,9 @@ public class LocalUpload extends Thread {
 	 * @return
 	 */
 	private boolean uploadFile(BDFSFile file) {
+		if(!checkLocalFile(file)){//本地文件不在了,直接删除任务
+			return false;
+		}
 		if (fileExists(file)) {
 			return true;
 		}
@@ -104,6 +107,21 @@ public class LocalUpload extends Thread {
 		return false;
 	}
 
+	/**
+	 * 检查本地文件是否还在
+	 * @param file
+	 * @return
+	 */
+	private boolean checkLocalFile(BDFSFile file){
+		final String localpath = String.format("%s/%s", root,
+				file.getAbsolutePath());
+		final File localFile = new File(localpath);
+		if(localFile.exists()){
+			return true;
+		}
+		return false;
+	}
+	
 	/**
 	 * 上传文件正文
 	 * 
