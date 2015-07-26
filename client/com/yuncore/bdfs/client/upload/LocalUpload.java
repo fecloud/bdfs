@@ -225,6 +225,7 @@ public class LocalUpload extends Thread {
 
 			final MkDirResult mkdir = api.mkdir(file.getAbsolutePath());
 			if (null != mkdir) {
+				Log.d(TAG, "mkir " + file.getAbsolutePath());
 				if (mkdir.getStatus() == 0) {
 					return true;
 				}
