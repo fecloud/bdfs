@@ -3,11 +3,11 @@
  */
 package com.yuncore.bdfs.http;
 
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Random;
 
 /**
@@ -19,18 +19,18 @@ public class HttpFormOutput extends Http {
 	private String file;
 
 	private String filestart;
-	
+
 	private String fileend;
-	
+
 	private long filesize;
-	
+
 	private String BOUNDARY = "---------------------------"
 			+ new Random().nextLong();
 
 	public HttpFormOutput(String url, String file) {
 		super(url, Method.POST);
 		this.file = file;
-		
+
 	}
 
 	/*
@@ -44,24 +44,31 @@ public class HttpFormOutput extends Http {
 				"multipart/form-data; boundary=" + BOUNDARY);
 		conn.setFixedLengthStreamingMode(getInputSize());
 	}
-	
+
+	/**
+	 * 取文件内容大小
+	 * @return
+	 */
 	protected int getInputSize() {
-		
-		final File filename = new File(file);
-		filesize = filename.length();
-		
-		StringBuffer strBuf = new StringBuffer();
-		strBuf.append("\r\n").append("--").append(BOUNDARY).append("\r\n");
-		strBuf.append("Content-Disposition: form-data; name=\"file\"; filename=\""
-				+ filename.getName() + "\"\r\n");
-		strBuf.append("Content-Type:application/octet-stream\r\n\r\n");
-		
-		filestart = strBuf.toString();
-		
-		fileend = ("\r\n--" + BOUNDARY + "--\r\n");
-		
-		filesize += filestart.getBytes().length;
-		filesize += fileend.getBytes().length;
+
+		try {
+			final File filename = new File(file);
+			filesize = filename.length();
+
+			StringBuffer strBuf = new StringBuffer();
+			strBuf.append("\r\n").append("--").append(BOUNDARY).append("\r\n");
+			strBuf.append("Content-Disposition: form-data; name=\"file\"; filename=\""
+					+ filename.getName() + "\"\r\n");
+			strBuf.append("Content-Type:application/octet-stream\r\n\r\n");
+
+			filestart = strBuf.toString();
+
+			fileend = ("\r\n--" + BOUNDARY + "--\r\n");
+
+			filesize += filestart.getBytes("UTF-8").length;
+			filesize += fileend.getBytes("UTF-8").length;
+		} catch (UnsupportedEncodingException e) {
+		}
 		return (int) filesize;
 	}
 
@@ -72,19 +79,18 @@ public class HttpFormOutput extends Http {
 	 */
 	@Override
 	protected boolean addFormData() throws IOException {
-		OutputStream out = new DataOutputStream(conn.getOutputStream());  
-		out.write(filestart.getBytes());
-		FileInputStream in = new FileInputStream(file);
+		final OutputStream out = conn.getOutputStream();
+		out.write(filestart.getBytes("UTF-8"));
+		final FileInputStream in = new FileInputStream(file);
 		int bytes = 0;
-		byte[] bufferOut = new byte[1024 * 512];
+		final byte[] bufferOut = new byte[1024 * 40];
 		while ((bytes = in.read(bufferOut)) != -1) {
 			out.write(bufferOut, 0, bytes);
 			out.flush();
 		}
 		in.close();
-		out.write(fileend.getBytes());
+		out.write(fileend.getBytes("UTF-8"));
 		out.flush();
-		out.close();
 		return true;
 	}
 }
