@@ -53,7 +53,10 @@ public class FileListWrite extends FileOutputStream {
 	}
 
 	public synchronized boolean insertAll() {
-
+		
+		if(null == caches){
+			return true;
+		}
 		try {
 			final ByteBuffer buffer = ByteBuffer.allocate(10);
 			// size
