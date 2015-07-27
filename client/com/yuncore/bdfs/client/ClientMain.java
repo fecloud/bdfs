@@ -31,7 +31,7 @@ public class ClientMain {
 	public static final void printHelp() {
 		System.err.println("Usage:bdsync [sync|cookie|ucookie]");
 		System.err.println("");
-		System.err.println("sync <local_dir> [-l exinclude dir] [-c exinclude dir]");
+		System.err.println("sync <local_dir> <-p port> [-l exinclude dir] [-c exinclude dir]");
 		System.err.println("");
 		System.err.println("sync [cookie|ucookie] <username> <password>");
 	}

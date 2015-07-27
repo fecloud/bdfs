@@ -8,6 +8,8 @@ import com.yuncore.bdfs.entity.BDFSFile;
 
 public class FileUtil {
 
+	private static String BYTE_SIZE_UNIT[] = { "BYTE", "KB", "MB", "GB", "TB" };
+	
 	/**
 	 * 读取目录
 	 * 
@@ -55,4 +57,19 @@ public class FileUtil {
 		return false;
 	}
 
+	public static String byteSizeToHuman(long size) {
+		final StringBuilder builder = new StringBuilder();
+		int i = 0;
+		double unit = size;
+		double temp = 0;
+		while ((temp = (unit / 1024)) >= 1) {
+			i++;
+			unit = temp;
+		}
+		builder.append(String.format("%.1f", unit));
+		// builder.append(".").append(size % 1024);
+		builder.append(BYTE_SIZE_UNIT[i]);
+		return builder.toString();
+	}
+	
 }

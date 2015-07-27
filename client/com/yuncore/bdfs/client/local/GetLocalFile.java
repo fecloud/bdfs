@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.yuncore.bdfs.client.ClientEnv;
 import com.yuncore.bdfs.client.Const;
 import com.yuncore.bdfs.client.util.BDFSFileExclude;
 import com.yuncore.bdfs.client.util.FileListWrite;
@@ -55,9 +56,10 @@ public class GetLocalFile extends TaskService {
 
 	public synchronized boolean list() {
 		if (dir.exists()) {
-			System.setProperty(Const.LOCALLIST_SESSION,
-					"" + System.currentTimeMillis());
+			final long session = System.currentTimeMillis();
+			System.setProperty(Const.LOCALLIST_SESSION, "" + session);
 			taskContainer.addTask(new GetLocalFileTask(""));
+			ClientEnv.setProperty(ClientEnv.key_localfilelist_last, session);
 			waitTaskFinish();
 			fileListWrite.insertAllCacaheFlush();
 			try {

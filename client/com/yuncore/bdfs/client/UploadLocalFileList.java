@@ -37,6 +37,7 @@ public class UploadLocalFileList extends Thread {
 				Log.e(TAG, "", e);
 			}
 			try {
+				ClientEnv.setProperty(ClientEnv.key_localfilelist, "sleep");
 				Thread.sleep(300000);
 			} catch (InterruptedException e) {
 				Log.e(TAG, "", e);
@@ -51,6 +52,7 @@ public class UploadLocalFileList extends Thread {
 		final GetLocalFile listFiles = new GetLocalFile(4,
 				System.getProperty("syncdir"));
 		listFiles.addExclude(excludeFiles);
+		ClientEnv.setProperty(ClientEnv.key_localfilelist, "listing");
 		listFiles.list();
 		stopwatch.stop("GetLocalFile");
 
@@ -58,6 +60,7 @@ public class UploadLocalFileList extends Thread {
 		final String zipname = listFiles.getOutFilename() + ".gzip";
 		final FileGzip fileZip = new FileGzip(listFiles.getOutFilename(),
 				zipname);
+		ClientEnv.setProperty(ClientEnv.key_localfilelist, "gziping");
 		final boolean fileZipResult = fileZip.gzip();
 		stopwatch.stop("UploadLocalFileList FileZip");
 		if (fileZipResult) {
@@ -68,6 +71,8 @@ public class UploadLocalFileList extends Thread {
 				boolean upload = false;
 				try {
 					// 上传到服务器
+					ClientEnv.setProperty(ClientEnv.key_localfilelist,
+							"uploading");
 					upload = serverApi.uploadlocal(zipname);
 				} catch (ServerApiException e) {
 				}

@@ -2,11 +2,13 @@ package com.yuncore.bdfs.client.upload;
 
 import java.io.File;
 
+import com.yuncore.bdfs.client.ClientEnv;
 import com.yuncore.bdfs.client.api.FSApi;
 import com.yuncore.bdfs.client.api.ServerApi;
 import com.yuncore.bdfs.client.api.imple.FSApiImple;
 import com.yuncore.bdfs.client.api.imple.ServerApiImple;
 import com.yuncore.bdfs.client.entity.MkDirResult;
+import com.yuncore.bdfs.client.util.FileUtil;
 import com.yuncore.bdfs.client.util.Log;
 import com.yuncore.bdfs.entity.BDFSFile;
 import com.yuncore.bdfs.entity.CloudFile;
@@ -42,8 +44,7 @@ public class LocalUpload extends Thread {
 	@Override
 	public void run() {
 		setName(LocalUpload.class.getSimpleName());
-		Log.i(TAG,
-				String.format("LocalUpload root:%s tmpDir:%s", root, tmpDir));
+		Log.i(TAG, String.format("LocalUpload root:%s tmpDir:%s", root, tmpDir));
 		falg = true;
 
 		BDFSFile file = null;
@@ -51,14 +52,18 @@ public class LocalUpload extends Thread {
 		while (falg) {
 			file = getUpload();
 			if (file != null) {
-				Log.i(TAG, "getUpload " + file.getAbsolutePath());
+				Log.i(TAG, "getUpload " + file.getAbsolutePath() + " size:"
+						+ FileUtil.byteSizeToHuman(file.getLength()));
+				ClientEnv.setProperty(ClientEnv.key_uploading, file);
 				upload = uploadFile(file);
 				if (upload) {
+					ClientEnv.setProperty(ClientEnv.key_uploading, "");
 					delUpload(file);
 				}
 			} else {
 				try {
 					Thread.sleep(30000);
+					ClientEnv.setProperty(ClientEnv.key_uploading, false);
 				} catch (InterruptedException e) {
 					break;
 				}
@@ -92,8 +97,12 @@ public class LocalUpload extends Thread {
 	 * @return
 	 */
 	private boolean uploadFile(BDFSFile file) {
-		if(!checkLocalFile(file)){//本地文件不在了,直接删除任务
-			Log.w(TAG, "local file " +  file.getAbsolutePath() + " is deleted");
+		if (checkBDFSFile(file)) {
+			Log.w(TAG, "file too big ,not upload");
+			return true;
+		}
+		if (!checkLocalFile(file)) {// 本地文件不在了,直接删除任务
+			Log.w(TAG, "local file " + file.getAbsolutePath() + " is deleted");
 			return true;
 		}
 		if (fileExists(file)) {
@@ -109,20 +118,34 @@ public class LocalUpload extends Thread {
 	}
 
 	/**
-	 * 检查本地文件是否还在
+	 * 检查要上传的文件大小,http超过1G上传不鸟
+	 * 
 	 * @param file
 	 * @return
 	 */
-	private boolean checkLocalFile(BDFSFile file){
-		final String localpath = String.format("%s/%s", root,
-				file.getAbsolutePath());
-		final File localFile = new File(localpath);
-		if(localFile.exists()){
+	private boolean checkBDFSFile(BDFSFile file) {
+		if (file.getLength() >= 1024 * 1024 * 1024) {
 			return true;
 		}
 		return false;
 	}
-	
+
+	/**
+	 * 检查本地文件是否还在
+	 * 
+	 * @param file
+	 * @return
+	 */
+	private boolean checkLocalFile(BDFSFile file) {
+		final String localpath = String.format("%s/%s", root,
+				file.getAbsolutePath());
+		final File localFile = new File(localpath);
+		if (localFile.exists()) {
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * 上传文件正文
 	 * 
@@ -133,10 +156,10 @@ public class LocalUpload extends Thread {
 		final long fileLen = file.getLength();
 		// 判断是否大小分块上传的单块数,可以用秒传试一下
 		if (fileLen > FSApi.RAPIDUPLOAD) {
-			if(secondFileContext(file)){
+			if (secondFileContext(file)) {
 				Log.d(TAG, "secondFileContext ok");
 				return true;
-			}else {
+			} else {
 				return norMalFileContext(file);
 			}
 		} else {
@@ -164,9 +187,10 @@ public class LocalUpload extends Thread {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * 秒传文件的方式
+	 * 
 	 * @param file
 	 * @return
 	 */
@@ -194,20 +218,27 @@ public class LocalUpload extends Thread {
 		try {
 			final CloudFile fileExists = api.fileExists(file.getAbsolutePath());
 			if (fileExists != null) {
-				Log.d(TAG, String.format("%s exists cloud", file.getAbsolutePath()));
+				Log.d(TAG, String.format("%s exists cloud",
+						file.getAbsolutePath()));
 				// 两个都是文件
 				if (file.isFile() && fileExists.isFile()) {
 					// 两个文件长度一样
 					if (file.getLength() == fileExists.getLength()) {
-						Log.d(TAG, String.format("%s exists cloud len equal", file.getAbsolutePath()));
+						Log.d(TAG,
+								String.format("%s exists cloud len equal",
+										file.getAbsolutePath()));
 						return true;
 					}
 				} else if (file.isDir() && fileExists.isDir()) {
-					Log.d(TAG, String.format("%s exists cloud isdir", file.getAbsolutePath()));
+					Log.d(TAG,
+							String.format("%s exists cloud isdir",
+									file.getAbsolutePath()));
 					return true;
 				}
-			}else {
-				Log.d(TAG, String.format("%s not exists cloud", file.getAbsolutePath()));
+			} else {
+				Log.d(TAG,
+						String.format("%s not exists cloud",
+								file.getAbsolutePath()));
 			}
 		} catch (ApiException e) {
 			Log.e(TAG, "fileExists error", e);
