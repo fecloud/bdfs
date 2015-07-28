@@ -27,10 +27,16 @@ public class HttpFormOutput extends Http {
 	private String BOUNDARY = "---------------------------"
 			+ new Random().nextLong();
 
+	private OutputDataListener listener;
+
 	public HttpFormOutput(String url, String file) {
 		super(url, Method.POST);
 		this.file = file;
+	}
 
+	public HttpFormOutput(String url, String file, OutputDataListener listener) {
+		this(url, file);
+		this.listener = listener;
 	}
 
 	/*
@@ -47,6 +53,7 @@ public class HttpFormOutput extends Http {
 
 	/**
 	 * 取文件内容大小
+	 * 
 	 * @return
 	 */
 	protected int getInputSize() {
@@ -81,17 +88,43 @@ public class HttpFormOutput extends Http {
 	protected boolean addFormData() throws IOException {
 		final OutputStream out = conn.getOutputStream();
 		out.write(filestart.getBytes("UTF-8"));
-		final FileInputStream in = new FileInputStream(file);
-		int bytes = 0;
-		//缓存大小
-		final byte[] bufferOut = new byte[1024 * 1024 * 5];
-		while ((bytes = in.read(bufferOut)) != -1) {
-			out.write(bufferOut, 0, bytes);
+		final File infile = new File(file);
+		final FileInputStream in = new FileInputStream(infile);
+		long commit = 0;
+		int len = 0;
+		// 缓存大小
+		final byte[] buffer = new byte[1024 * 50];
+		while ((len = in.read(buffer)) != -1) {
+			out.write(buffer, 0, len);
 			out.flush();
+			commit += len;
+			if(null != listener){
+				listener.onWrite(infile.length(), commit);
+			}
 		}
 		in.close();
 		out.write(fileend.getBytes("UTF-8"));
 		out.flush();
 		return true;
 	}
+
+	/**
+	 * 写出数据监听
+	 * 
+	 * @author wjh
+	 *
+	 */
+	public interface OutputDataListener {
+
+		/**
+		 * 
+		 * @param sum
+		 *            总长度
+		 * @param commit
+		 *            已完成长度
+		 */
+		void onWrite(long sum, long commit);
+
+	}
+
 }
