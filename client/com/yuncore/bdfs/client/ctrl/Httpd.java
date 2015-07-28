@@ -1,21 +1,21 @@
 package com.yuncore.bdfs.client.ctrl;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.yuncore.bdfs.client.ClientEnv;
 import com.yuncore.bdfs.client.util.Log;
+import com.yuncore.bdfs.entity.EntityJSON;
 import com.yuncore.bdfs.util.Gzip;
 
 public class Httpd extends NanoHTTPd {
@@ -83,11 +83,25 @@ public class Httpd extends NanoHTTPd {
 	 * @param object
 	 */
 	private void printEnv(JSONObject object) {
-		final ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
-		PrintStream out = new PrintStream(arrayOutputStream);
-		System.getProperties().list(out);
+		final Properties properties = System.getProperties();
+		final Enumeration<Object> keys = properties.keys();
+		JSONObject jsonObject = new JSONObject();
+		Object key = null;
+		Object value = null;
+		JSONObject item = null;
+		while (keys.hasMoreElements()) {
+			key = keys.nextElement();
+			value = properties.get(key);
+			if (value instanceof EntityJSON) {
+				item = new JSONObject();
+				((EntityJSON) value).toJSON(item);
+				jsonObject.put(key.toString(), item);
+			} else {
+				jsonObject.put(key.toString(), value);
+			}
+		}
 		object.put("code", 200);
-		object.put("data", new String(arrayOutputStream.toByteArray()));
+		object.put("env", jsonObject);
 	}
 
 	/**

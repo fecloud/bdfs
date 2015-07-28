@@ -21,7 +21,7 @@
             var service = "bdfs";
 
             $.ajax({url: "{0}?action=status".format(service, randomInt()), success: function (data) {
-				if(data.code && data.code == 200) {
+				if (data.code && data.code == 200) {
 					$("#status").html("正常");
 				}else {
 					$("#status").html("故障");
@@ -32,6 +32,27 @@
 			$.ajax({url: "{0}?action=cpuinfo".format(service, randomInt()), success: function (data) {
 				if(data.code && data.code == 200) {
 					$("#core").html(data.data);
+				}
+            }});
+			
+			$.ajax({url: "{0}?action=env".format(service, randomInt()), success: function (data) {
+				if (data.code && data.code == 200) {
+					var env = data.env;
+					if (env.cloudlist_session) {
+						var date = new Date(); 
+						date.setTime(env.cloudlist_session);
+						$("#cloudlist_session").html(date.format("MM-dd hh:mm:ss"));
+					}
+					if (env.locallist_session) {
+						var date = new Date(); 
+						date.setTime(env.locallist_session);
+						$("#locallist_session").html(date.format("MM-dd hh:mm:ss"));
+					}
+					
+					$("#arch").html(env['os.arch']);
+					$("#operate").html(env['os.name']);
+					$("#java").html(env['java.runtime.version']);
+					
 				}
             }});
 
@@ -46,6 +67,7 @@
 <div id="page">
 
     <div id="header">
+		<div class="btn back_btn">返回</div>
         <h1>服务器状态</h1>
 
         <div style=" width: 50px;height: 30px;"></div>
@@ -60,8 +82,23 @@
             </div>
         </li>
     </ul>
+	
+	<ul class="list group">
+        <li class="list-item">
+            <div class="box">
+                <div class="content">云端文件列表时间</div>
+                <div class="service_operate text_right" id="cloudlist_session">...</div>
+            </div>
+        </li>
+		<li class="list-item">
+            <div class="box">
+                <div class="content">本地文件列表时间</div>
+                <div class="service_operate text_right" id="locallist_session">...</div>
+            </div>
+        </li>
+    </ul>
 
-    <ul id="env" class="list group">
+    <ul class="list group">
         <li class="list-item">
             <div class="box">
                 <div class="content">CPU</div>
@@ -74,7 +111,18 @@
                 <div class="service_operate text_right" id="core">...</div>
             </div>
         </li>
-
+		<li class="list-item">
+            <div class="box">
+                <div class="content">操作系统</div>
+                <div class="service_operate text_right" id="operate">...</div>
+            </div>
+        </li>
+		<li class="list-item">
+            <div class="box">
+                <div class="content">Java版本</div>
+                <div class="service_operate text_right" id="java">...</div>
+            </div>
+        </li>
     </ul>
 
     <div style="text-align: center;margin: 10px 0 20px 0;" class="ios7_font">
