@@ -136,6 +136,16 @@ public class NanoHTTPd {
             } catch (java.io.UnsupportedEncodingException uee) {
             }
         }
+        
+        /**
+         * Convenience method that makes an InputStream out of
+         * given text.
+         */
+        public Response(String status, String mimeType, byte [] bytes) {
+            this.status = status;
+            this.mimeType = mimeType;
+            this.data = new ByteArrayInputStream(bytes);
+        }
 
         /**
          * Adds given line to the header.

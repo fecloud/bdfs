@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 import com.yuncore.bdfs.client.ClientEnv;
 import com.yuncore.bdfs.client.util.Log;
+import com.yuncore.bdfs.util.Gzip;
 
 public class Httpd extends NanoHTTPd {
 
@@ -31,9 +32,11 @@ public class Httpd extends NanoHTTPd {
 			Properties parms, Properties files) {
 		Response response = dispath(uri, method, header, parms, files);
 		if (response == null) {
-			response = new Response(HTTP_NOTFOUND, MIME_PLAINTEXT, "not found");
+			response = new Response(HTTP_NOTFOUND, MIME_PLAINTEXT,
+					Gzip.gzip("not found".getBytes()));
 		}
 		response.addHeader("Connection", "close");
+		response.addHeader("Content-Encoding", "gzip");
 		return response;
 	}
 
@@ -56,16 +59,20 @@ public class Httpd extends NanoHTTPd {
 				printEnv(object);
 			} else if (action.equalsIgnoreCase("clientEnv")) {
 				printClientEnv(object);
-			} else if (action.equals("threads")) {
+			} else if (action.equalsIgnoreCase("threads")) {
 				getThreads(object);
-			} else if (action.equals("cpuinfo")) {
+			} else if (action.equalsIgnoreCase("cpuinfo")) {
 				object.put("code", 200);
 				object.put("data", Runtime.getRuntime().availableProcessors());
+
+			} else if (action.equalsIgnoreCase("status")) {
+				object.put("code", 200);
 			} else {
 				object.put("code", 500);
 				object.put("msg", "not support");
 			}
-			return new Response(HTTP_OK, MIME_JSON, object.toString());
+			return new Response(HTTP_OK, MIME_JSON, Gzip.gzip(object.toString()
+					.getBytes()));
 		}
 		return null;
 	}
