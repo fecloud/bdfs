@@ -98,10 +98,10 @@ public class Http {
 
 		conn.setConnectTimeout(20000);
 		conn.setReadTimeout(20000);
-
+		
 		addFormString();
 		addFormData();
-
+		
 		conn.connect();
 		if (DEBUG)
 			printResponeHead();
