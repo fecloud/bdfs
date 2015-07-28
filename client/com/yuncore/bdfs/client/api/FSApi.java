@@ -7,6 +7,7 @@ import com.yuncore.bdfs.client.util.DownloadInputStream;
 import com.yuncore.bdfs.entity.BDFSFile;
 import com.yuncore.bdfs.entity.CloudFile;
 import com.yuncore.bdfs.exception.ApiException;
+import com.yuncore.bdfs.http.HttpFormOutput.OutputDataListener;
 
 public interface FSApi {
 
@@ -67,6 +68,16 @@ public interface FSApi {
 	 * @throws ApiException
 	 */
 	public boolean upload(String localpath, String cloudpath)throws ApiException;
+	
+	/**
+	 * 上传文件
+	 * @param filename 本地文件路径
+	 * @param dir 服务器路径
+	 * @param listener 数据写入监听
+	 * @return
+	 * @throws ApiException
+	 */
+	public boolean upload(String localpath, String cloudpath, OutputDataListener listener)throws ApiException;
 	
 	/**
 	 * 秒传

@@ -26,6 +26,7 @@ import com.yuncore.bdfs.entity.CloudFile;
 import com.yuncore.bdfs.exception.ApiException;
 import com.yuncore.bdfs.http.Http;
 import com.yuncore.bdfs.http.Http.Method;
+import com.yuncore.bdfs.http.HttpFormOutput.OutputDataListener;
 import com.yuncore.bdfs.http.HttpFormOutput;
 import com.yuncore.bdfs.http.HttpInput;
 import com.yuncore.bdfs.http.cookie.HttpCookieContainer;
@@ -339,7 +340,12 @@ public class FSApiImple implements FSApi {
 	}
 
 	@Override
-	public boolean upload(String localpath, String cloudpath)
+	public boolean upload(String localpath, String cloudpath) throws ApiException {
+		return upload(localpath, cloudpath, null);
+	}
+	
+	@Override
+	public boolean upload(String localpath, String cloudpath, OutputDataListener listener)
 			throws ApiException {
 		try {
 			if (context.load()) {
@@ -350,7 +356,7 @@ public class FSApiImple implements FSApi {
 						URLEncoder.encode(cloudFile.getParentPath(), "UTF-8"),
 						URLEncoder.encode(cloudFile.getName(), "UTF-8"), BDUSS);
 
-				final HttpFormOutput http = new HttpFormOutput(url, localpath);
+				final HttpFormOutput http = new HttpFormOutput(url, localpath, listener);
 				if (http.http()) {
 					if(DEBUG)
 						Log.i(TAG, String.format("upload result:%s", http.result()));
