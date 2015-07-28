@@ -158,6 +158,7 @@ public class LocalUpload extends Thread implements OutputDataListener {
 		final long fileLen = file.getLength();
 		// 判断是否大小分块上传的单块数,可以用秒传试一下
 		if (fileLen > FSApi.RAPIDUPLOAD) {
+			Log.d(TAG, "try secondFileContext");
 			if (secondFileContext(file)) {
 				Log.d(TAG, "secondFileContext ok");
 				return true;
