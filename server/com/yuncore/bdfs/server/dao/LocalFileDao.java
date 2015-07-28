@@ -39,7 +39,7 @@ public class LocalFileDao extends BaseDao {
 		// f
 		// .getDir().replace("\\", "\\\\"), f.getName(), f.getLength(), f
 		// .getType(), f.getfId(), f.getSession()));
-		insert.append(String.format("(UUID(),\"%s\",%s,%s,\"%s\",%s)",
+		insert.append(String.format("(CONCAT(UUID(),RAND()),\"%s\",%s,%s,\"%s\",%s)",
 				f.getPath(), f.getLength(), f.isDir() ? 1 : 0, f.getfId(),
 				f.getSession()));
 		size++;

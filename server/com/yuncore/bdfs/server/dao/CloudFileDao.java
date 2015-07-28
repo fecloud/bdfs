@@ -47,7 +47,7 @@ public class CloudFileDao extends BaseDao {
 				insert.append(",");
 			}
 			insert.append(String.format(
-					"(UUID(),\"%s\",%s,%s,\"%s\",\"%s\",%s)", f.getPath(),
+					"(CONCAT(UUID(),RAND()),\"%s\",%s,%s,\"%s\",\"%s\",%s)", f.getPath(),
 					f.getLength(), f.isDir() ? 1 : 0, f.toFid(),
 					f.getMd5() == null ? "" : f.getMd5(), f.getSession()));
 			size++;
@@ -86,7 +86,7 @@ public class CloudFileDao extends BaseDao {
 			stopwatch.stop("CloudFileDao insertAll " + size);
 			return result;
 		} catch (SQLException e) {
-			logger.error("", e);
+			logger.error("error " + insert.toString(), e);
 		}
 		return false;
 	}
