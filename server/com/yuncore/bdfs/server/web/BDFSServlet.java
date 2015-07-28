@@ -8,13 +8,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -27,6 +28,7 @@ import org.json.JSONObject;
 
 import com.yuncore.bdfs.entity.Account;
 import com.yuncore.bdfs.entity.BDFSFile;
+import com.yuncore.bdfs.entity.EntityJSON;
 //import com.yuncore.bdfs.entity.Device;
 import com.yuncore.bdfs.entity.History;
 import com.yuncore.bdfs.server.BDFSServer;
@@ -113,11 +115,11 @@ public class BDFSServlet extends HttpServlet {
 			getDownLoad(object);
 		} else if (action.equals("deldownload")) {
 			delDownLoad(req, object);
-		} else if (action.equals("getupload")){
+		} else if (action.equals("getupload")) {
 			getUpLoad(object);
 		} else if (action.equals("delupload")) {
 			delUpLoad(req, object);
-		}else if (action.equals("getclouddelete")) {
+		} else if (action.equals("getclouddelete")) {
 			getCloudDelete(object);
 		} else if (action.equals("delclouddelete")) {
 			delCloudDelete(req, object);
@@ -135,13 +137,14 @@ public class BDFSServlet extends HttpServlet {
 		} else if (action.equals("localhistory")) {
 			localHistory(req, object);
 		} else if (action.equals("devices")) {
-			/*devices(req, object);*/
+			/* devices(req, object); */
 		} else {
 			object.put("code", 500);
 			object.put("msg", "not support");
 		}
 		resp.setContentType("application/json;charset=UTF-8");
-		resp.getOutputStream().write(Gzip.gzip(object.toString().getBytes("UTF-8")));
+		resp.getOutputStream().write(
+				Gzip.gzip(object.toString().getBytes("UTF-8")));
 	}
 
 	/**
@@ -149,19 +152,14 @@ public class BDFSServlet extends HttpServlet {
 	 * 
 	 * @param req
 	 * @param object
-	 
-	private void devices(HttpServletRequest req, JSONObject object) {
-		final JSONArray array = new JSONArray();
-		final List<Device> list = DeviceList.getAll();
-		JSONObject jsonObject = null;
-		for (Device s : list) {
-			jsonObject = new JSONObject();
-			s.toJSON(jsonObject);
-			array.put(jsonObject);
-		}
-		object.put("data", array);
-	}
-*/
+	 * 
+	 *            private void devices(HttpServletRequest req, JSONObject
+	 *            object) { final JSONArray array = new JSONArray(); final
+	 *            List<Device> list = DeviceList.getAll(); JSONObject jsonObject
+	 *            = null; for (Device s : list) { jsonObject = new JSONObject();
+	 *            s.toJSON(jsonObject); array.put(jsonObject); }
+	 *            object.put("data", array); }
+	 */
 	private void dispathUploadCookie(HttpServletRequest req,
 			HttpServletResponse resp, JSONObject object) {
 		final int contentLength = req.getContentLength();
@@ -299,10 +297,10 @@ public class BDFSServlet extends HttpServlet {
 			final boolean delete = new DownloadDao().delete(id);
 			object.put("code", 200);
 			object.put("data", delete);
-			
+
 		}
 	}
-	
+
 	private void delUpLoad(HttpServletRequest req, JSONObject object) {
 		final String id = req.getParameter("id");
 		if (id == null) {
@@ -356,7 +354,7 @@ public class BDFSServlet extends HttpServlet {
 			object.put("data", fileoObject);
 		}
 	}
-	
+
 	/**
 	 * 取一个下载任务
 	 */
@@ -452,11 +450,25 @@ public class BDFSServlet extends HttpServlet {
 	 * @param object
 	 */
 	private void printEnv(JSONObject object) {
-		final ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
-		PrintStream out = new PrintStream(arrayOutputStream);
-		System.getProperties().list(out);
+		final Properties properties = System.getProperties();
+		final Enumeration<Object> keys = properties.keys();
+		JSONObject jsonObject = new JSONObject();
+		Object key = null;
+		Object value = null;
+		JSONObject item = null;
+		while (keys.hasMoreElements()) {
+			key = keys.nextElement();
+			value = properties.get(key);
+			if (value instanceof EntityJSON) {
+				item = new JSONObject();
+				((EntityJSON) value).toJSON(item);
+				jsonObject.put(key.toString(), item);
+			} else {
+				jsonObject.put(key.toString(), value);
+			}
+		}
 		object.put("code", 200);
-		object.put("env", new String(arrayOutputStream.toByteArray()));
+		object.put("env", jsonObject);
 	}
 
 	/**

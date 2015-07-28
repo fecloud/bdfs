@@ -1,0 +1,27 @@
+.group{
+
+    margin-top: 44px;
+    border-top: solid 1px #c8c7cc;
+}
+
+.content{
+    line-height: 44px;
+    font-size: 18px;
+    margin-left: 18px;
+    margin-left: 0px;
+}
+
+.list {
+    border-bottom: none;
+}
+.service_operate {
+    font-size: 18px;
+    color: #8e8e93;
+    line-height: 44px;
+    vertical-align: middle;
+}
+.box .content {
+    -moz-box-flex: 1;
+    -webkit-box-flex: 1;
+    box-flex: 1;
+}

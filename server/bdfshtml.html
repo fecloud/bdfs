@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>服务器状态</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui"/>
+    <link rel="apple-touch-icon-precomposed" href="img/screen_icon.png"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <link rel="stylesheet" href="css/com.css"/>
+    <link rel="stylesheet" href="css/status.css"/>
+    <script type="text/javascript" src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script type="text/javascript" src="js/com.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            back_bind();
+
+            var service = "bdfs";
+
+            $.ajax({url: "{0}?action=status".format(service, randomInt()), success: function (data) {
+				if(data.code && data.code == 200) {
+					$("#status").html("正常");
+				}else {
+					$("#status").html("故障");
+					$("#status").css('color','red');
+				}
+            }});
+			
+			$.ajax({url: "{0}?action=cpuinfo".format(service, randomInt()), success: function (data) {
+				if(data.code && data.code == 200) {
+					$("#core").html(data.data);
+				}
+            }});
+
+        });
+
+    </script>
+
+</head>
+
+<body>
+
+<div id="page">
+
+    <div id="header">
+        <h1>服务器状态</h1>
+
+        <div style=" width: 50px;height: 30px;"></div>
+
+    </div>
+
+    <ul id="services" class="list group">
+        <li class="list-item">
+            <div class="box">
+                <div class="content">服务状态</div>
+                <div class="service_operate text_right" id="status">...</div>
+            </div>
+        </li>
+    </ul>
+
+    <ul id="env" class="list group">
+        <li class="list-item">
+            <div class="box">
+                <div class="content">CPU</div>
+                <div class="service_operate text_right" id="arch">...</div>
+            </div>
+        </li>
+        <li class="list-item">
+            <div class="box">
+                <div class="content">核心数</div>
+                <div class="service_operate text_right" id="core">...</div>
+            </div>
+        </li>
+
+    </ul>
+
+    <div style="text-align: center;margin: 10px 0 20px 0;" class="ios7_font">
+        Copyright FCloud, Inc
+    </div>
+
+</div>
+
+</body>
+</html>
