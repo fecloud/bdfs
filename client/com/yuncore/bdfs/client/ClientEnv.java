@@ -15,6 +15,11 @@ public class ClientEnv {
 	public static final String key_uploading = "uploading";
 	
 	/**
+	 * 正在上传的文件已上传大小
+	 */
+	public static final String key_upload_size = "upload_size";
+	
+	/**
 	 * 本上传文件列表
 	 */
 	public static final String key_localfilelist = "localfilelist";
