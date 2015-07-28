@@ -14,8 +14,9 @@ import com.yuncore.bdfs.entity.BDFSFile;
 import com.yuncore.bdfs.entity.CloudFile;
 import com.yuncore.bdfs.exception.ApiException;
 import com.yuncore.bdfs.exception.ServerApiException;
+import com.yuncore.bdfs.http.HttpFormOutput.OutputDataListener;
 
-public class LocalUpload extends Thread {
+public class LocalUpload extends Thread implements OutputDataListener {
 
 	static final String TAG = "LocalUpload";
 
@@ -97,6 +98,7 @@ public class LocalUpload extends Thread {
 	 * @return
 	 */
 	private boolean uploadFile(BDFSFile file) {
+		ClientEnv.setProperty(ClientEnv.key_upload_size, 0);
 		if (checkBDFSFile(file)) {
 			Log.w(TAG, "file too big ,not upload");
 			return true;
@@ -184,6 +186,7 @@ public class LocalUpload extends Thread {
 			Log.e(TAG,
 					String.format("uploadFileContext file:%s error",
 							file.getAbsolutePath()), e);
+			ClientEnv.setProperty(ClientEnv.key_upload_size, 0);
 		}
 		return false;
 	}
@@ -268,5 +271,10 @@ public class LocalUpload extends Thread {
 			Log.e(TAG, "mkdirCloud error", e);
 		}
 		return false;
+	}
+
+	@Override
+	public void onWrite(long sum, long commit) {
+		ClientEnv.setProperty(ClientEnv.key_upload_size, commit);
 	}
 }
