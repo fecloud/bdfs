@@ -132,7 +132,11 @@
 			<lib file="${dist.server}">
 			</lib>
 			<fileset dir="${src.server.dir}">
+				<include name="favicon.ico" />
 				<include name="index.html" />
+				<include name="css/**" />
+				<include name="js/**" />
+				<include name="img/**" />
 			</fileset>
 		</war>
 	</target>
