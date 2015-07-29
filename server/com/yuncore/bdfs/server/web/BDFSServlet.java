@@ -360,7 +360,7 @@ public class BDFSServlet extends HttpServlet {
 				object.put("data", fileoObject);
 				return;
 			} else {
-				downloadDao.delete(file.getfId());
+				downloadDao.delete(file.getId());
 			}
 		}
 		object.put("code", 500);
@@ -382,7 +382,7 @@ public class BDFSServlet extends HttpServlet {
 				object.put("data", fileoObject);
 				return;
 			} else {
-				uploadDao.delete(file.getfId());
+				uploadDao.delete(file.getId());
 			}
 		}
 		object.put("code", 500);
