@@ -38,7 +38,7 @@ public class UploadLocalFileList extends Thread {
 			}
 			try {
 				ClientEnv.setProperty(ClientEnv.key_localfilelist, "sleep");
-				Thread.sleep(300000);
+				Thread.sleep(60 * 1000 * 10);
 			} catch (InterruptedException e) {
 				Log.e(TAG, "", e);
 			}
