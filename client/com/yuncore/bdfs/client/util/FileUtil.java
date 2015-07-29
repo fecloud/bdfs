@@ -9,7 +9,7 @@ import com.yuncore.bdfs.entity.BDFSFile;
 public class FileUtil {
 
 	private static String BYTE_SIZE_UNIT[] = { "BYTE", "KB", "MB", "GB", "TB" };
-	
+
 	/**
 	 * 读取目录
 	 * 
@@ -23,17 +23,31 @@ public class FileUtil {
 			if (null != listFiles) {
 				final List<BDFSFile> list = new ArrayList<BDFSFile>();
 				BDFSFile localFile = null;
-				for (File f : listFiles) {
-					localFile = new BDFSFile();
-//					localFile.setPath(f.getAbsolutePath().substring(root.length()).replace("\\", "/"));
-					localFile.setPath(f.getAbsolutePath().substring(root.length()));
-					if (f.isFile()) {
-						localFile.setLength(f.length());
+				boolean file_separator = File.separator.equals("\\");
+				if (file_separator) {
+					for (File f : listFiles) {
+						localFile = new BDFSFile();
+						localFile.setPath(f.getAbsolutePath().substring(root.length()).replace("\\", "/"));
+						if (f.isFile()) {
+							localFile.setLength(f.length());
+						}
+						localFile.setDir((f.isFile() ? false : true));
+						localFile.setSession(session);
+						localFile.setfId(localFile.toFid());
+						list.add(localFile);
 					}
-					localFile.setDir((f.isFile() ? false : true));
-					localFile.setSession(session);
-					localFile.setfId(localFile.toFid());
-					list.add(localFile);
+				} else {
+					for (File f : listFiles) {
+						localFile = new BDFSFile();
+						localFile.setPath(f.getAbsolutePath().substring(root.length()));
+						if (f.isFile()) {
+							localFile.setLength(f.length());
+						}
+						localFile.setDir((f.isFile() ? false : true));
+						localFile.setSession(session);
+						localFile.setfId(localFile.toFid());
+						list.add(localFile);
+					}
 				}
 
 				return list;
@@ -71,5 +85,5 @@ public class FileUtil {
 		builder.append(BYTE_SIZE_UNIT[i]);
 		return builder.toString();
 	}
-	
+
 }
