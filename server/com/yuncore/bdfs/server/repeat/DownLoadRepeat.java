@@ -10,21 +10,23 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.yuncore.bdfs.entity.BDFSFile;
-import com.yuncore.bdfs.server.BDFSServer;
 import com.yuncore.bdfs.server.dao.BaseDao;
 import com.yuncore.bdfs.server.dao.DownloadDao;
 
 public class DownLoadRepeat extends Thread {
 
-	Logger logger = Logger.getLogger(BDFSServer.class.getSimpleName());
+	private static final int UNIT = 1000;
+	
+	protected Logger logger;
 
 	protected DownloadDao downloadDao;
 
 	protected RepeatDao repeatDao = new RepeatDao();
 
 	protected Connection connection;
-
+	
 	public DownLoadRepeat() {
+		logger = Logger.getLogger(getTAG());
 		downloadDao = new DownloadDao();
 	}
 
@@ -60,7 +62,7 @@ public class DownLoadRepeat extends Thread {
 		List<BDFSFile> list = null;
 		List<String> deleteIds = new ArrayList<String>();
 		try {
-			while (null != (list = downloadDao.query(1000))) {
+			while (null != (list = downloadDao.query(UNIT))) {
 				for (BDFSFile file : list) {
 					if (exists(file)) {
 						deleteIds.add(file.getId());
@@ -69,6 +71,7 @@ public class DownLoadRepeat extends Thread {
 				deletes(deleteIds);
 			}
 		} catch (Exception e) {
+			logger.error("", e);
 		} finally {
 			if (null != connection) {
 				try {
@@ -119,7 +122,7 @@ public class DownLoadRepeat extends Thread {
 					builder.append(",");
 				}
 
-				builder.append(ids.get(i));
+				builder.append(String.format("\"%s\"", ids.get(i)));
 			}
 			builder.append(")");
 			final PreparedStatement preparedStatement = connection
