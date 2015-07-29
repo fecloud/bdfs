@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.yuncore.bdfs.entity.BDFSFile;
 import com.yuncore.bdfs.entity.CloudFile;
 import com.yuncore.bdfs.server.Const;
 import com.yuncore.bdfs.server.util.Stopwatch;
@@ -127,6 +128,36 @@ public class CloudFileDao extends BaseDao {
 		return file;
 	}
 
+	/**
+	 * 是否存在一样的数据
+	 * @param file
+	 * @return
+	 */
+	public boolean exists(BDFSFile file) {
+		boolean con = false;
+		if (null != file) {
+			try {
+				final Connection connection = getDB();
+				final PreparedStatement prepareStatement = connection
+						.prepareStatement(String
+								.format("SELECT COUNT(*) FROM %s WHERE fid=? AND isdir=? AND length=?",
+										getTableName()));
+				prepareStatement.setString(1, file.getfId());
+				prepareStatement.setInt(2, file.isDir() ? 0 : 1);
+				prepareStatement.setLong(3, file.getLength());
+
+				final ResultSet executeQuery = prepareStatement.executeQuery();
+				con = executeQuery.next();
+				executeQuery.close();
+				prepareStatement.close();
+				connection.close();
+			} catch (SQLException e) {
+				logger.error("", e);
+			}
+		}
+		return con;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

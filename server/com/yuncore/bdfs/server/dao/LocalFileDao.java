@@ -1,6 +1,7 @@
 package com.yuncore.bdfs.server.dao;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -91,6 +92,37 @@ public class LocalFileDao extends BaseDao {
 		}
 		return false;
 	}
+	
+	/**
+	 * 是否存在一样的数据
+	 * @param file
+	 * @return
+	 */
+	public boolean exists(BDFSFile file) {
+		boolean con = false;
+		if (null != file) {
+			try {
+				final Connection connection = getDB();
+				final PreparedStatement prepareStatement = connection
+						.prepareStatement(String
+								.format("SELECT COUNT(*) FROM %s WHERE fid=? AND isdir=? AND length=?",
+										getTableName()));
+				prepareStatement.setString(1, file.getfId());
+				prepareStatement.setInt(2, file.isDir() ? 0 : 1);
+				prepareStatement.setLong(3, file.getLength());
+
+				final ResultSet executeQuery = prepareStatement.executeQuery();
+				con = executeQuery.next();
+				executeQuery.close();
+				prepareStatement.close();
+				connection.close();
+			} catch (SQLException e) {
+				logger.error("", e);
+			}
+		}
+		return con;
+	}
+	
 
 	protected static BDFSFile buildLocalFile(ResultSet resultSet)
 			throws SQLException {
