@@ -63,16 +63,21 @@ public class DownLoadRepeat extends Thread {
 		List<BDFSFile> list = null;
 		List<String> deleteIds = new ArrayList<String>();
 		try {
-			Stopwatch stopwatch = null;
-			while (null != (list = downloadDao.query(UNIT))) {
-				stopwatch = new Stopwatch();
-				for (BDFSFile file : list) {
-					if (exists(file)) {
-						deleteIds.add(file.getfId());
+			if (chekcSelectTable()){
+				Stopwatch stopwatch = null;
+				while (null != (list = downloadDao.query(UNIT))) {
+					stopwatch = new Stopwatch();
+					stopwatch.start();
+					for (BDFSFile file : list) {
+						if (exists(file)) {
+							deleteIds.add(file.getfId());
+						}
 					}
+					stopwatch.stop(getTAG() + " select exists");
+					deletes(deleteIds);
 				}
-				stopwatch.stop(getTAG() + " select exists");
-				deletes(deleteIds);
+			} else {
+				logger.warn(selectTableName() + " no data return");
 			}
 		} catch (Exception e) {
 			logger.error("", e);
@@ -87,6 +92,24 @@ public class DownLoadRepeat extends Thread {
 		}
 	}
 
+	/**
+	 * 检查查询表是否有数据
+	 * @return
+	 * @throws SQLException
+	 */
+	protected boolean chekcSelectTable() throws SQLException {
+		boolean conn = false;
+		final PreparedStatement preparedStatement = connection.prepareStatement("select count(*) from " + selectTableName());
+		final ResultSet resultSet = preparedStatement.executeQuery();
+		if(resultSet != null && resultSet.next()){
+			final long count = resultSet.getLong(1);
+			conn = (count > 0);
+		}
+		resultSet.close();
+		preparedStatement.close();
+		return conn;
+	}
+	
 	/**
 	 * 查找重复的
 	 * 
