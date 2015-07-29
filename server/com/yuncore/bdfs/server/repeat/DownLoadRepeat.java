@@ -15,7 +15,7 @@ import com.yuncore.bdfs.server.dao.DownloadDao;
 
 public class DownLoadRepeat extends Thread {
 
-	private static final int UNIT = 1000;
+	private static final int UNIT = 2000;
 	
 	protected Logger logger;
 
@@ -65,7 +65,7 @@ public class DownLoadRepeat extends Thread {
 			while (null != (list = downloadDao.query(UNIT))) {
 				for (BDFSFile file : list) {
 					if (exists(file)) {
-						deleteIds.add(file.getId());
+						deleteIds.add(file.getfId());
 					}
 				}
 				deletes(deleteIds);
@@ -94,11 +94,9 @@ public class DownLoadRepeat extends Thread {
 		boolean conn = false;
 		final PreparedStatement prepareStatement = connection
 				.prepareStatement(String
-						.format("SELECT COUNT(*) FROM %s WHERE fid=? AND isdir=? AND length=?",
+						.format("SELECT COUNT(*) FROM %s WHERE fid=?",
 								selectTableName()));
 		prepareStatement.setString(1, file.getfId());
-		prepareStatement.setInt(2, file.isDir() ? 0 : 1);
-		prepareStatement.setLong(3, file.getLength());
 
 		final ResultSet executeQuery = prepareStatement.executeQuery();
 		conn = executeQuery.next();
@@ -116,7 +114,7 @@ public class DownLoadRepeat extends Thread {
 	protected synchronized void deletes(List<String> ids) throws SQLException {
 		if (null != ids && !ids.isEmpty()) {
 			final StringBuilder builder = new StringBuilder("DELETE FROM "
-					+ getFromTableName() + " WHERE id IN (");
+					+ getFromTableName() + " WHERE fid IN (");
 			for (int i = 0; i < ids.size(); i++) {
 				if (i != 0) {
 					builder.append(",");
@@ -127,8 +125,11 @@ public class DownLoadRepeat extends Thread {
 			builder.append(")");
 			final PreparedStatement preparedStatement = connection
 					.prepareStatement(builder.toString());
+			connection.setAutoCommit(false);
 			final int count = preparedStatement.executeUpdate();
-			logger.debug(String.format("%s delete %s local exists files",
+			connection.commit();
+			connection.setAutoCommit(true);
+			logger.debug(String.format("%s delete %s exists files",
 					getTAG(), count));
 			preparedStatement.close();
 		}
