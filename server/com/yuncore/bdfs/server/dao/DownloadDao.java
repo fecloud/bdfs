@@ -83,7 +83,7 @@ public class DownloadDao extends BaseDao {
 	}
 
 	public BDFSFile query() {
-		List<BDFSFile> query = query(1);
+		List<BDFSFile> query = query(0l, 1);
 		if (null != query && !query.isEmpty()) {
 			return query.get(0);
 		} else {
@@ -91,14 +91,14 @@ public class DownloadDao extends BaseDao {
 		}
 	}
 
-	public List<BDFSFile> query(int num) {
+	public List<BDFSFile> query(long start,int num) {
 
 		try {
 			final Stopwatch stopwatch = new Stopwatch();
 			stopwatch.start();
 			final List<BDFSFile> list = new ArrayList<BDFSFile>();
-			final String sql = String.format("SELECT * FROM %s LIMIT 0,%s",
-					getTableName(), num);
+			final String sql = String.format("SELECT * FROM %s LIMIT %s,%s",
+					getTableName(),start ,num);
 
 			final Connection connection = getDB();
 			final PreparedStatement prepareStatement = connection
@@ -118,7 +118,7 @@ public class DownloadDao extends BaseDao {
 			resultSet.close();
 			prepareStatement.close();
 			connection.close();
-			stopwatch.stop("DownloadDao query:" + num);
+			stopwatch.stop(getClass().getSimpleName() + " query:" + num + " " + getTableName());
 			return list;
 		} catch (SQLException e) {
 			logger.error("query error", e);

@@ -4,7 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -61,20 +62,21 @@ public class DownLoadRepeat extends Thread {
 		connection = repeatDao.getConnection();
 
 		List<BDFSFile> list = null;
-		List<String> deleteIds = new ArrayList<String>();
+		HashSet<String> deleteIds = null;
 		try {
-			if (chekcSelectTable()){
+			if (chekcSelectTable()) {
+				long start = 0;
 				Stopwatch stopwatch = null;
-				while (null != (list = downloadDao.query(UNIT))) {
+				while (null != (list = downloadDao.query(start, UNIT))
+						&& !list.isEmpty()) {
 					stopwatch = new Stopwatch();
 					stopwatch.start();
-					for (BDFSFile file : list) {
-						if (exists(file)) {
-							deleteIds.add(file.getfId());
-						}
-					}
+					deleteIds = exists(list);
 					stopwatch.stop(getTAG() + " select exists");
-					deletes(deleteIds);
+					if (null != deleteIds && !deleteIds.isEmpty()) {
+						deletes(deleteIds);
+					}
+					start += list.size();
 				}
 			} else {
 				logger.warn(selectTableName() + " no data return");
@@ -99,7 +101,7 @@ public class DownLoadRepeat extends Thread {
 	 */
 	protected boolean chekcSelectTable() throws SQLException {
 		boolean conn = false;
-		final PreparedStatement preparedStatement = connection.prepareStatement("select count(*) from " + selectTableName());
+		final PreparedStatement preparedStatement = connection.prepareStatement("SELECT COUNT(*) FROM " + selectTableName());
 		final ResultSet resultSet = preparedStatement.executeQuery();
 		if(resultSet != null && resultSet.next()){
 			final long count = resultSet.getLong(1);
@@ -117,19 +119,34 @@ public class DownLoadRepeat extends Thread {
 	 * @return
 	 * @throws SQLException
 	 */
-	protected synchronized boolean exists(BDFSFile file) throws SQLException {
-		boolean conn = false;
-		final PreparedStatement prepareStatement = connection
-				.prepareStatement(String
-						.format("SELECT COUNT(*) FROM %s WHERE fid=?",
-								selectTableName()));
-		prepareStatement.setString(1, file.getfId());
+	protected synchronized HashSet<String> exists(List<BDFSFile> files)
+			throws SQLException {
+		final HashSet<String> list = new HashSet<String>();
+		if (null != files && !files.isEmpty()) {
+			final StringBuilder builder = new StringBuilder("SELECT fid FROM "
+					+ selectTableName() + " WHERE fid IN (");
+			for (int i = 0; i < files.size(); i++) {
+				if (i != 0) {
+					builder.append(",");
+				}
 
-		final ResultSet executeQuery = prepareStatement.executeQuery();
-		conn = executeQuery.next();
-		executeQuery.close();
-		prepareStatement.close();
-		return conn;
+				builder.append("\"").append( files.get(i).getfId()).append("\"");
+			}
+			builder.append(")");
+			final PreparedStatement prepareStatement = connection
+					.prepareStatement(builder.toString());
+			final ResultSet resulSet = prepareStatement.executeQuery();
+			if (null != resulSet) {
+				while (resulSet.next()) {
+					list.add(resulSet.getString(1));
+				}
+				resulSet.close();
+			}
+			prepareStatement.close();
+			
+			logger.debug("found " + list.size() + " in " + selectTableName());
+		}
+		return list;
 	}
 
 	/**
@@ -138,18 +155,18 @@ public class DownLoadRepeat extends Thread {
 	 * @param ids
 	 * @throws SQLException
 	 */
-	protected synchronized void deletes(List<String> ids) throws SQLException {
+	protected synchronized void deletes(HashSet<String> ids) throws SQLException {
 		if (null != ids && !ids.isEmpty()) {
 			final Stopwatch stopwatch = new Stopwatch();
 			stopwatch.start();
 			final StringBuilder builder = new StringBuilder("DELETE FROM "
 					+ getFromTableName() + " WHERE fid IN (");
-			for (int i = 0; i < ids.size(); i++) {
-				if (i != 0) {
-					builder.append(",");
+			final Iterator<String> iterator = ids.iterator();
+			if(iterator.hasNext()){
+				builder.append("\"").append(iterator.next()).append("\"");
+				while(iterator.hasNext()){
+					builder.append(",").append("\"").append(iterator.next()).append("\"");
 				}
-
-				builder.append(String.format("\"%s\"", ids.get(i)));
 			}
 			builder.append(")");
 			final PreparedStatement preparedStatement = connection
