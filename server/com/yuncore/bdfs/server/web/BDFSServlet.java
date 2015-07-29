@@ -33,12 +33,10 @@ import com.yuncore.bdfs.entity.EntityJSON;
 import com.yuncore.bdfs.entity.History;
 import com.yuncore.bdfs.server.BDFSServer;
 import com.yuncore.bdfs.server.dao.AccountDao;
-import com.yuncore.bdfs.server.dao.CloudFileDao;
 import com.yuncore.bdfs.server.dao.CloudFileDeleteDao;
 import com.yuncore.bdfs.server.dao.CloudHistoryDao;
 import com.yuncore.bdfs.server.dao.CookieDao;
 import com.yuncore.bdfs.server.dao.DownloadDao;
-import com.yuncore.bdfs.server.dao.LocalFileDao;
 import com.yuncore.bdfs.server.dao.LocalHistoryDao;
 import com.yuncore.bdfs.server.dao.UploadDao;
 //import com.yuncore.bdfs.server.device.DeviceList;
@@ -348,44 +346,30 @@ public class BDFSServlet extends HttpServlet {
 	 * 取一个下载任务
 	 */
 	private void getDownLoad(JSONObject object) {
-		final DownloadDao downloadDao = new DownloadDao();
-		final LocalFileDao localFileDao = new LocalFileDao();
-		BDFSFile file = null;
-		while (null != (file = downloadDao.query())) {
-
-			if (!localFileDao.exists(file)) {
-				object.put("code", 200);
-				final JSONObject fileoObject = new JSONObject();
-				file.toJSON(fileoObject);
-				object.put("data", fileoObject);
-				return;
-			} else {
-				downloadDao.delete(file.getId());
-			}
+		final BDFSFile file = new DownloadDao().query();
+		if (null != file) {
+			object.put("code", 200);
+			final JSONObject fileoObject = new JSONObject();
+			file.toJSON(fileoObject);
+			object.put("data", fileoObject);
+		}else {
+			object.put("code", 500);
 		}
-		object.put("code", 500);
 	}
 
 	/**
 	 * 取一个下载任务
 	 */
 	private void getUpLoad(JSONObject object) {
-		final UploadDao uploadDao = new UploadDao();
-		final CloudFileDao cloudFileDao = new CloudFileDao();
-		BDFSFile file = null;
-		while (null != (file = uploadDao.query())) {
-
-			if (!cloudFileDao.exists(file)) {
-				object.put("code", 200);
-				final JSONObject fileoObject = new JSONObject();
-				file.toJSON(fileoObject);
-				object.put("data", fileoObject);
-				return;
-			} else {
-				uploadDao.delete(file.getId());
-			}
+		final BDFSFile file = new UploadDao().query();
+		if (null != file) {
+			object.put("code", 200);
+			final JSONObject fileoObject = new JSONObject();
+			file.toJSON(fileoObject);
+			object.put("data", fileoObject);
+		}else {
+			object.put("code", 500);
 		}
-		object.put("code", 500);
 	}
 
 	/**
