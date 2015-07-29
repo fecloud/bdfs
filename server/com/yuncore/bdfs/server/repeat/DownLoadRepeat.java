@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import com.yuncore.bdfs.entity.BDFSFile;
 import com.yuncore.bdfs.server.dao.BaseDao;
 import com.yuncore.bdfs.server.dao.DownloadDao;
+import com.yuncore.bdfs.server.util.Stopwatch;
 
 public class DownLoadRepeat extends Thread {
 
@@ -62,12 +63,15 @@ public class DownLoadRepeat extends Thread {
 		List<BDFSFile> list = null;
 		List<String> deleteIds = new ArrayList<String>();
 		try {
+			Stopwatch stopwatch = null;
 			while (null != (list = downloadDao.query(UNIT))) {
+				stopwatch = new Stopwatch();
 				for (BDFSFile file : list) {
 					if (exists(file)) {
 						deleteIds.add(file.getfId());
 					}
 				}
+				stopwatch.stop(getTAG() + " select exists");
 				deletes(deleteIds);
 			}
 		} catch (Exception e) {
@@ -113,6 +117,8 @@ public class DownLoadRepeat extends Thread {
 	 */
 	protected synchronized void deletes(List<String> ids) throws SQLException {
 		if (null != ids && !ids.isEmpty()) {
+			final Stopwatch stopwatch = new Stopwatch();
+			stopwatch.start();
 			final StringBuilder builder = new StringBuilder("DELETE FROM "
 					+ getFromTableName() + " WHERE fid IN (");
 			for (int i = 0; i < ids.size(); i++) {
@@ -132,6 +138,7 @@ public class DownLoadRepeat extends Thread {
 			logger.debug(String.format("%s delete %s exists files",
 					getTAG(), count));
 			preparedStatement.close();
+			stopwatch.stop(getTAG() + " deletes count:" + ids.size());
 		}
 	}
 

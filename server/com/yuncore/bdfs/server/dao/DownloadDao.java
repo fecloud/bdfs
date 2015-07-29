@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.yuncore.bdfs.entity.BDFSFile;
+import com.yuncore.bdfs.server.util.Stopwatch;
 
 public class DownloadDao extends BaseDao {
 
@@ -93,6 +94,8 @@ public class DownloadDao extends BaseDao {
 	public List<BDFSFile> query(int num) {
 
 		try {
+			final Stopwatch stopwatch = new Stopwatch();
+			stopwatch.start();
 			final List<BDFSFile> list = new ArrayList<BDFSFile>();
 			final String sql = String.format("SELECT * FROM %s LIMIT 0,%s",
 					getTableName(), num);
@@ -115,7 +118,7 @@ public class DownloadDao extends BaseDao {
 			resultSet.close();
 			prepareStatement.close();
 			connection.close();
-
+			stopwatch.stop("DownloadDao query:" + num);
 			return list;
 		} catch (SQLException e) {
 			logger.error("query error", e);
