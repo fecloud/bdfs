@@ -107,8 +107,13 @@ public class LocalUpload extends Thread implements OutputDataListener {
 			Log.w(TAG, "local file " + file.getAbsolutePath() + " is deleted");
 			return true;
 		}
-		if (fileExists(file)) {
-			return true;
+		try {
+			if (fileExists(file)) {
+				return true;
+			}
+		} catch (ApiException e) {
+			Log.e(TAG, "fileExists", e);
+			return false;
 		}
 		if (file.isDirectory()) {
 			return mkdirCloud(file);
@@ -214,39 +219,37 @@ public class LocalUpload extends Thread implements OutputDataListener {
 
 	/**
 	 * 检查文件在云端是否存在
-	 * 
+	 * 如果文件存在,长度跟本地不一样,删了
 	 * @param file
 	 * @return
 	 */
-	private boolean fileExists(BDFSFile file) {
-		try {
-			final CloudFile fileExists = api.fileExists(file.getAbsolutePath());
-			if (fileExists != null) {
-				Log.d(TAG, String.format("%s exists cloud",
-						file.getAbsolutePath()));
-				// 两个都是文件
-				if (file.isFile() && fileExists.isFile()) {
-					// 两个文件长度一样
-					if (file.getLength() == fileExists.getLength()) {
-						Log.d(TAG,
-								String.format("%s exists cloud len equal",
-										file.getAbsolutePath()));
-						return true;
-					}
-				} else if (file.isDir() && fileExists.isDir()) {
+	private boolean fileExists(BDFSFile file) throws ApiException {
+		final CloudFile fileExists = api.fileExists(file.getAbsolutePath());
+		if (fileExists != null) {
+			Log.d(TAG, String.format("%s exists cloud", file.getAbsolutePath()));
+			// 两个都是文件
+			if (file.isFile() && fileExists.isFile()) {
+				// 两个文件长度一样
+				if (file.getLength() == fileExists.getLength()) {
 					Log.d(TAG,
-							String.format("%s exists cloud isdir",
+							String.format("%s exists cloud len equal",
 									file.getAbsolutePath()));
 					return true;
+				} else {
+					// 把文件删了
+					api.rm(file.getAbsolutePath());
 				}
-			} else {
+			} else if (file.isDir() && fileExists.isDir()) {
 				Log.d(TAG,
-						String.format("%s not exists cloud",
+						String.format("%s exists cloud isdir",
 								file.getAbsolutePath()));
+				return true;
 			}
-		} catch (ApiException e) {
-			Log.e(TAG, "fileExists error", e);
+		} else {
+			Log.d(TAG, String.format("%s not exists cloud",
+					file.getAbsolutePath()));
 		}
+
 		return false;
 	}
 
