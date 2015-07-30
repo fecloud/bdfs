@@ -96,25 +96,30 @@ public class LocalUpload extends Thread implements OutputDataListener {
 	 * 
 	 * @param file
 	 * @return
+	 * @throws ApiException 
 	 */
 	private boolean uploadFile(BDFSFile file) {
-		ClientEnv.setProperty(ClientEnv.key_upload_size, 0);
-		if (checkBDFSFile(file)) {
-			Log.w(TAG, "file too big ,not upload");
-			return true;
-		}
-		if (!checkLocalFile(file)) {// 本地文件不在了,直接删除任务
-			Log.w(TAG, "local file " + file.getAbsolutePath() + " is deleted");
-			return true;
-		}
-		if (fileExists(file)) {
-			return true;
-		}
-		if (file.isDirectory()) {
-			return mkdirCloud(file);
-		}
-		if (file.isFile()) {
-			return uploadFileContext(file);
+		try{
+			ClientEnv.setProperty(ClientEnv.key_upload_size, 0);
+			if (checkBDFSFile(file)) {
+				Log.w(TAG, "file too big ,not upload");
+				return true;
+			}
+			if (!checkLocalFile(file)) {// 本地文件不在了,直接删除任务
+				Log.w(TAG, "local file " + file.getAbsolutePath() + " is deleted");
+				return true;
+			}
+			if (fileExists(file)) {
+				return true;
+			}
+			if (file.isDirectory()) {
+				return mkdirCloud(file);
+			}
+			if (file.isFile()) {
+				return uploadFileContext(file);
+			}
+		} catch (ApiException e){
+			Log.e(TAG, "uploadFile" ,e);
 		}
 		return false;
 	}
@@ -217,35 +222,30 @@ public class LocalUpload extends Thread implements OutputDataListener {
 	 * 
 	 * @param file
 	 * @return
+	 * @throws ApiException 
 	 */
-	private boolean fileExists(BDFSFile file) {
-		try {
-			final CloudFile fileExists = api.fileExists(file.getAbsolutePath());
-			if (fileExists != null) {
-				Log.d(TAG, String.format("%s exists cloud",
-						file.getAbsolutePath()));
-				// 两个都是文件
-				if (file.isFile() && fileExists.isFile()) {
-					// 两个文件长度一样
-					if (file.getLength() == fileExists.getLength()) {
-						Log.d(TAG,
-								String.format("%s exists cloud len equal",
-										file.getAbsolutePath()));
-						return true;
-					}
-				} else if (file.isDir() && fileExists.isDir()) {
+	private boolean fileExists(BDFSFile file) throws ApiException {
+		final CloudFile fileExists = api.fileExists(file.getAbsolutePath());
+		if (fileExists != null) {
+			Log.d(TAG, String.format("%s exists cloud", file.getAbsolutePath()));
+			// 两个都是文件
+			if (file.isFile() && fileExists.isFile()) {
+				// 两个文件长度一样
+				if (file.getLength() == fileExists.getLength()) {
 					Log.d(TAG,
-							String.format("%s exists cloud isdir",
+							String.format("%s exists cloud len equal",
 									file.getAbsolutePath()));
 					return true;
 				}
-			} else {
+			} else if (file.isDir() && fileExists.isDir()) {
 				Log.d(TAG,
-						String.format("%s not exists cloud",
+						String.format("%s exists cloud isdir",
 								file.getAbsolutePath()));
+				return true;
 			}
-		} catch (ApiException e) {
-			Log.e(TAG, "fileExists error", e);
+		} else {
+			Log.d(TAG, String.format("%s not exists cloud",
+					file.getAbsolutePath()));
 		}
 		return false;
 	}

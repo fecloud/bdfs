@@ -2,6 +2,7 @@ package com.yuncore.bdfs.server.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
@@ -47,6 +48,30 @@ public abstract class BaseDao {
 		}
 
 		return result;
+	}
+	
+	/**
+	 * 查询表数据条数
+	 * @return
+	 */
+	public synchronized long count(){
+		long count = 0l;
+		try {
+			final Connection connection = getDB();
+			final PreparedStatement prepareStatement = connection
+					.prepareStatement(String.format("SELECT COUNT(*) FROM %s", getTableName()));
+			final ResultSet resultSet = prepareStatement.executeQuery();
+			if(null != resultSet && resultSet.next()){
+				count = resultSet.getLong(1);
+				resultSet.close();
+			}
+			prepareStatement.close();
+			connection.close();
+		} catch (SQLException e) {
+			logger.error("count", e);
+		}
+		
+		return count;
 	}
 
 	public abstract String getTableName();
