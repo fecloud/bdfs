@@ -389,7 +389,7 @@ public class FSApiImple implements FSApi {
 				final String slice_md5 = MD5.md5File(localpath, RAPIDUPLOAD);
 				final String url = BDFSURL.getsecondupload(
 						URLEncoder.encode(cloudFile.getParentPath(), "UTF-8"), URLEncoder.encode(cloudFile.getName(), "UTF-8"),
-						file.length(), content_md5, slice_md5, BDUSS, bdstoken);
+						file.length(), content_md5, slice_md5, URLEncoder.encode(BDUSS, "UTF-8"), bdstoken);
 
 				final Http http = new Http(url, Method.GET);
 				if (http.http()) {
@@ -482,5 +482,97 @@ public class FSApiImple implements FSApi {
 
 		return null;
 
+	}
+
+	@Override
+	public boolean upload2(String localpath, String cloudpath)
+			throws ApiException {
+		return upload2(localpath, cloudpath, null);
+	}
+
+	@Override
+	public boolean upload2(String localpath, String cloudpath,
+			OutputDataListener listener) throws ApiException {
+		try {
+			if (context.load()) {
+				final String BDUSS = HttpCookieContainer.getInstance()
+						.getCookie("BDUSS").getValue();
+				final String url = BDFSURL.getuploadfile2(URLEncoder.encode(
+						BDUSS, "UTF-8"));
+
+				final HttpFormOutput http = new HttpFormOutput(url, localpath,
+						listener, true);
+				if (http.http()) {
+					if (DEBUG)
+						Log.i(TAG,
+								String.format("upload2 result:%s",
+										http.result()));
+					final String resultString = http.result();
+					final JSONObject object = new JSONObject(resultString);
+					if (object.has("md5")) {
+						final String[] block_list = new String[1];
+						block_list[0] = object.getString("md5");
+						if (block_list.length > 0) {
+							// 调用 createFile
+							for (int i = 0; i < 3; i++) {
+								if (createFile(cloudpath,
+										new File(localpath).length(),
+										block_list)) {
+									return true;
+								}
+							}
+						}
+					}
+
+				}
+
+			}
+		} catch (Exception e) {
+			throw new ApiException("upload error", e);
+		}
+		return false;
+	}
+
+	@Override
+	public boolean createFile(String path, long size, String[] block_list)
+			throws ApiException {
+
+		try {
+			if (context.load()) {
+				final String bdstoken = context.getProperty(BDSTOKEN, "");
+				final String url = BDFSURL.mkdir(bdstoken);
+
+				final StringBuffer block_listString = new StringBuffer("[");
+				for (int i = 0; i < block_list.length; i++) {
+					if (i != 0) {
+						block_listString.append(",");
+					}
+					block_listString.append("\"").append(block_list[i])
+							.append("\"");
+				}
+				block_listString.append("]");
+
+				final String formString = String
+						.format("path=%s&isdir=0&size=%s&block_list=%s&method=post",
+								URLEncoder.encode(path, "UTF-8"), size,
+								URLEncoder.encode(block_listString.toString(),
+										"UTF-8"));
+				if (DEBUG)
+					Log.d(TAG,
+							String.format("mkdir form string:%s", formString));
+				final Http http = new Http(url, Method.POST, formString);
+				if (http.http()) {
+					if (DEBUG)
+						Log.d(TAG, String.format("mkdir:%s", http.result()));
+					final MkDirResult mkDirResult = new MkDirResult();
+					mkDirResult.formJOSN(http.result());
+					return mkDirResult.getSize() == size;
+				}
+
+			}
+		} catch (Exception e) {
+			throw new ApiException("createFile error", e);
+		}
+		return false;
 	}
 }

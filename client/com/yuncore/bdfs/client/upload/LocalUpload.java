@@ -182,7 +182,7 @@ public class LocalUpload extends Thread implements OutputDataListener {
 			final String localpath = String.format("%s/%s", root,
 					file.getAbsolutePath());
 			final String cloudpath = file.getAbsolutePath();
-			return api.upload(localpath, cloudpath, this);
+			return api.upload2(localpath, cloudpath, this);
 		} catch (ApiException e) {
 			Log.e(TAG,
 					String.format("uploadFileContext file:%s error",

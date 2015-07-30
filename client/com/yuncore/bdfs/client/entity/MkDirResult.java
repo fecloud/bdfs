@@ -20,6 +20,8 @@ public class MkDirResult implements EntityJSON {
 
 	private String name;
 
+	private long size;
+
 	public long getFs_id() {
 		return fs_id;
 	}
@@ -76,6 +78,14 @@ public class MkDirResult implements EntityJSON {
 		this.name = name;
 	}
 
+	public long getSize() {
+		return size;
+	}
+
+	public void setSize(long size) {
+		this.size = size;
+	}
+
 	@Override
 	public boolean formJOSN(JSONObject object) {
 		if (null != object) {
@@ -114,6 +124,12 @@ public class MkDirResult implements EntityJSON {
 				name = object.getString("name");
 			}
 		}
+
+		if (null != object) {
+			if (object.has("size")) {
+				size = object.getLong("size");
+			}
+		}
 		return false;
 	}
 
@@ -131,7 +147,7 @@ public class MkDirResult implements EntityJSON {
 	 */
 	@Override
 	public boolean formJOSN(String json) {
-		return false;
+		return formJOSN(new JSONObject(json));
 	}
 
 	/*
