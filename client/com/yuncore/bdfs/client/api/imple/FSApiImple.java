@@ -473,6 +473,8 @@ public class FSApiImple implements FSApi {
 
 					}
 
+				} else {
+					throw new ApiException("fileExists http error");
 				}
 
 			}
