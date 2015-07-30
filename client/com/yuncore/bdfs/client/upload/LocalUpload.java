@@ -96,30 +96,30 @@ public class LocalUpload extends Thread implements OutputDataListener {
 	 * 
 	 * @param file
 	 * @return
+	 * @throws ApiException 
 	 */
 	private boolean uploadFile(BDFSFile file) {
-		ClientEnv.setProperty(ClientEnv.key_upload_size, 0);
-		if (checkBDFSFile(file)) {
-			Log.w(TAG, "file too big ,not upload");
-			return true;
-		}
-		if (!checkLocalFile(file)) {// 本地文件不在了,直接删除任务
-			Log.w(TAG, "local file " + file.getAbsolutePath() + " is deleted");
-			return true;
-		}
-		try {
+		try{
+			ClientEnv.setProperty(ClientEnv.key_upload_size, 0);
+			if (checkBDFSFile(file)) {
+				Log.w(TAG, "file too big ,not upload");
+				return true;
+			}
+			if (!checkLocalFile(file)) {// 本地文件不在了,直接删除任务
+				Log.w(TAG, "local file " + file.getAbsolutePath() + " is deleted");
+				return true;
+			}
 			if (fileExists(file)) {
 				return true;
 			}
-		} catch (ApiException e) {
-			Log.e(TAG, "fileExists", e);
-			return false;
-		}
-		if (file.isDirectory()) {
-			return mkdirCloud(file);
-		}
-		if (file.isFile()) {
-			return uploadFileContext(file);
+			if (file.isDirectory()) {
+				return mkdirCloud(file);
+			}
+			if (file.isFile()) {
+				return uploadFileContext(file);
+			}
+		} catch (ApiException e){
+			Log.e(TAG, "uploadFile" ,e);
 		}
 		return false;
 	}
@@ -187,7 +187,7 @@ public class LocalUpload extends Thread implements OutputDataListener {
 			final String localpath = String.format("%s/%s", root,
 					file.getAbsolutePath());
 			final String cloudpath = file.getAbsolutePath();
-			return api.upload(localpath, cloudpath, this);
+			return api.upload2(localpath, cloudpath, this);
 		} catch (ApiException e) {
 			Log.e(TAG,
 					String.format("uploadFileContext file:%s error",
@@ -222,6 +222,7 @@ public class LocalUpload extends Thread implements OutputDataListener {
 	 * 如果文件存在,长度跟本地不一样,删了
 	 * @param file
 	 * @return
+	 * @throws ApiException 
 	 */
 	private boolean fileExists(BDFSFile file) throws ApiException {
 		final CloudFile fileExists = api.fileExists(file.getAbsolutePath());

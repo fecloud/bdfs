@@ -51,7 +51,7 @@ public class DownLoadRepeat extends Thread {
 		while (true) {
 			try {
 				doWork();
-				Thread.sleep(5000);
+				Thread.sleep(30000);
 			} catch (Exception e) {
 			}
 		}
@@ -74,9 +74,11 @@ public class DownLoadRepeat extends Thread {
 					deleteIds = exists(list);
 					stopwatch.stop(getTAG() + " select exists");
 					if (null != deleteIds && !deleteIds.isEmpty()) {
+						//找到重复的,删除了limit 不加
 						deletes(deleteIds);
+					}else {
+						start += list.size();
 					}
-					start += list.size();
 				}
 			} else {
 				logger.warn(selectTableName() + " no data return");

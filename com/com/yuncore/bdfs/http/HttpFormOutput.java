@@ -28,15 +28,28 @@ public class HttpFormOutput extends Http {
 			+ new Random().nextLong();
 
 	private OutputDataListener listener;
+	
+	private boolean upload2;
 
 	public HttpFormOutput(String url, String file) {
 		super(url, Method.POST);
 		this.file = file;
 	}
+	public HttpFormOutput(String url, String file, boolean upload2) {
+		super(url, Method.POST);
+		this.file = file;
+		this.upload2  = upload2;
+	}
 
 	public HttpFormOutput(String url, String file, OutputDataListener listener) {
 		this(url, file);
 		this.listener = listener;
+	}
+	
+	public HttpFormOutput(String url, String file, OutputDataListener listener, boolean upload2) {
+		this(url, file);
+		this.listener = listener;
+		this.upload2  = upload2;
 	}
 
 	/*
@@ -48,7 +61,11 @@ public class HttpFormOutput extends Http {
 	protected void addRequestProperty() {
 		conn.setRequestProperty("Content-Type",
 				"multipart/form-data; boundary=" + BOUNDARY);
-		conn.setFixedLengthStreamingMode(getInputSize());
+		if(upload2){
+			conn.setFixedLengthStreamingMode(getInputSize2());
+		}	else  {
+			conn.setFixedLengthStreamingMode(getInputSize());
+		}
 	}
 
 	/**
@@ -71,6 +88,38 @@ public class HttpFormOutput extends Http {
 			filestart = strBuf.toString();
 
 			fileend = ("\r\n--" + BOUNDARY + "--\r\n");
+
+			filesize += filestart.getBytes("UTF-8").length;
+			filesize += fileend.getBytes("UTF-8").length;
+		} catch (UnsupportedEncodingException e) {
+		}
+		return (int) filesize;
+	}
+	
+	protected int getInputSize2(){
+		try {
+			final File filename = new File(file);
+			filesize = filename.length();
+
+			final StringBuffer strBuf = new StringBuffer();
+			strBuf.append("\r\n").append("--").append(BOUNDARY).append("\r\n");
+			
+			strBuf.append("Content-Disposition: form-data; name=\"Filename\"").append("\r\n\r\n");
+			strBuf.append(filename.getName());
+			strBuf.append("\r\n--" + BOUNDARY + "\r\n");
+			
+			strBuf.append("Content-Disposition: form-data; name=\"Filedata\"; filename=\""
+					+ filename.getName() + "\"\r\n");
+			strBuf.append("Content-Type:application/octet-stream\r\n\r\n");
+
+			filestart = strBuf.toString();
+
+			final StringBuffer eStrBuf = new StringBuffer();
+			eStrBuf.append("\r\n--" + BOUNDARY + "\r\n");
+			eStrBuf.append("Content-Disposition: form-data; name=\"Upload\"\r\n\r\n");
+			eStrBuf.append("Submit Query");
+			eStrBuf.append("\r\n--" + BOUNDARY + "--\r\n");
+			fileend = eStrBuf.toString();
 
 			filesize += filestart.getBytes("UTF-8").length;
 			filesize += fileend.getBytes("UTF-8").length;

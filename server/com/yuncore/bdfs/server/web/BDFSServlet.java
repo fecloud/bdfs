@@ -33,10 +33,13 @@ import com.yuncore.bdfs.entity.EntityJSON;
 import com.yuncore.bdfs.entity.History;
 import com.yuncore.bdfs.server.BDFSServer;
 import com.yuncore.bdfs.server.dao.AccountDao;
+import com.yuncore.bdfs.server.dao.CloudFileDao;
 import com.yuncore.bdfs.server.dao.CloudFileDeleteDao;
 import com.yuncore.bdfs.server.dao.CloudHistoryDao;
 import com.yuncore.bdfs.server.dao.CookieDao;
 import com.yuncore.bdfs.server.dao.DownloadDao;
+import com.yuncore.bdfs.server.dao.LocalFileDao;
+import com.yuncore.bdfs.server.dao.LocalFileDeleteDao;
 import com.yuncore.bdfs.server.dao.LocalHistoryDao;
 import com.yuncore.bdfs.server.dao.UploadDao;
 //import com.yuncore.bdfs.server.device.DeviceList;
@@ -138,6 +141,8 @@ public class BDFSServlet extends HttpServlet {
 			localHistory(req, object);
 		} else if (action.equals("devices")) {
 			/* devices(req, object); */
+		} else if (action.equals("statistics")) {
+			statistics(object);
 		} else {
 			object.put("code", 500);
 			object.put("msg", "not support");
@@ -145,6 +150,21 @@ public class BDFSServlet extends HttpServlet {
 		resp.setContentType("application/json;charset=UTF-8");
 		resp.getOutputStream().write(
 				Gzip.gzip(object.toString().getBytes("UTF-8")));
+	}
+
+	/**
+	 * 取数据库统计
+	 * @param object
+	 */
+	private void statistics(JSONObject object) {
+		object.put("code", 200);
+		object.put("cloudfile", new CloudFileDao().count());
+		object.put("clouddownload", new DownloadDao().count());
+		object.put("clouddelete", new CloudFileDeleteDao().count());
+		
+		object.put("localfile", new LocalFileDao().count());
+		object.put("localupload", new UploadDao().count());
+		object.put("localdelete", new LocalFileDeleteDao().count());
 	}
 
 	/**

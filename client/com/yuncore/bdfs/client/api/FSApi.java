@@ -81,13 +81,41 @@ public interface FSApi {
 	public boolean upload(String localpath, String cloudpath, OutputDataListener listener)throws ApiException;
 	
 	/**
+	 * 上传文件
+	 * @param filename 本地文件路径
+	 * @param dir 服务器路径
+	 * @return
+	 * @throws ApiException
+	 */
+	public boolean upload2(String localpath, String cloudpath)throws ApiException;
+	
+	/**
+	 * 上传文件
+	 * @param filename 本地文件路径
+	 * @param dir 服务器路径
+	 * @param listener 数据写入监听
+	 * @return
+	 * @throws ApiException
+	 */
+	public boolean upload2(String localpath, String cloudpath, OutputDataListener listener)throws ApiException;
+	
+	/**
+	 * 根据md5创建文件
+	 * @param path
+	 * @param size
+	 * @param block_list
+	 * @return
+	 */
+	public boolean createFile(String path, long size, String [] block_list) throws ApiException;
+	
+	/**
 	 * 秒传
 	 * @param filename 本地文件路径
 	 * @param dir 服务器路径
 	 * @return
 	 * @throws ApiException
 	 */
-	public boolean secondUpload(String localpath, String cloudpath)throws ApiException;
+	public boolean secondUpload(String localpath, String cloudpath) throws ApiException;
 	
 	/**
 	 * 
