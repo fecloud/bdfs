@@ -52,7 +52,7 @@ public final class BDFSURL {
 	}
 
 	/**
-	 * 建立文件夹
+	 * 建立文件夹或者文件
 	 * 
 	 * @param bdstoken
 	 *            http://pan.baidu.com/api/create?a=commit&bdstoken=6f
@@ -215,6 +215,17 @@ public final class BDFSURL {
 	public static String getsecondupload(String dir, String filename, long content_length, String content_md5, String slice_md5 ,String BDUSS,String bdstoken) {
 		final String ex_url = "http://c.pcs.baidu.com/rest/2.0/pcs/file?method=rapidupload&app_id=%s&ondup=newcopy&dir=%s&filename=%s&content-length=%s&content-md5=%s&slice-md5=%s&path=%s&BDUSS=%s&bdstoken=%s";
 		return String.format(ex_url, APPID, dir, filename, content_length, content_md5, slice_md5, String.format("%s%s",dir,filename), BDUSS, bdstoken);
+	}
+	
+	/**
+	 * 上传文件
+	 *http://c.pcs.baidu.com/rest/2.0/pcs/file?method=upload&type=tmpfile&app_id=250528&BDUSS=pansec_DCb740ccc5511e5e8fedcff06b081203-SS0LVTjRD9hiwUrlvUeK1p2zhFg0lKOORN6NNjGn9%2FCde2bBAnZqTjJESSIfZOBltRpEI5UNQUPs7MOJZO7gcrh9jNfOzkwTRxM2mjoOPaKaYMdlPdcncJdOhMDI5v4cwctpcYwcP99An7HlL4A6KdGIogWlQUyc4YYX%2BopMdkUsrWiLO3yDBqv7btmawpJg11hFJX9nL7A0WcKWIKq6kaWnWIKwxgW0LBJyyHz8kudOVVFjhL6yGPM0BD5oHO%2BdhG7SxlrElcZDa3diFjgVVQ%3D%3D
+	 * 
+	 * @return
+	 */
+	public static String getuploadfile2(String BDUSS) {
+		final String ex_url = "http://c.pcs.baidu.com/rest/2.0/pcs/file?method=upload&type=tmpfile&app_id=%s&BDUSS=%s";
+		return String.format(ex_url, APPID,BDUSS);
 	}
 	
 }
