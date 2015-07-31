@@ -219,7 +219,7 @@ public class LocalUpload extends Thread implements OutputDataListener {
 
 	/**
 	 * 检查文件在云端是否存在
-	 * 
+	 * 如果文件存在,长度跟本地不一样,删了
 	 * @param file
 	 * @return
 	 * @throws ApiException 
@@ -236,6 +236,9 @@ public class LocalUpload extends Thread implements OutputDataListener {
 							String.format("%s exists cloud len equal",
 									file.getAbsolutePath()));
 					return true;
+				} else {
+					// 把文件删了
+					api.rm(file.getAbsolutePath());
 				}
 			} else if (file.isDir() && fileExists.isDir()) {
 				Log.d(TAG,
@@ -247,6 +250,7 @@ public class LocalUpload extends Thread implements OutputDataListener {
 			Log.d(TAG, String.format("%s not exists cloud",
 					file.getAbsolutePath()));
 		}
+
 		return false;
 	}
 

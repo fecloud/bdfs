@@ -2,6 +2,7 @@ package com.yuncore.bdfs.client.api;
 
 import java.util.Map;
 
+import com.yuncore.bdfs.client.entity.CloudRmResult;
 import com.yuncore.bdfs.client.entity.MkDirResult;
 import com.yuncore.bdfs.client.util.DownloadInputStream;
 import com.yuncore.bdfs.entity.BDFSFile;
@@ -131,5 +132,13 @@ public interface FSApi {
 	 * @return
 	 */
 	public CloudFile fileExists(String file) throws ApiException;
+	
+	/**
+	 * 删除文件或文件夹
+	 * 
+	 * @param filename
+	 * @return
+	 */
+	public CloudRmResult rm(String... filename) throws ApiException;
 
 }

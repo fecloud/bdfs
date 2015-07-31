@@ -18,6 +18,7 @@ import com.yuncore.bdfs.api.BDFSURL;
 import com.yuncore.bdfs.app.Context;
 import com.yuncore.bdfs.client.Const;
 import com.yuncore.bdfs.client.api.FSApi;
+import com.yuncore.bdfs.client.entity.CloudRmResult;
 import com.yuncore.bdfs.client.entity.MkDirResult;
 import com.yuncore.bdfs.client.util.DownloadInputStream;
 import com.yuncore.bdfs.client.util.Log;
@@ -26,8 +27,8 @@ import com.yuncore.bdfs.entity.CloudFile;
 import com.yuncore.bdfs.exception.ApiException;
 import com.yuncore.bdfs.http.Http;
 import com.yuncore.bdfs.http.Http.Method;
-import com.yuncore.bdfs.http.HttpFormOutput.OutputDataListener;
 import com.yuncore.bdfs.http.HttpFormOutput;
+import com.yuncore.bdfs.http.HttpFormOutput.OutputDataListener;
 import com.yuncore.bdfs.http.HttpInput;
 import com.yuncore.bdfs.http.cookie.HttpCookieContainer;
 import com.yuncore.bdfs.util.DateUtil;
@@ -487,6 +488,36 @@ public class FSApiImple implements FSApi {
 	}
 
 	@Override
+	public CloudRmResult rm(String... filenames) throws ApiException {
+		try {
+			if (context.load()) {
+				final String bdstoken = context.getProperty(BDSTOKEN, "");
+				final String url = BDFSURL.rm(bdstoken);
+
+				final JSONArray files = new JSONArray();
+				for (String s : filenames) {
+					files.put(s);
+				}
+				final String formString = String.format("filelist=%s",
+						URLEncoder.encode(files.toString(), "UTF-8"));
+				if (DEBUG)
+					Log.d(TAG, String.format("rm form string:%s", formString));
+				final Http http = new Http(url, Method.POST, formString);
+				if (http.http()) {
+					if (DEBUG)
+						Log.d(TAG, String.format("rm:%s", http.result()));
+					final CloudRmResult rmResult = new CloudRmResult();
+					if (rmResult.formJOSN(http.result()))
+						return rmResult;
+				}
+			}
+		} catch (Exception e) {
+			throw new ApiException("rm error", e);
+		}
+		return null;
+
+	}
+	
 	public boolean upload2(String localpath, String cloudpath)
 			throws ApiException {
 		return upload2(localpath, cloudpath, null);
