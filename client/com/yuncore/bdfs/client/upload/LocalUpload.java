@@ -112,10 +112,11 @@ public class LocalUpload extends Thread implements OutputDataListener {
 			if (fileExists(file)) {
 				return true;
 			}
+			
+			//
 			if (file.isDirectory()) {
 				return mkdirCloud(file);
-			}
-			if (file.isFile()) {
+			} else if (file.isFile()) {
 				return uploadFileContext(file);
 			}
 		} catch (ApiException e){

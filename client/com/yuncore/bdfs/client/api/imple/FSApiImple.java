@@ -466,10 +466,20 @@ public class FSApiImple implements FSApi {
 							&& object.has("list")) {
 						JSONArray jsonArray = object.getJSONArray("list");
 						if (jsonArray.length() > 0) {
-							JSONObject jsonObject = jsonArray.getJSONObject(0);
-							final CloudFile pcsFile = new CloudFile();
-							pcsFile.formJOSN(jsonObject.toString());
-							return pcsFile;
+							JSONObject jsonObject = null;
+							CloudFile pcsFile = null;
+							//返回的文件可能有很多
+							for (int i = 0; i < jsonArray.length(); i++){
+								jsonObject = jsonArray.getJSONObject(0);
+								pcsFile = new CloudFile();
+								pcsFile.formJOSN(jsonObject.toString());
+								//找到名字匹配的
+								if (pcsFile.getName().equals(f.getName())){
+									return pcsFile;
+								}
+								
+							}
+							
 						}
 
 					}
