@@ -238,7 +238,8 @@ public class LocalUpload extends Thread implements OutputDataListener {
 									file.getAbsolutePath()));
 					return true;
 				} else {
-					// 把文件删了
+					// 判断文件哪个是最新的,把文件删了
+					//TODO
 					api.rm(file.getAbsolutePath());
 				}
 			} else if (file.isDir() && fileExists.isDir()) {
