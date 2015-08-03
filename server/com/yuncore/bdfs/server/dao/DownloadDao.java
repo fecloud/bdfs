@@ -97,7 +97,7 @@ public class DownloadDao extends BaseDao {
 			final Stopwatch stopwatch = new Stopwatch();
 			stopwatch.start();
 			final List<BDFSFile> list = new ArrayList<BDFSFile>();
-			final String sql = String.format("SELECT * FROM %s LIMIT %s,%s",
+			final String sql = String.format("SELECT * FROM %s ORDER BY mtime DESC LIMIT %s,%s",
 					getTableName(),start ,num);
 
 			final Connection connection = getDB();
@@ -113,6 +113,7 @@ public class DownloadDao extends BaseDao {
 				file.setPath(resultSet.getString("path"));
 				file.setSession(resultSet.getLong("session"));
 				file.setLength(resultSet.getLong("length"));
+				file.setMtime(resultSet.getLong("mtime"));
 				list.add(file);
 			}
 			resultSet.close();
