@@ -29,6 +29,7 @@ public class FileUtil {
 						localFile = new BDFSFile();
 						localFile.setPath(f.getAbsolutePath().substring(root.length()).replace("\\", "/"));
 						if (f.isFile()) {
+							localFile.setMtime(f.lastModified() / 1000);
 							localFile.setLength(f.length());
 						}
 						localFile.setDir((f.isFile() ? false : true));
@@ -41,6 +42,7 @@ public class FileUtil {
 						localFile = new BDFSFile();
 						localFile.setPath(f.getAbsolutePath().substring(root.length()));
 						if (f.isFile()) {
+							localFile.setMtime(f.lastModified() / 1000);
 							localFile.setLength(f.length());
 						}
 						localFile.setDir((f.isFile() ? false : true));

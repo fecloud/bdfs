@@ -15,6 +15,8 @@ public class BDFSFile implements EntityJSON {
 	protected String fId;
 
 	protected long session;
+	
+	protected long mtime;
 
 	public BDFSFile(){
 		
@@ -94,6 +96,14 @@ public class BDFSFile implements EntityJSON {
 		return fId;
 	}
 
+	public long getMtime() {
+		return mtime;
+	}
+
+	public void setMtime(long mtime) {
+		this.mtime = mtime;
+	}
+
 	public String getParentPath() {
 		if (isDir()) {
 			return path.substring(0, path.lastIndexOf("/"));
@@ -159,6 +169,9 @@ public class BDFSFile implements EntityJSON {
 			if (object.has("session")) {
 				this.session = object.getLong("session");
 			}
+			if (object.has("mtime")) {
+				this.mtime = object.getLong("mtime");
+			}
 			return true;
 		}
 		return false;
@@ -190,6 +203,7 @@ public class BDFSFile implements EntityJSON {
 		object.put("isdir", isdir);
 		object.put("fId", fId);
 		object.put("session", session);
+		object.put("mtime", mtime);
 	}
 
 }

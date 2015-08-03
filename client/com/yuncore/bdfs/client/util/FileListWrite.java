@@ -38,8 +38,10 @@ public class FileListWrite extends FileOutputStream {
 		for (BDFSFile f : files) {
 			buffer.clear();
 			bs = f.getPath().getBytes();
-			buffer.putShort((short) bs.length).put(bs).putLong(f.getLength())
-					.put((byte) (f.isDir() ? 0x1 : 0x0));
+			buffer.putShort((short) bs.length).put(bs)
+					.putLong(f.getLength())
+					.put((byte) (f.isDir() ? 0x1 : 0x0))
+					.putInt((int) f.getMtime());
 			buffer.flip();
 			caches.write(buffer.array(), 0, buffer.limit());
 		}

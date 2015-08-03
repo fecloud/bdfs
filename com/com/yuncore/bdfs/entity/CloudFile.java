@@ -34,7 +34,9 @@ public class CloudFile extends BDFSFile {
 			if (object.has("md5")) {
 				md5 = object.getString("md5");
 			}
-
+			if (!isdir && object.has("server_mtime")) {
+				mtime = object.getLong("server_mtime");
+			}
 			return true;
 		}
 		return false;
