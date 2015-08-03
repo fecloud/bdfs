@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.yuncore.bdfs.entity.BDFSFile;
 import com.yuncore.bdfs.entity.CloudFile;
 import com.yuncore.bdfs.server.Const;
 import com.yuncore.bdfs.server.util.Stopwatch;
@@ -37,7 +36,7 @@ public class CloudFileDao extends BaseDao {
 		if (size == 0) {
 			insert = new StringBuilder(
 					String.format(
-							"INSERT INTO %s (id,path,length,isdir,fid,md5,session) VALUES ",
+							"INSERT INTO %s (id,path,length,isdir,mtime,fid,md5,session) VALUES ",
 							getTableName()));
 		}
 		final long session = Long.parseLong(System.getProperty(
@@ -48,8 +47,8 @@ public class CloudFileDao extends BaseDao {
 				insert.append(",");
 			}
 			insert.append(String.format(
-					"(CONCAT(UUID(),RAND()),\"%s\",%s,%s,\"%s\",\"%s\",%s)", f.getPath(),
-					f.getLength(), f.isDir() ? 1 : 0, f.toFid(),
+					"(CONCAT(UUID(),RAND()),\"%s\",%s,%s,%s,\"%s\",\"%s\",%s)", f.getPath(),
+					f.getLength(), f.isDir() ? 1 : 0, f.getMtime(), f.toFid(),
 					f.getMd5() == null ? "" : f.getMd5(), f.getSession()));
 			size++;
 		}
@@ -125,6 +124,7 @@ public class CloudFileDao extends BaseDao {
 		file.setLength(resultSet.getLong("length"));
 		file.setDir(resultSet.getBoolean("isdir"));
 		file.setSession(resultSet.getLong("session"));
+		file.setMtime(resultSet.getLong("mtime"));
 		return file;
 	}
 
@@ -132,7 +132,7 @@ public class CloudFileDao extends BaseDao {
 	 * 是否存在一样的数据
 	 * @param file
 	 * @return
-	 */
+	 
 	public boolean exists(BDFSFile file) {
 		boolean con = false;
 		if (null != file) {
@@ -157,7 +157,7 @@ public class CloudFileDao extends BaseDao {
 		}
 		return con;
 	}
-	
+	*/
 	/*
 	 * (non-Javadoc)
 	 * 

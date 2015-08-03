@@ -67,17 +67,22 @@ public class DownLoadRepeat extends Thread {
 			if (chekcSelectTable()) {
 				long start = 0;
 				Stopwatch stopwatch = null;
-				while (null != (list = downloadDao.query(start, UNIT))
-						&& !list.isEmpty()) {
-					stopwatch = new Stopwatch();
-					stopwatch.start();
-					deleteIds = exists(list);
-					stopwatch.stop(getTAG() + " select exists");
-					if (null != deleteIds && !deleteIds.isEmpty()) {
-						//找到重复的,删除了limit 不加
-						deletes(deleteIds);
-					}else {
-						start += list.size();
+				while (null != (list = downloadDao.query(start, UNIT))) {
+					if (!list.isEmpty()) {
+						stopwatch = new Stopwatch();
+						stopwatch.start();
+						deleteIds = exists(list);
+						stopwatch.stop(getTAG() + " select exists");
+						if (null != deleteIds && !deleteIds.isEmpty()) {
+							// 找到重复的,删除了limit 不加
+							deletes(deleteIds);
+						} else {
+							start += list.size();
+						}
+					} else {
+						logger.debug(String.format("%s %s not data return",
+								getTAG(), getFromTableName()));
+						break;
 					}
 				}
 			} else {

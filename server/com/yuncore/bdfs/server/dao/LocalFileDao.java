@@ -1,7 +1,6 @@
 package com.yuncore.bdfs.server.dao;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -30,7 +29,7 @@ public class LocalFileDao extends BaseDao {
 		if (size == 0) {
 			insert = new StringBuilder(
 					String.format(
-							"INSERT INTO %s (id,path,length,isdir,fid,session) VALUES ",
+							"INSERT INTO %s (id,path,length,isdir,mtime,fid,session) VALUES ",
 							getTableName()));
 		}
 		if (size != 0) {
@@ -40,8 +39,8 @@ public class LocalFileDao extends BaseDao {
 		// f
 		// .getDir().replace("\\", "\\\\"), f.getName(), f.getLength(), f
 		// .getType(), f.getfId(), f.getSession()));
-		insert.append(String.format("(CONCAT(UUID(),RAND()),\"%s\",%s,%s,\"%s\",%s)",
-				f.getPath(), f.getLength(), f.isDir() ? 1 : 0, f.getfId(),
+		insert.append(String.format("(CONCAT(UUID(),RAND()),\"%s\",%s,%s,%s,\"%s\",%s)",
+				f.getPath(), f.getLength(), f.isDir() ? 1 : 0, f.getMtime(), f.getfId(),
 				f.getSession()));
 		size++;
 		return true;
@@ -97,7 +96,7 @@ public class LocalFileDao extends BaseDao {
 	 * 是否存在一样的数据
 	 * @param file
 	 * @return
-	 */
+	 
 	public boolean exists(BDFSFile file) {
 		boolean con = false;
 		if (null != file) {
@@ -122,7 +121,7 @@ public class LocalFileDao extends BaseDao {
 		}
 		return con;
 	}
-	
+	*/
 
 	protected static BDFSFile buildLocalFile(ResultSet resultSet)
 			throws SQLException {

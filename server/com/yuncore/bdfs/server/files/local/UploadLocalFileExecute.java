@@ -92,6 +92,7 @@ public class UploadLocalFileExecute extends TaskExecute {
 				buffer.position(buffer.position() + len);
 				file.setLength(buffer.getLong());
 				file.setDir(buffer.get() == 0x1 ? true : false);
+				file.setMtime(buffer.getInt());
 				file.toFid();
 				file.setSession(session);
 				localFileDao.insertCache(file);
