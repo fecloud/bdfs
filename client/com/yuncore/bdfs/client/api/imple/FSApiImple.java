@@ -41,7 +41,7 @@ public class FSApiImple implements FSApi {
 	private static boolean DEBUG = false;
 
 	private static Context context;
-
+	
 	public FSApiImple() {
 		super();
 		inStanceContext();
@@ -496,9 +496,14 @@ public class FSApiImple implements FSApi {
 		return null;
 
 	}
+	
+	@Override
+	public CloudRmResult rm(String filenames) throws ApiException {
+		return rm(new String[] { filenames });
+	}
 
 	@Override
-	public CloudRmResult rm(String... filenames) throws ApiException {
+	public CloudRmResult rm(String [] filenames) throws ApiException {
 		try {
 			if (context.load()) {
 				final String bdstoken = context.getProperty(BDSTOKEN, "");
@@ -618,4 +623,65 @@ public class FSApiImple implements FSApi {
 		}
 		return false;
 	}
+	
+//	@Override
+//	public CloudPageFile list(String dir) throws ApiException {
+//		int i = 1;
+//		CloudPageFile file = new CloudPageFile();
+//		file.setList(new ArrayList<CloudFile>());
+//		CloudPageFile pageFile = null;
+//		while ((pageFile = list(dir, i)) != null) {
+//			file.setErrno(pageFile.getErrno());
+//			file.getList().addAll(pageFile.getList());
+//			if (pageFile.getErrno() != 0 || pageFile.getList().isEmpty()
+//					|| pageFile.getList().size() < PAGESIZE) {
+//				break;
+//			}
+//			i++;
+//		}
+//		return file;
+//	}
+//
+//	@Override
+//	public CloudPageFile list(String dir, int page) throws ApiException {
+//		return list(dir, page, PAGESIZE);
+//	}
+//
+//	@Override
+//	public CloudPageFile list(String dir, int page, int page_num)
+//			throws ApiException {
+//		try {
+//			if (context.load()) {
+//				final long c_time = DateUtil.current_time_ss();
+//				final String url = BDFSURL.list(page, page_num, dir, c_time,
+//						context.getProperty(BDSTOKEN));
+//
+//				final Http http = new Http(url, Method.GET);
+//				if (http.http()) {
+//					// if (DEBUG)
+//					// logger.debug(String.format("list result:%s",
+//					// http.result()));
+//					final CloudPageFile pageFile = new CloudPageFile();
+//					if (pageFile.formJOSN(http.result())) {
+//						return pageFile;
+//					}
+//				}
+//
+//			}
+//
+//		} catch (Exception e) {
+//			throw new ApiException("list error", e);
+//		}
+//		return null;
+//	}
+
+	/* (non-Javadoc)
+	 * @see com.yuncore.bdfs.client.api.FSApi#exists(java.lang.String)
+	 */
+	@Override
+	public CloudFile exists(String file) throws ApiException {
+		final File f = new File(file);
+		return null;
+	}
+
 }

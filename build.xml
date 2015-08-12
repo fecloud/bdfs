@@ -70,6 +70,7 @@
 		<jar destfile="${dist.client}" basedir="${dest.client.dir}">
 			<fileset dir="${dest.com.dir}" />
 			<zipfileset src="${libs.dir}/json.jar" />
+			<zipfileset src="${libs.dir}/mysql-connector-java-5.1.9.jar" />
 			<manifest>
 				<attribute name="Main-class" value="com.yuncore.bdfs.client.ClientMain" />
 			</manifest>

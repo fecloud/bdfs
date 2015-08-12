@@ -21,6 +21,12 @@ public interface FSApi {
 	 * bdstoken
 	 */
 	String BDSTOKEN = "MYBDSTOKEN";
+	
+	/**
+	 * 每页数量
+	 */
+	int PAGESIZE = 2000;
+	
 	/**
 	 * 登录
 	 * 
@@ -134,11 +140,52 @@ public interface FSApi {
 	public CloudFile fileExists(String file) throws ApiException;
 	
 	/**
+	 * 文件或者目录是否存在
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public CloudFile exists(String file) throws ApiException;
+	
+	/**
 	 * 删除文件或文件夹
 	 * 
 	 * @param filename
 	 * @return
 	 */
-	public CloudRmResult rm(String... filename) throws ApiException;
+	public CloudRmResult rm(String filename) throws ApiException;
+	
+	/**
+	 * 删除文件或文件夹
+	 * 
+	 * @param filename
+	 * @return
+	 */
+	public CloudRmResult rm(String [] filename) throws ApiException;
+	
+//	/**
+//	 * 列表当前目录的文件(包含文件夹)
+//	 * {"errno":-9,"request_id":8897598895336496977} //目录不存在
+//	 * @param dir
+//	 * @return
+//	 */
+//	public CloudPageFile list(String dir) throws ApiException;
+//
+//	/**
+//	 * 列表当前目录的文件(包含文件夹)
+//	 * 
+//	 * @param dir
+//	 * @return
+//	 */
+//	public CloudPageFile list(String dir, int page) throws ApiException;
+//
+//	/**
+//	 * 列表当前目录的文件(包含文件夹)
+//	 * 
+//	 * @param dir
+//	 * @return
+//	 */
+//	public CloudPageFile list(String dir, int page, int page_num)
+//			throws ApiException;
 
 }

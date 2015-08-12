@@ -9,7 +9,7 @@ public class TT extends TestCase{
 	private static UploadLocalFile uploadLocalFile = new UploadLocalFile();
 	
 	public void testTT() throws InterruptedException{
-		final String filename = "E:\\cocos2d-x-3.3\\.bdsync\\localfiles";
+		final String filename = "C:\\Users\\wjh\\Downloads\\localfiles";
 		uploadLocalFile.addTask(filename);
 		Thread.sleep(10000000);
 	}

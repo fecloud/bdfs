@@ -9,6 +9,7 @@ import com.yuncore.bdfs.client.app.ClientContext;
 import com.yuncore.bdfs.client.ctrl.Httpd;
 import com.yuncore.bdfs.client.down.CloudDownLoad;
 import com.yuncore.bdfs.client.http.cookie.MemCookieContainer;
+import com.yuncore.bdfs.client.repeat.DeleteRepeat;
 import com.yuncore.bdfs.client.upload.LocalUpload;
 import com.yuncore.bdfs.client.util.Log;
 
@@ -91,18 +92,18 @@ public class Sync implements Runnable {
 
 	private void startCoreService() {
 
-		if (httpd == null) {
-			try {
-				httpd = new Httpd(httpPort);
-			} catch (IOException e) {
-				Log.w(TAG, "start httpd service error");
-			}
-		}
+//		if (httpd == null) {
+//			try {
+//				httpd = new Httpd(httpPort);
+//			} catch (IOException e) {
+//				Log.w(TAG, "start httpd service error");
+//			}
+//		}
 
-		if (null == uploadLocalFileList) {
-			uploadLocalFileList = new UploadLocalFileList(localExcludeFiles);
-			uploadLocalFileList.start();
-		}
+//		if (null == uploadLocalFileList) {
+//			uploadLocalFileList = new UploadLocalFileList(localExcludeFiles);
+//			uploadLocalFileList.start();
+//		}
 		// if (null == cloudDownLoad) {
 		// cloudDownLoad = new CloudDownLoad(
 		// System.getProperty(Const.SYNCDIR),
@@ -111,12 +112,13 @@ public class Sync implements Runnable {
 		// cloudDownLoad.start();
 		// }
 
-		if (null == localUpload) {
-			localUpload = new LocalUpload(System.getProperty(Const.SYNCDIR),
-					System.getProperty(Const.TMP));
-			localUpload.start();
-		}
+//		if (null == localUpload) {
+//			localUpload = new LocalUpload(System.getProperty(Const.SYNCDIR),
+//					System.getProperty(Const.TMP));
+//			localUpload.start();
+//		}
 
+		new DeleteRepeat().start();
 	}
 
 	public void start() {
