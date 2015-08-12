@@ -101,10 +101,6 @@ public class LocalUpload extends Thread implements OutputDataListener {
 	private boolean uploadFile(BDFSFile file) {
 		try{
 			ClientEnv.setProperty(ClientEnv.key_upload_size, 0);
-			if (checkBDFSFile(file)) {
-				Log.w(TAG, "file too big ,not upload");
-				return true;
-			}
 			if (!checkLocalFile(file)) {// 本地文件不在了,直接删除任务
 				Log.w(TAG, "local file " + file.getAbsolutePath() + " is deleted");
 				return true;
@@ -185,6 +181,10 @@ public class LocalUpload extends Thread implements OutputDataListener {
 	private boolean norMalFileContext(BDFSFile file) {
 		Log.d(TAG, "norMalFileContext");
 		try {
+			if (checkBDFSFile(file)) {
+				Log.w(TAG, "file too big ,not upload");
+				return true;
+			}
 			final String localpath = String.format("%s/%s", root,
 					file.getAbsolutePath());
 			final String cloudpath = file.getAbsolutePath();
@@ -239,8 +239,12 @@ public class LocalUpload extends Thread implements OutputDataListener {
 					return true;
 				} else {
 					// 判断文件哪个是最新的,把文件删了
-					//TODO
-					api.rm(file.getAbsolutePath());
+					if (fileExists.getMtime() < new File(root, file.getAbsolutePath()).lastModified()){ //本地文件是最新的
+						api.rm(file.getAbsolutePath());
+					}else {
+						//云端文件最新
+						return true;
+					}
 				}
 			} else if (file.isDir() && fileExists.isDir()) {
 				Log.d(TAG,

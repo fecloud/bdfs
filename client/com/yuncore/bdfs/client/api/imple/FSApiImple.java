@@ -456,7 +456,7 @@ public class FSApiImple implements FSApi {
 
 				final Http http = new Http(url, Method.GET);
 				if (http.http()) {
-					if (DEBUG)
+//					if (DEBUG)
 						Log.d(TAG,
 								String.format("fileExists result:%s",
 										http.result()));
