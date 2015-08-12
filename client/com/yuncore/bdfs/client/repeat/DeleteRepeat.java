@@ -53,22 +53,26 @@ public class DeleteRepeat extends Thread {
 							System.out.println(String.format("%s.%s", (i + 1),
 									fs.get(i)));
 						}
-						line = scanner.nextLine();
-						if (line.startsWith("q")) {
-							flag = false;
-							System.exit(1);
-							break;
-						} else if (line.length() == 0
-								|| line.trim().startsWith("0")) {
-							System.out.println("跳过");
-						} else {
-							System.out.println("删除文件中");
-							final String[] deletes = findDelete(line, fs);
-							if (null != deletes && deletes.length > 0) {
-								if (!deleteFiles(deletes)) {
-									continue;
+						if(!skip(fs)){
+							line = scanner.nextLine();
+							if (line.startsWith("q")) {
+								flag = false;
+								System.exit(1);
+								break;
+							} else if (line.length() == 0
+									|| line.trim().startsWith("0")) {
+								System.out.println("========跳过");
+							} else {
+								System.out.println("删除文件中");
+								final String[] deletes = findDelete(line, fs);
+								if (null != deletes && deletes.length > 0) {
+									if (!deleteFiles(deletes)) {
+										continue;
+									}
 								}
 							}
+						} else {
+							System.out.println("========自动跳过");
 						}
 						deleteMd5(connection, md5);
 					}
@@ -89,6 +93,21 @@ public class DeleteRepeat extends Thread {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * 是否自动跳过
+	 * @param list
+	 * @return
+	 */
+	public boolean skip(List<String> list){
+		if(!list.isEmpty()){
+			final String str = list.get(0);
+			if(str.endsWith("jpg")||str.endsWith("JPG")){
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public List<String> getSameMd5(Connection connection, String md5)
@@ -126,9 +145,8 @@ public class DeleteRepeat extends Thread {
 			final String l = line.trim();
 			final List<String> list = new ArrayList<>();
 			for (int i = 0; i < l.length(); i++) {
-				char charAt = l.charAt(0);
+				char charAt = l.charAt(i);
 				if (charAt > '0' && charAt <= '9') {
-
 					int parseInt = Integer.parseInt("" + charAt);
 					if (parseInt <= fs.size()) {
 						list.add(fs.get(parseInt - 1));
@@ -137,7 +155,9 @@ public class DeleteRepeat extends Thread {
 			}
 			if (list.size() > 0) {
 				final String[] files = new String[list.size()];
-				list.toArray(files);
+				for(int i =0 ;i < list.size();i++){
+					files[i] = list.get(i);
+				}
 				return files;
 			}
 		}
@@ -162,6 +182,10 @@ public class DeleteRepeat extends Thread {
 	public boolean deleteFiles(String[] files) {
 		final FSApi api = new com.yuncore.bdfs.client.api.imple.FSApiImple();
 		try {
+			System.out.println("将要删除以下文件：");
+			for(int i = 0; i < files.length;i++){
+				System.out.println(String.format("%s.%s", (i+1),files[i]));
+			}
 			CloudRmResult rm = api.rm(files);
 			if (null != rm && rm.getErrno() == 0) {
 				System.out.println("删除文件成功");
