@@ -41,7 +41,7 @@
 		<javac srcdir="${src.com.dir}" destdir="${dest.com.dir}" encoding="${java.encoding}" includeantruntime="false" verbose="${verbose}" debug="true">
 			<classpath>
 				<fileset dir="${libs.dir}">
-					<include name="json.jar" />
+					<include name="json-1.6.jar" />
 				</fileset>
 			</classpath>
 		</javac>
@@ -57,7 +57,7 @@
 		<javac srcdir="${src.client.dir}" destdir="${dest.client.dir}" encoding="${java.encoding}" includeantruntime="false" verbose="${verbose}" debug="true">
 			<classpath>
 				<fileset dir="${libs.dir}">
-					<include name="json.jar" />
+					<include name="json-1.6.jar" />
 				</fileset>
 				<path location="${dest.com.dir}" />
 			</classpath>
@@ -69,8 +69,7 @@
 		<echo level="info">package jar start</echo>
 		<jar destfile="${dist.client}" basedir="${dest.client.dir}">
 			<fileset dir="${dest.com.dir}" />
-			<zipfileset src="${libs.dir}/json.jar" />
-			<zipfileset src="${libs.dir}/mysql-connector-java-5.1.9.jar" />
+			<zipfileset src="${libs.dir}/json-1.6.jar" />
 			<manifest>
 				<attribute name="Main-class" value="com.yuncore.bdfs.client.ClientMain" />
 			</manifest>
@@ -118,7 +117,7 @@
 				<attribute name="Main-class" value="com.yuncore.bdfs.server.BDFSServer" />
 			</manifest>
 			<zipfileset src="${libs.dir}/commons-logging-1.2.jar" />
-			<zipfileset src="${libs.dir}/json.jar" />
+			<zipfileset src="${libs.dir}/json-1.6.jar" />
 			<zipfileset src="${libs.dir}/log4j-1.2.17.jar" />
 			<zipfileset src="${libs.dir}/mysql-connector-java-5.1.9.jar" />
 		</jar>

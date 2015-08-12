@@ -143,7 +143,7 @@ public class DeleteRepeat extends Thread {
 	public String[] findDelete(String line, List<String> fs) {
 		if (line.trim().length() > 0) {
 			final String l = line.trim();
-			final List<String> list = new ArrayList<>();
+			final List<String> list = new ArrayList<String>();
 			for (int i = 0; i < l.length(); i++) {
 				char charAt = l.charAt(i);
 				if (charAt > '0' && charAt <= '9') {

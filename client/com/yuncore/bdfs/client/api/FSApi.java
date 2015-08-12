@@ -7,6 +7,7 @@ import com.yuncore.bdfs.client.entity.MkDirResult;
 import com.yuncore.bdfs.client.util.DownloadInputStream;
 import com.yuncore.bdfs.entity.BDFSFile;
 import com.yuncore.bdfs.entity.CloudFile;
+import com.yuncore.bdfs.entity.CloudPageFile;
 import com.yuncore.bdfs.exception.ApiException;
 import com.yuncore.bdfs.http.HttpFormOutput.OutputDataListener;
 
@@ -145,7 +146,7 @@ public interface FSApi {
 	 * @param file
 	 * @return
 	 */
-	public CloudFile exists(String file) throws ApiException;
+	public CloudFile exists(String file, boolean dir) throws ApiException;
 	
 	/**
 	 * 删除文件或文件夹
@@ -163,29 +164,29 @@ public interface FSApi {
 	 */
 	public CloudRmResult rm(String [] filename) throws ApiException;
 	
-//	/**
-//	 * 列表当前目录的文件(包含文件夹)
-//	 * {"errno":-9,"request_id":8897598895336496977} //目录不存在
-//	 * @param dir
-//	 * @return
-//	 */
-//	public CloudPageFile list(String dir) throws ApiException;
-//
-//	/**
-//	 * 列表当前目录的文件(包含文件夹)
-//	 * 
-//	 * @param dir
-//	 * @return
-//	 */
-//	public CloudPageFile list(String dir, int page) throws ApiException;
-//
-//	/**
-//	 * 列表当前目录的文件(包含文件夹)
-//	 * 
-//	 * @param dir
-//	 * @return
-//	 */
-//	public CloudPageFile list(String dir, int page, int page_num)
-//			throws ApiException;
 
+	/**
+	 * 列表当前目录的文件(包含文件夹)
+	 * {"errno":-9,"request_id":8897598895336496977} //目录不存在
+	 * @param dir
+	 * @return
+	 */
+	public CloudPageFile list(String dir) throws ApiException;
+
+	/**
+	 * 列表当前目录的文件(包含文件夹)
+	 * 
+	 * @param dir
+	 * @return
+	 */
+	public CloudPageFile list(String dir, int page) throws ApiException;
+
+	/**
+	 * 列表当前目录的文件(包含文件夹)
+	 * 
+	 * @param dir
+	 * @return
+	 */
+	public CloudPageFile list(String dir, int page, int page_num)
+			throws ApiException;
 }

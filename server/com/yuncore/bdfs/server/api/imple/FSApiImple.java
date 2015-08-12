@@ -10,12 +10,12 @@ import java.util.regex.Pattern;
 import com.yuncore.bdfs.api.BDFSURL;
 import com.yuncore.bdfs.app.Context;
 import com.yuncore.bdfs.entity.CloudFile;
+import com.yuncore.bdfs.entity.CloudPageFile;
 import com.yuncore.bdfs.exception.ApiException;
 import com.yuncore.bdfs.http.Http;
 import com.yuncore.bdfs.http.Http.Method;
 import com.yuncore.bdfs.server.Const;
 import com.yuncore.bdfs.server.api.FSApi;
-import com.yuncore.bdfs.server.entity.CloudPageFile;
 import com.yuncore.bdfs.util.DateUtil;
 
 public class FSApiImple implements FSApi {

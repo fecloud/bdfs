@@ -226,7 +226,7 @@ public class LocalUpload extends Thread implements OutputDataListener {
 	 * @throws ApiException 
 	 */
 	private boolean fileExists(BDFSFile file) throws ApiException {
-		final CloudFile fileExists = api.fileExists(file.getAbsolutePath());
+		final CloudFile fileExists = api.exists(file.getAbsolutePath(),file.isDir());
 		if (fileExists != null) {
 			Log.d(TAG, String.format("%s exists cloud", file.getAbsolutePath()));
 			// 两个都是文件

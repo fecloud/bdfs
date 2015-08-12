@@ -1,13 +1,10 @@
-package com.yuncore.bdfs.server.entity;
+package com.yuncore.bdfs.entity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import com.yuncore.bdfs.entity.CloudFile;
-import com.yuncore.bdfs.entity.EntityJSON;
 
 public class CloudPageFile implements EntityJSON {
 

@@ -2,8 +2,8 @@ package com.yuncore.bdfs.server.api;
 
 import java.util.Map;
 
+import com.yuncore.bdfs.entity.CloudPageFile;
 import com.yuncore.bdfs.exception.ApiException;
-import com.yuncore.bdfs.server.entity.CloudPageFile;
 
 public interface FSApi {
 

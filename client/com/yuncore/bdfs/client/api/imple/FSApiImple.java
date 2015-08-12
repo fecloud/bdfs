@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -24,6 +25,7 @@ import com.yuncore.bdfs.client.util.DownloadInputStream;
 import com.yuncore.bdfs.client.util.Log;
 import com.yuncore.bdfs.entity.BDFSFile;
 import com.yuncore.bdfs.entity.CloudFile;
+import com.yuncore.bdfs.entity.CloudPageFile;
 import com.yuncore.bdfs.exception.ApiException;
 import com.yuncore.bdfs.http.Http;
 import com.yuncore.bdfs.http.Http.Method;
@@ -624,63 +626,86 @@ public class FSApiImple implements FSApi {
 		return false;
 	}
 	
-//	@Override
-//	public CloudPageFile list(String dir) throws ApiException {
-//		int i = 1;
-//		CloudPageFile file = new CloudPageFile();
-//		file.setList(new ArrayList<CloudFile>());
-//		CloudPageFile pageFile = null;
-//		while ((pageFile = list(dir, i)) != null) {
-//			file.setErrno(pageFile.getErrno());
-//			file.getList().addAll(pageFile.getList());
-//			if (pageFile.getErrno() != 0 || pageFile.getList().isEmpty()
-//					|| pageFile.getList().size() < PAGESIZE) {
-//				break;
-//			}
-//			i++;
-//		}
-//		return file;
-//	}
-//
-//	@Override
-//	public CloudPageFile list(String dir, int page) throws ApiException {
-//		return list(dir, page, PAGESIZE);
-//	}
-//
-//	@Override
-//	public CloudPageFile list(String dir, int page, int page_num)
-//			throws ApiException {
-//		try {
-//			if (context.load()) {
-//				final long c_time = DateUtil.current_time_ss();
-//				final String url = BDFSURL.list(page, page_num, dir, c_time,
-//						context.getProperty(BDSTOKEN));
-//
-//				final Http http = new Http(url, Method.GET);
-//				if (http.http()) {
-//					// if (DEBUG)
-//					// logger.debug(String.format("list result:%s",
-//					// http.result()));
-//					final CloudPageFile pageFile = new CloudPageFile();
-//					if (pageFile.formJOSN(http.result())) {
-//						return pageFile;
-//					}
-//				}
-//
-//			}
-//
-//		} catch (Exception e) {
-//			throw new ApiException("list error", e);
-//		}
-//		return null;
-//	}
+	@Override
+	public CloudPageFile list(String dir) throws ApiException {
+		int i = 1;
+		CloudPageFile file = new CloudPageFile();
+		file.setList(new ArrayList<CloudFile>());
+		CloudPageFile pageFile = null;
+		while ((pageFile = list(dir, i)) != null) {
+			file.setErrno(pageFile.getErrno());
+			file.getList().addAll(pageFile.getList());
+			if (pageFile.getErrno() != 0 || pageFile.getList().isEmpty()
+					|| pageFile.getList().size() < PAGESIZE) {
+				break;
+			}
+			i++;
+		}
+		return file;
+	}
+
+	@Override
+	public CloudPageFile list(String dir, int page) throws ApiException {
+		return list(dir, page, PAGESIZE);
+	}
+
+	@Override
+	public CloudPageFile list(String dir, int page, int page_num)
+			throws ApiException {
+		try {
+			if (context.load()) {
+				final long c_time = DateUtil.current_time_ss();
+				final String url = BDFSURL.list(page, page_num, dir, c_time,
+						context.getProperty(BDSTOKEN));
+
+				final Http http = new Http(url, Method.GET);
+				if (http.http()) {
+					final CloudPageFile pageFile = new CloudPageFile();
+					if (pageFile.formJOSN(http.result())) {
+						return pageFile;
+					}
+				}
+
+			}
+
+		} catch (Exception e) {
+			throw new ApiException("list error", e);
+		}
+		return null;
+	}
 
 	/* (non-Javadoc)
 	 * @see com.yuncore.bdfs.client.api.FSApi#exists(java.lang.String)
 	 */
 	@Override
-	public CloudFile exists(String file) throws ApiException {
-		final File f = new File(file);
+	public CloudFile exists(String file, boolean dir) throws ApiException {
+		String dirpath = null;
+		if(dir){
+			dirpath = file;
+		}else {
+			dirpath = new File(file).getParent();
+		}
+		
+		CloudPageFile list = list(dirpath);
+		if (list.getErrno() == 0) {
+			if (dir) {
+				final CloudFile cloudFile = new CloudFile();
+				cloudFile.setDir(true);
+				cloudFile.setPath(file);
+			}else {
+				if(null != list.getList()){
+					for(CloudFile f:list.getList()){
+						//百度云windows不区别大小写的
+						if(f.getPath().equalsIgnoreCase(file)){
+							return f;
+						}
+					}
+				}
+			}
+		} else if(list.getErrno() == -9){
+			//文件夹不存在
+			return null;
+		}
 		return null;
 	}
 
