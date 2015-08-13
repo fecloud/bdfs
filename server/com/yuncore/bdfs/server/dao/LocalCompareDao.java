@@ -14,7 +14,7 @@ import com.yuncore.bdfs.server.util.Stopwatch;
 
 public class LocalCompareDao extends BaseDao {
 
-	Logger logger = Logger.getLogger(BaseDao.class.getSimpleName());
+	Logger logger = Logger.getLogger(LocalCompareDao.class.getSimpleName());
 
 	@Override
 	public String getTableName() {
@@ -280,6 +280,7 @@ public class LocalCompareDao extends BaseDao {
 
 			final ResultSet resultSet = prepareStatement.executeQuery();
 			while (resultSet.next()) {
+				logger.debug("groupBySession:" + resultSet.getLong("session"));
 				list.add(resultSet.getLong("session"));
 			}
 

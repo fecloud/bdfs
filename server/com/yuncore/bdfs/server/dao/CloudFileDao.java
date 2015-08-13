@@ -15,7 +15,7 @@ import com.yuncore.bdfs.server.util.Stopwatch;
 
 public class CloudFileDao extends BaseDao {
 
-	Logger logger = Logger.getLogger(BaseDao.class.getSimpleName());
+	Logger logger = Logger.getLogger(CloudFileDao.class.getSimpleName());
 
 	private StringBuilder insert;
 

@@ -14,7 +14,7 @@ import com.yuncore.bdfs.entity.History;
 
 public class LocalHistoryDao extends BaseDao {
 
-	Logger logger = Logger.getLogger(LocalFileDao.class.getSimpleName());
+	Logger logger = Logger.getLogger(LocalHistoryDao.class.getSimpleName());
 
 	@Override
 	public String getTableName() {

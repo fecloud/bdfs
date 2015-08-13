@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.apache.log4j.Logger;
+
 import com.yuncore.bdfs.server.util.Stopwatch;
 
 /**
@@ -16,6 +18,8 @@ import com.yuncore.bdfs.server.util.Stopwatch;
  */
 public class CookieDao extends BaseDao {
 
+	Logger logger = Logger.getLogger(CookieDao.class.getSimpleName());
+	
 	public CookieDao() {
 	}
 
