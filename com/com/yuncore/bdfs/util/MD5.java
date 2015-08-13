@@ -64,7 +64,16 @@ public class MD5 {
 				// 获得MD5摘要算法的 MessageDigest 对象
 				final MessageDigest digest = MessageDigest.getInstance("MD5");
 				final FileInputStream in = new FileInputStream(file);
-				final byte[] buffer = new byte[1024 * 1024 * 5];
+				
+				byte[] buffer = null;
+				if (file.length() >= (1024 * 1024 * 500)) {
+					// 30M读取缓存
+					buffer = new byte[1024 * 1024 * 30];
+				} else {
+					// 5M读取缓存
+					buffer = new byte[1024 * 1024 * 5];
+				}
+				
 				int len = -1;
 				while (-1 != (len = in.read(buffer))) {
 					digest.update(buffer, 0, len);

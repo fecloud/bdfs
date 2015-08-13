@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.yuncore.bdfs.client.ClientEnv;
 import com.yuncore.bdfs.client.api.FSApi;
 import com.yuncore.bdfs.client.api.ServerApi;
 import com.yuncore.bdfs.client.api.imple.FSApiImple;
@@ -74,6 +75,7 @@ public class CloudDownLoad extends Thread {
 			cloudFile = getDownLoad();
 			if (cloudFile != null) {
 				Log.i(TAG, "getDownLoad " + cloudFile.getAbsolutePath());
+				ClientEnv.setProperty(ClientEnv.key_downloading, cloudFile);
 				// 检查是否是排除下载的目录
 				if (isExclude(cloudFile)) {
 					downloaded = true;
@@ -82,11 +84,13 @@ public class CloudDownLoad extends Thread {
 				}
 				// 删除下载任务
 				if (downloaded) {
+					ClientEnv.setProperty(ClientEnv.key_downloading, "");
 					delDownLoad(cloudFile);
 				}
 			} else {
 				try {
 					Thread.sleep(30000);
+					ClientEnv.setProperty(ClientEnv.key_downloading, false);
 				} catch (InterruptedException e) {
 					break;
 				}
@@ -171,7 +175,6 @@ public class CloudDownLoad extends Thread {
 	 * @param cloudFile
 	 * @return
 	 */
-	@SuppressWarnings("resource")
 	private boolean downloadFileContext(BDFSFile cloudFile) {
 		Log.i(TAG, "downloadFileContext " + cloudFile.getAbsolutePath());
 		final String tmpFile = tmpDir + File.separator + cloudFile.getfId();
@@ -180,7 +183,7 @@ public class CloudDownLoad extends Thread {
 		long sum = 0;
 		try {
 			long fileStart = checkTempFile(tmpFile);
-
+			ClientEnv.setProperty(ClientEnv.key_download_size, fileStart);
 			DownloadInputStream in = null;
 			FileOutputStream out = null;
 			if (fileStart > 0) {
@@ -208,6 +211,7 @@ public class CloudDownLoad extends Thread {
 				int len = -1;
 
 				while (-1 != (len = in.read(buffer))) {
+					ClientEnv.setProperty(ClientEnv.key_download_size, sum);
 					out.write(buffer, 0, len);
 					sum += len;
 				}

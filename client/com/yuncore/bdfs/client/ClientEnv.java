@@ -29,6 +29,16 @@ public class ClientEnv {
 	 */
 	public static final String key_localfilelist_last = "localfilelist_last";
 	
+	/**
+	 * 正在下载的文件
+	 */
+	public static final String key_downloading = "downloading";
+	
+	/**
+	 * 正在下载的文件已上传大小
+	 */
+	public static final String key_download_size = "download_size";
+	
 
 	private static final Hashtable<String, Object> env = new Hashtable<String, Object>();
 

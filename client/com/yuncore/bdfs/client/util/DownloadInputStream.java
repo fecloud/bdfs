@@ -32,14 +32,23 @@ public class DownloadInputStream {
 	}
 
 	public int read() throws IOException {
+		if (null == in) {
+			return -1;
+		}
 		return in.read();
 	}
 
 	public int read(byte b[]) throws IOException {
+		if (null == in) {
+			return -1;
+		}
 		return in.read(b);
 	}
 
 	public int read(byte b[], int off, int len) throws IOException {
+		if (null == in) {
+			return -1;
+		}
 		return in.read(b, off, len);
 	}
 	
@@ -52,7 +61,8 @@ public class DownloadInputStream {
 	}
 
 	public void close() throws IOException {
-		 in.close();
+		if(null != in)
+			in.close();
 	 }
 
 }
