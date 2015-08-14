@@ -180,6 +180,15 @@ public class CloudDownLoad extends Thread {
 		long sum = 0;
 		try {
 			long fileStart = checkTempFile(tmpFile);
+			//如果文件下载完成没有移动到目录路径
+			if(fileStart == cloudFile.getLength()){
+				if (new FileMV(tmpFile, file).mv()) {
+					return true;
+				} else {
+					fileStart = 0;
+					//重新下载
+				}
+			}
 
 			DownloadInputStream in = null;
 			FileOutputStream out = null;
@@ -210,6 +219,9 @@ public class CloudDownLoad extends Thread {
 				while (-1 != (len = in.read(buffer))) {
 					out.write(buffer, 0, len);
 					sum += len;
+					if (sum == cloudFile.getLength()){
+						break;
+					}
 				}
 				out.flush();
 				out.close();
