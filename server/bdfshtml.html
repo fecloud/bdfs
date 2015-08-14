@@ -35,7 +35,10 @@
                     $("#status").html("故障");
                     $("#status").css('color','red');
                 }
-            }});
+            }, error: function () {
+				$("#status").html("故障");
+				$("#status").css('color','red');
+			}});
             
             $.ajax({url: "{0}?action=cpuinfo".format(service, randomInt()), success: function (data) {
                 if(data.code && data.code == 200) {

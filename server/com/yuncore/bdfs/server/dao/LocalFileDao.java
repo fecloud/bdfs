@@ -12,7 +12,7 @@ import com.yuncore.bdfs.server.util.Stopwatch;
 
 public class LocalFileDao extends BaseDao {
 
-	Logger logger = Logger.getLogger(BaseDao.class.getSimpleName());
+	Logger logger = Logger.getLogger(LocalFileDao.class.getSimpleName());
 
 	private StringBuilder insert;
 
