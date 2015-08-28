@@ -1,5 +1,6 @@
 package com.yuncore.bdfs.client.util;
 
+import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.UnknownHostException;
@@ -8,7 +9,7 @@ import java.util.Date;
 
 public class Log {
 
-	//private FileWriter writer;
+	private FileWriter writer;
 
 	private int priority;
 
@@ -17,8 +18,8 @@ public class Log {
 
 	private Log() {
 		try {
-//			writer = new FileWriter(System.getProperty("java.io.logdir", "")
-//					+ "bdfs.log");
+			writer = new FileWriter(System.getProperty("java.io.logdir", "")
+					+ "bdfs.log");
 			priority = getPriority(System.getProperty("java.io.logpriority",
 					"VERBOSE"));
 		} catch (Exception e) {
@@ -183,8 +184,8 @@ public class Log {
 					getPriority(priority), tag, msg, line_separator);
 			try {
 				System.out.print(str);
-				//log.writer.write(str);
-				//log.writer.flush();
+				log.writer.write(str);
+				log.writer.flush();
 			} catch (Exception e) {
 			}
 		}

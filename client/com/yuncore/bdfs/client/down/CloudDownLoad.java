@@ -76,6 +76,7 @@ public class CloudDownLoad extends Thread {
 			if (cloudFile != null) {
 				Log.i(TAG, "getDownLoad " + cloudFile.getAbsolutePath());
 				ClientEnv.setProperty(ClientEnv.key_downloading, cloudFile);
+				ClientEnv.setProperty(ClientEnv.key_download_size, 0);
 				// 检查是否是排除下载的目录
 				if (isExclude(cloudFile)) {
 					downloaded = true;

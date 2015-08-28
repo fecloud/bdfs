@@ -1,6 +1,7 @@
 package com.yuncore.bdfs.client.ctrl;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -71,8 +72,11 @@ public class Httpd extends NanoHTTPd {
 				object.put("code", 500);
 				object.put("msg", "not support");
 			}
-			return new Response(HTTP_OK, MIME_JSON, Gzip.gzip(object.toString()
-					.getBytes()));
+			try {
+				return new Response(HTTP_OK, MIME_JSON, Gzip.gzip(object
+						.toString().getBytes("UTF-8")));
+			} catch (UnsupportedEncodingException e) {
+			}
 		}
 		return null;
 	}

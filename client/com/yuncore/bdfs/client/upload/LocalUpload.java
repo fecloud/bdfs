@@ -128,10 +128,8 @@ public class LocalUpload extends Thread implements OutputDataListener {
 	 * @return
 	 */
 	private boolean checkBDFSFile(BDFSFile file) {
-		if (file.getLength() >= 1024 * 1024 * 1024) {
-			return true;
-		}
-		return false;
+		final long max = 1024l * 1024l * 1024l * 3l;
+		return file.getLength() >= max;
 	}
 
 	/**
@@ -144,7 +142,7 @@ public class LocalUpload extends Thread implements OutputDataListener {
 		final String localpath = String.format("%s/%s", root,
 				file.getAbsolutePath());
 		final File localFile = new File(localpath);
-		if (localFile.exists()) {
+		if (localFile.exists() && localFile.length() > 0) {
 			return true;
 		}
 		return false;
@@ -155,8 +153,9 @@ public class LocalUpload extends Thread implements OutputDataListener {
 	 * 
 	 * @param file
 	 * @return
+	 * @throws ApiException 
 	 */
-	private boolean uploadFileContext(BDFSFile file) {
+	private boolean uploadFileContext(BDFSFile file) throws ApiException {
 		final long fileLen = file.getLength();
 		// 判断是否大小分块上传的单块数,可以用秒传试一下
 		if (fileLen > FSApi.RAPIDUPLOAD) {
@@ -177,8 +176,9 @@ public class LocalUpload extends Thread implements OutputDataListener {
 	 * 
 	 * @param file
 	 * @return
+	 * @throws ApiException 
 	 */
-	private boolean norMalFileContext(BDFSFile file) {
+	private boolean norMalFileContext(BDFSFile file) throws ApiException {
 		Log.d(TAG, "norMalFileContext");
 		try {
 			if (checkBDFSFile(file)) {
@@ -190,12 +190,11 @@ public class LocalUpload extends Thread implements OutputDataListener {
 			final String cloudpath = file.getAbsolutePath();
 			return api.upload2(localpath, cloudpath, this);
 		} catch (ApiException e) {
-			Log.e(TAG,
+			ClientEnv.setProperty(ClientEnv.key_upload_size, 0);
+			throw new ApiException(
 					String.format("uploadFileContext file:%s error",
 							file.getAbsolutePath()), e);
-			ClientEnv.setProperty(ClientEnv.key_upload_size, 0);
 		}
-		return false;
 	}
 
 	/**
@@ -203,19 +202,17 @@ public class LocalUpload extends Thread implements OutputDataListener {
 	 * 
 	 * @param file
 	 * @return
+	 * @throws ApiException 
 	 */
-	private boolean secondFileContext(BDFSFile file) {
+	private boolean secondFileContext(BDFSFile file) throws ApiException {
 		try {
 			final String localpath = String.format("%s/%s", root,
 					file.getAbsolutePath());
 			final String cloudpath = file.getAbsolutePath();
 			return api.secondUpload(localpath, cloudpath);
 		} catch (ApiException e) {
-			Log.e(TAG,
-					String.format("secondFileContext file:%s error",
-							file.getAbsolutePath()), e);
+			throw new ApiException( String.format("secondFileContext file:%s error", file.getAbsolutePath()), e);
 		}
-		return false;
 	}
 
 	/**
@@ -265,8 +262,9 @@ public class LocalUpload extends Thread implements OutputDataListener {
 	 * 
 	 * @param file
 	 * @return
+	 * @throws ApiException 
 	 */
-	private boolean mkdirCloud(BDFSFile file) {
+	private boolean mkdirCloud(BDFSFile file) throws ApiException {
 		try {
 
 			final MkDirResult mkdir = api.mkdir(file.getAbsolutePath());
@@ -279,7 +277,7 @@ public class LocalUpload extends Thread implements OutputDataListener {
 						+ mkdir.getStatus());
 			}
 		} catch (ApiException e) {
-			Log.e(TAG, "mkdirCloud error", e);
+			throw new ApiException("mkdirCloud error", e);
 		}
 		return false;
 	}

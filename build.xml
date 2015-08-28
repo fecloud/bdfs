@@ -19,7 +19,7 @@
 	<property name="src.server.dir" location="server" />
 	<property name="dest.server.dir" location="${dest.dir}/server" />
 	<property name="dist.server" location="${dist.dir}/server.jar" />
-	<property name="dist.server.war" location="${dist.dir}/ROOT.war" />
+	<property name="dist.server.war" location="${dist.dir}/bdfs.war" />
 
 
 	<!--编译相关参数 -->

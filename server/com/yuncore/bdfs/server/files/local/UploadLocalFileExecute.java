@@ -88,7 +88,7 @@ public class UploadLocalFileExecute extends TaskExecute {
 			while (buffer.hasRemaining()) {
 				file = new BDFSFile();
 				len = buffer.getShort();
-				file.setPath(new String(buffer.array(), buffer.position(), len));
+				file.setPath(new String(buffer.array(), buffer.position(), len, "UTF-8"));
 				buffer.position(buffer.position() + len);
 				file.setLength(buffer.getLong());
 				file.setDir(buffer.get() == 0x1 ? true : false);

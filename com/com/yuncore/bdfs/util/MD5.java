@@ -12,7 +12,7 @@ public class MD5 {
 	 * @param bytes
 	 * @return
 	 */
-	private static final String bytes2String(byte[] bytes) {
+	public static final String bytes2String(byte[] bytes) {
 		if (bytes == null) {
 			return "";
 		}
@@ -21,7 +21,7 @@ public class MD5 {
 		int one = 0x0;
 		for (int i = 0; i < bytes.length; i++) {
 			one = bytes[i] & 0xFF;
-			if (one <= 0x10) {
+			if (one < 0x10) {
 				hexString.append("0");
 			}
 			shaHex = Integer.toHexString(one);

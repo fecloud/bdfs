@@ -560,17 +560,24 @@ public class FSApiImple implements FSApi {
 					final String resultString = http.result();
 					final JSONObject object = new JSONObject(resultString);
 					if (object.has("md5")) {
-						final String[] block_list = new String[1];
-						block_list[0] = object.getString("md5");
-						if (block_list.length > 0) {
-							// 调用 createFile
-							for (int i = 0; i < 3; i++) {
-								if (createFile(cloudpath,
-										new File(localpath).length(),
-										block_list)) {
-									return true;
+						if (object.getString("md5").equalsIgnoreCase(
+								http.getFilemd5())) {
+							final String[] block_list = new String[1];
+							block_list[0] = object.getString("md5");
+							if (block_list.length > 0) {
+								// 调用 createFile
+								for (int i = 0; i < 3; i++) {
+									if (createFile(cloudpath, new File(
+											localpath).length(), block_list)) {
+										return true;
+									}
 								}
 							}
+						} else {
+							Log.w(TAG,
+									"cloud result md5 not same to local "
+											+ http.getFilemd5() + " "
+											+ object.getString("md5"));
 						}
 					}
 
@@ -683,23 +690,27 @@ public class FSApiImple implements FSApi {
 		if(dir){
 			dirpath = file;
 		}else {
-			dirpath = new File(file).getParent();
+			dirpath = new BDFSFile(file).getParentPath();
 		}
-		
+		dirpath = dirpath.replaceAll("\\\\", "/");
 		CloudPageFile list = list(dirpath);
 		if (list.getErrno() == 0) {
 			if (dir) {
 				final CloudFile cloudFile = new CloudFile();
 				cloudFile.setDir(true);
 				cloudFile.setPath(file);
+				return cloudFile;
 			}else {
 				if(null != list.getList()){
+					Log.d(TAG, "getList:" + list.getList().size());
 					for(CloudFile f:list.getList()){
 						//百度云windows不区别大小写的
 						if(f.getPath().equalsIgnoreCase(file)){
+							Log.d(TAG, "found in getlist :" + f.getAbsolutePath());
 							return f;
 						}
 					}
+					Log.d(TAG, "not found in getlist");
 				}
 			}
 		} else if(list.getErrno() == -9){

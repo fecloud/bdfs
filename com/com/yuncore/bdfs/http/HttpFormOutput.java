@@ -8,7 +8,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Random;
+
+import com.yuncore.bdfs.util.MD5;
 
 /**
  * @author ouyangfeng
@@ -30,6 +34,8 @@ public class HttpFormOutput extends Http {
 	private OutputDataListener listener;
 	
 	private boolean upload2;
+	
+	private String filemd5;
 
 	public HttpFormOutput(String url, String file) {
 		super(url, Method.POST);
@@ -138,12 +144,18 @@ public class HttpFormOutput extends Http {
 		final OutputStream out = conn.getOutputStream();
 		out.write(filestart.getBytes("UTF-8"));
 		final File infile = new File(file);
+		MessageDigest digest = null;
+		try {
+			digest = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+		}
 		final FileInputStream in = new FileInputStream(infile);
 		long commit = 0;
 		int len = 0;
 		// 缓存大小
 		final byte[] buffer = new byte[1024 * 50];
 		while ((len = in.read(buffer)) != -1) {
+			digest.update(buffer, 0, len);
 			out.write(buffer, 0, len);
 			out.flush();
 			commit += len;
@@ -152,10 +164,17 @@ public class HttpFormOutput extends Http {
 			}
 		}
 		in.close();
+		final byte[] md = digest.digest();
+		this.filemd5 = MD5.bytes2String(md);
 		out.write(fileend.getBytes("UTF-8"));
 		out.flush();
 		return true;
 	}
+
+	public String getFilemd5() {
+		return filemd5;
+	}
+
 
 	/**
 	 * 写出数据监听

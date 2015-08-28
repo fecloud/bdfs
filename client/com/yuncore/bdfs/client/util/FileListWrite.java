@@ -3,6 +3,7 @@ package com.yuncore.bdfs.client.util;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -37,7 +38,10 @@ public class FileListWrite extends FileOutputStream {
 		byte[] bs = null;
 		for (BDFSFile f : files) {
 			buffer.clear();
-			bs = f.getPath().getBytes();
+			try {
+				bs = f.getPath().getBytes("UTF-8");
+			} catch (UnsupportedEncodingException e) {
+			}
 			buffer.putShort((short) bs.length).put(bs)
 					.putLong(f.getLength())
 					.put((byte) (f.isDir() ? 0x1 : 0x0))

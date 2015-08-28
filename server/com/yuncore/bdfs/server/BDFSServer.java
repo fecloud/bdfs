@@ -47,6 +47,7 @@ public class BDFSServer extends Thread {
 				new CloudHistoryDao().insert();
 				new CloudCompare().compare();
 			}
+			break;
 		}
 	}
 
