@@ -15,15 +15,25 @@ public class LocalFileDao extends BaseDao {
 
 	private static String TAG = "LocalFileDao";
 
+	private String tableName;
+
 	private List<BDFSFile> cache = new ArrayList<BDFSFile>();
 
 	private int size;
 
 	private static final int CACHE_SIZE = 5000;
 
+	public LocalFileDao() {
+		this.tableName = "localfile";
+	}
+
+	public LocalFileDao(String tableName) {
+		this.tableName = tableName;
+	}
+	
 	@Override
 	public String getTableName() {
-		return "localfile";
+		return tableName;
 	}
 
 	public synchronized boolean insertAllCacaheFlush() {
@@ -53,7 +63,7 @@ public class LocalFileDao extends BaseDao {
 
 			Stopwatch stopwatch = new Stopwatch();
 			stopwatch.start();
-			final Connection connection = getDB();
+			final Connection connection = getConnection();
 
 			final String sql = String
 					.format("INSERT INTO %s ('path','length','isdir','mtime' ,'fid','session') VALUES (?,?,?,?,?,?)",

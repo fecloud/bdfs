@@ -42,7 +42,7 @@ public class CookieDao extends BaseDao {
 		try {
 			Stopwatch stopwatch = new Stopwatch();
 			stopwatch.start();
-			final Connection connection = getDB();
+			final Connection connection = getConnection();
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement(String.format(
 							"REPLACE INTO %s (id,cookie) VALUES (1,?)",
@@ -75,7 +75,7 @@ public class CookieDao extends BaseDao {
 		try {
 			Stopwatch stopwatch = new Stopwatch();
 			stopwatch.start();
-			final Connection connection = getDB();
+			final Connection connection = getConnection();
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement(String.format(
 							"SELECT id,cookie FROM %s LIMIT 0,1",

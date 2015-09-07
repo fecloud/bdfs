@@ -3,9 +3,13 @@
  */
 package com.yuncore.bdfs.cloud;
 
-import com.yuncore.bdfs.Const;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.yuncore.bdfs.Environment;
 import com.yuncore.bdfs.api.imple.FSApiImple;
 import com.yuncore.bdfs.dao.CloudFileDao;
+import com.yuncore.bdfs.entity.BDFSFile;
 import com.yuncore.bdfs.entity.CloudFile;
 import com.yuncore.bdfs.entity.CloudPageFile;
 import com.yuncore.bdfs.exception.ApiException;
@@ -14,6 +18,7 @@ import com.yuncore.bdfs.task.Task;
 import com.yuncore.bdfs.task.TaskContainer;
 import com.yuncore.bdfs.task.TaskExecute;
 import com.yuncore.bdfs.task.TaskStatus;
+import com.yuncore.bdfs.util.FileExclude;
 import com.yuncore.bdfs.util.Log;
 
 /**
@@ -24,6 +29,8 @@ public class GetCloudFileExecute extends TaskExecute {
 
 	private static final String TAG = "GetCloudFileExecute";
 
+	private FileExclude exclude;
+
 	private CloudFileDao cloudFileDao;
 
 	/**
@@ -31,8 +38,10 @@ public class GetCloudFileExecute extends TaskExecute {
 	 * @param taskContainer
 	 */
 	public GetCloudFileExecute(TaskStatus taskStatus,
-			TaskContainer taskContainer, CloudFileDao cloudFileDao) {
+			TaskContainer taskContainer, FileExclude exclude,
+			CloudFileDao cloudFileDao) {
 		super(taskStatus, taskContainer);
+		this.exclude = exclude;
 		this.cloudFileDao = cloudFileDao;
 	}
 
@@ -50,20 +59,17 @@ public class GetCloudFileExecute extends TaskExecute {
 					.getDir());
 			if (listFiles != null) {
 				if (listFiles.getErrno() == 0 && listFiles.getList() != null) {
-					final long session = Long.parseLong(System.getProperty(
-							Const.CLOUDLIST_SESSION, "0"));
-					
+					final long session = Long.parseLong(Environment
+							.getCloudlistSession());
+
 					for (CloudFile f : listFiles.getList()) {
 						f.setSession(session);
 					}
+
+					checkExcludeAndAddTask(listFiles.getList());
+
 					cloudFileDao.insertAllCacahe(listFiles.getList());
-					for (CloudFile f : listFiles.getList()) {
-						if (f.isDirectory()) {
-							// System.out.println(f.getAbsolutePath());
-							taskContainer.addTask(new GetCloudFileTask(f
-									.getAbsolutePath()));
-						}
-					}
+
 				} else if (listFiles.getErrno() == -9) {
 					Log.w(TAG, "dir:" + fileTask.getDir() + " is not exits"); // 目录不存在了
 				} else {
@@ -89,5 +95,27 @@ public class GetCloudFileExecute extends TaskExecute {
 			// 因为网络失败取得失败
 			taskContainer.addTask(task);
 		}
+	}
+
+	/**
+	 * 检查并排除目录
+	 * 
+	 * @param files
+	 */
+	private void checkExcludeAndAddTask(List<CloudFile> files) {
+
+		final List<BDFSFile> deletes = new ArrayList<BDFSFile>();
+		for (CloudFile f : files) {
+			if (f.isDirectory()) {
+				if (exclude.rmExclude(f.getAbsolutePath())) {
+					deletes.add(f);
+				} else {
+					taskContainer.addTask(new GetCloudFileTask(f
+							.getAbsolutePath()));
+				}
+
+			}
+		}
+		files.removeAll(deletes);
 	}
 }

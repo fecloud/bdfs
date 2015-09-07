@@ -22,7 +22,7 @@ public class DownloadDao extends BaseDao {
 
 	public boolean insert(BDFSFile file) {
 		try {
-			final Connection connection = getDB();
+			final Connection connection = getConnection();
 
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement(String.format(
@@ -43,7 +43,7 @@ public class DownloadDao extends BaseDao {
 
 	public boolean delete(String id) {
 		try {
-			final Connection connection = getDB();
+			final Connection connection = getConnection();
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement(String.format(
 							"DELETE FROM %s WHERE id=?", getTableName()));
@@ -63,7 +63,7 @@ public class DownloadDao extends BaseDao {
 
 	public boolean delete(BDFSFile file) {
 		try {
-			final Connection connection = getDB();
+			final Connection connection = getConnection();
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement(String.format(
 							"DELETE FROM %s WHERE id=?", getTableName()));
@@ -100,7 +100,7 @@ public class DownloadDao extends BaseDao {
 					"SELECT * FROM %s ORDER BY isdir DESC LIMIT %s,%s",
 					getTableName(), start, num);
 
-			final Connection connection = getDB();
+			final Connection connection = getConnection();
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement(sql);
 			final ResultSet resultSet = prepareStatement.executeQuery();

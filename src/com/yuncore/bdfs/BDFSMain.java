@@ -47,8 +47,7 @@ public class BDFSMain {
 					break;
 				}
 			}
-			System.setProperty(Const.COOKIECONTAINER,
-					FileCookieContainer.class.getName());
+			Environment.setCookiecontainerClassName(FileCookieContainer.class.getName());
 			new LoginGetCookie(write, args[index + 1], args[index + 1])
 					.getCookie();
 		} else {
@@ -57,12 +56,14 @@ public class BDFSMain {
 	}
 
 	private static final void printHelp() {
+		System.err.println("");
 		System.err.println("Usage:bdsync [sync|cookie]");
 		System.err.println("");
 		System.err
 				.println("sync <local_dir> <-p port> [-l exinclude dir] [-c exinclude dir]");
 		System.err.println("");
 		System.err.println("cookie [-w] <username> <password>");
+		System.err.println("");
 	}
 
 }

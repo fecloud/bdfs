@@ -5,6 +5,8 @@ package com.yuncore.bdfs.http.cookie;
 
 import java.util.List;
 
+import com.yuncore.bdfs.Environment;
+
 /**
  * @author ouyangfeng
  * 
@@ -22,9 +24,10 @@ public class HttpCookieContainer implements CookieContainer {
 	private void inStanceCookieContainer() {
 		try {
 			imple = (CookieContainer) Class.forName(
-					System.getProperty(AppCookieContainer.COOKIECONTAINER)).newInstance();
+					Environment.getCookiecontainerClassName()).newInstance();
 		} catch (Exception e) {
-			throw new RuntimeException("not set " + AppCookieContainer.COOKIECONTAINER);
+			throw new RuntimeException("not set "
+					+ Environment.COOKIECONTAINER);
 		}
 	}
 

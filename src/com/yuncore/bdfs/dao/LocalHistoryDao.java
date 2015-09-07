@@ -24,7 +24,7 @@ public class LocalHistoryDao extends BaseDao {
 		String sql = String.format("INSERT INTO %s (time) VALUES (?)",
 				getTableName());
 		try {
-			final Connection connection = getDB();
+			final Connection connection = getConnection();
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement(sql);
 			prepareStatement.setString(1, "" + new Date().getTime());
@@ -57,7 +57,7 @@ public class LocalHistoryDao extends BaseDao {
 
 		final List<History> list = new ArrayList<History>();
 		try {
-			final Connection connection = getDB();
+			final Connection connection = getConnection();
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement(sql);
 			final ResultSet resultSet = prepareStatement.executeQuery();

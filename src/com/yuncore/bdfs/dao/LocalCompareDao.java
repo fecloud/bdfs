@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.yuncore.bdfs.Const;
+import com.yuncore.bdfs.Environment;
 import com.yuncore.bdfs.util.Log;
 import com.yuncore.bdfs.util.Stopwatch;
 
@@ -47,7 +48,7 @@ public class LocalCompareDao extends BaseDao {
 	}
 
 	public String getSession() {
-		return Const.LOCALLIST_SESSION;
+		return Environment.LOCALLIST_SESSION;
 	}
 
 	protected String getTag() {
@@ -111,7 +112,7 @@ public class LocalCompareDao extends BaseDao {
 		if (null != files && !files.isEmpty()) {
 
 			try {
-				final Connection connection = getDB();
+				final Connection connection = getConnection();
 				final StringBuilder sql = new StringBuilder(String.format(
 						"DELETE FROM %s WHERE fid IN( ", getTableName()));
 
@@ -200,12 +201,12 @@ public class LocalCompareDao extends BaseDao {
 
 	public synchronized boolean deleteBefore() {
 		try {
-			final Connection connection = getDB();
+			final Connection connection = getConnection();
 			final StringBuilder sql = new StringBuilder(String.format(
 					"DELETE FROM %s WHERE session<>%s", getCopyTableName(),
 					System.getProperty(getSession())));
 
-			final PreparedStatement prepareStatement = getDB()
+			final PreparedStatement prepareStatement = getConnection()
 					.prepareStatement(sql.toString());
 			Stopwatch stopwatch = new Stopwatch();
 			stopwatch.start();
@@ -242,7 +243,7 @@ public class LocalCompareDao extends BaseDao {
 			// stopwatch.start();
 			final String sql = String.format("SELECT fid FROM %s LIMIT %s,%s",
 					getSameTableName(), start, count);
-			final Connection connection = getDB();
+			final Connection connection = getConnection();
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement(sql);
 
@@ -273,7 +274,7 @@ public class LocalCompareDao extends BaseDao {
 			stopwatch.start();
 
 			Log.d(TAG, sql);
-			final Connection connection = getDB();
+			final Connection connection = getConnection();
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement(sql);
 
@@ -331,7 +332,7 @@ public class LocalCompareDao extends BaseDao {
 			stopwatch.start();
 
 			Log.d(TAG, sql);
-			final Connection connection = getDB();
+			final Connection connection = getConnection();
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement(sql);
 

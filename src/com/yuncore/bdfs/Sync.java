@@ -1,8 +1,9 @@
 package com.yuncore.bdfs;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.yuncore.bdfs.app.ClientContext;
 import com.yuncore.bdfs.cloud.GetCloudFile;
@@ -19,9 +20,9 @@ public class Sync implements Runnable {
 
 	private Thread pcsSyncThread;
 
-	private List<String> localExcludeFiles = new ArrayList<String>();
+	private Set<String> localExcludeFiles = new HashSet<String>();
 
-	private List<String> cloudExcludeFiles = new ArrayList<String>();
+	private Set<String> cloudExcludeFiles = new HashSet<String>();
 
 	// private UploadLocalFileList uploadLocalFileList;
 	//
@@ -38,6 +39,7 @@ public class Sync implements Runnable {
 	public Sync(String[] args) {
 		syncdir = args[1];
 		setHttpPort(args);
+		startHttp();
 		addExcludeFiles(args);
 	}
 
@@ -53,11 +55,25 @@ public class Sync implements Runnable {
 			}
 		}
 	}
+	
+	private void startHttp(){
+		if (httpd == null) {
+			try {
+				httpd = new Httpd(httpPort);
+			} catch (IOException e) {
+				Log.w(TAG, "start httpd service error");
+			}
+		}
+	}
 
 	private void addExcludeFiles(String[] args) {
-		localExcludeFiles.add(Const.TMP_DIR);
+		localExcludeFiles.add(Environment.BDSYNCDIR);
+		localExcludeFiles.add("tmp");
+		
+		cloudExcludeFiles.add("tmp");
+		
 		if (args.length > 3) {
-			List<String> to = null;
+			Set<String> to = null;
 			for (int i = 2; i < args.length; i++) {
 				if (args[i].equals("-l")) {
 					to = localExcludeFiles;
@@ -73,13 +89,12 @@ public class Sync implements Runnable {
 	}
 
 	private void setEnv() {
-		System.setProperty(Const.SYNCDIR, syncdir);
+		Environment.setSyncDir(syncdir);
 		// System.setProperty(Const.TMP,
 		// String.format("%s%s%s", syncdir, File.separator, Const.TMP_DIR));
 		// System.setProperty("http_proxy", "localhost:8888");
-		System.setProperty(Const.CONTEXT, ClientContext.class.getName());
-		System.setProperty(Const.COOKIECONTAINER,
-				DBCookieContainer.class.getName());
+		Environment.setContextClassName(ClientContext.class.getName());
+		Environment.setCookiecontainerClassName(DBCookieContainer.class.getName());
 
 	}
 
@@ -92,16 +107,13 @@ public class Sync implements Runnable {
 
 	private void startCoreService() {
 
-		if (httpd == null) {
-			try {
-				httpd = new Httpd(httpPort);
-			} catch (IOException e) {
-				Log.w(TAG, "start httpd service error");
-			}
-		}
-
 		GetCloudFile cloudFile = new GetCloudFile(4, "/");
+		cloudFile.addExclude(cloudExcludeFiles);
 		cloudFile.list();
+		
+//		getLocalFile = new GetLocalFile(4, syncdir);
+//		getLocalFile.addExclude(localExcludeFiles);
+//		getLocalFile.list();
 
 		// if (null == uploadLocalFileList) {
 		// uploadLocalFileList = new UploadLocalFileList(localExcludeFiles);

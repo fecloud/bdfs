@@ -73,7 +73,8 @@ public final class Log {
 	}
 
 	public static int d(String tag, String msg, Throwable tr) {
-		return println_native(DEBUG, tag, msg + line_separator + getStackTraceString(tr));
+		return println_native(DEBUG, tag, msg + line_separator
+				+ getStackTraceString(tr));
 	}
 
 	public static int i(String tag, String msg) {
@@ -81,7 +82,8 @@ public final class Log {
 	}
 
 	public static int i(String tag, String msg, Throwable tr) {
-		return println_native(INFO, tag, msg + line_separator + getStackTraceString(tr));
+		return println_native(INFO, tag, msg + line_separator
+				+ getStackTraceString(tr));
 	}
 
 	public static int w(String tag, String msg) {
@@ -89,7 +91,8 @@ public final class Log {
 	}
 
 	public static int w(String tag, String msg, Throwable tr) {
-		return println_native(WARN, tag, msg + line_separator + getStackTraceString(tr));
+		return println_native(WARN, tag, msg + line_separator
+				+ getStackTraceString(tr));
 	}
 
 	public static int w(String tag, Throwable tr) {
@@ -101,7 +104,8 @@ public final class Log {
 	}
 
 	public static int e(String tag, String msg, Throwable tr) {
-		return println_native(ERROR, tag, msg + line_separator + getStackTraceString(tr));
+		return println_native(ERROR, tag, msg + line_separator
+				+ getStackTraceString(tr));
 	}
 
 	/**
@@ -179,8 +183,9 @@ public final class Log {
 	private final static synchronized int println_native(int priority,
 			String tag, String msg) {
 		if (log.priority <= priority) {
-			final String str = String.format("%s [%s] %s :%s%s", getTime(),
-					getPriority(priority), tag, msg, line_separator);
+			final String str = String.format("%s [%s] [%s] %s :%s%s",
+					getTime(), getPriority(priority), Thread.currentThread()
+							.getName(), tag, msg, line_separator);
 			try {
 				System.out.print(str);
 				log.writer.write(str);

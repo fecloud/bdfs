@@ -1,14 +1,14 @@
 package com.yuncore.bdfs.util;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class BDFSFileExclude implements FileExclude {
 
-	protected List<String> excludes = new ArrayList<String>();
+	protected Set<String> excludes = new HashSet<String>();
 
 	@Override
-	public synchronized List<String> getExcludes() {
+	public synchronized Set<String> getExcludes() {
 		return excludes;
 	}
 
@@ -21,7 +21,7 @@ public class BDFSFileExclude implements FileExclude {
 	}
 
 	@Override
-	public synchronized void addExclude(List<String> files) {
+	public synchronized void addExclude(Set<String> files) {
 		excludes.addAll(files);
 	}
 

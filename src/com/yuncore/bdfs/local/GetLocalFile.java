@@ -1,11 +1,11 @@
 package com.yuncore.bdfs.local;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.yuncore.bdfs.ClientEnv;
-import com.yuncore.bdfs.Const;
+import com.yuncore.bdfs.Environment;
 import com.yuncore.bdfs.dao.LocalFileDao;
 import com.yuncore.bdfs.task.TaskExecute;
 import com.yuncore.bdfs.task.TaskService;
@@ -21,25 +21,33 @@ public class GetLocalFile extends TaskService {
 
 	private LocalFileDao localFileDao;
 
+	private long session;
+
 	public GetLocalFile(int threads, String dir) {
 		this.threads = threads;
 		exclude = new BDFSFileExclude();
 		this.dir = new File(dir);
-		this.localFileDao = new LocalFileDao();
+		localFileDao = new LocalFileDao("localfile_tmp");
+
+		localFileDao.delete(localFileDao.getTableName());
+		localFileDao
+				.executeSQL(String
+						.format("CREATE TABLE %s (id INTEGER PRIMARY KEY AUTOINCREMENT,path TEXT, length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, session INTEGER);",
+								localFileDao.getTableName()));
 	}
 
 	@Override
 	protected TaskExecute newTaskExecute() {
 		final GetLocalFileExecute getLocalExecute = new GetLocalFileExecute(
 				dir.getAbsolutePath(), taskStatus, taskContainer, exclude,
-				localFileDao);
+				localFileDao, session);
 		return getLocalExecute;
 	}
 
 	public synchronized boolean list() {
 		if (dir.exists()) {
-			final long session = System.currentTimeMillis();
-			System.setProperty(Const.LOCALLIST_SESSION, "" + session);
+			session = System.currentTimeMillis();
+			Environment.setLocallistSession("" + session);
 			taskContainer.addTask(new GetLocalFileTask(""));
 			ClientEnv.setProperty(ClientEnv.key_localfilelist_last, session);
 			waitTaskFinish();
@@ -67,8 +75,8 @@ public class GetLocalFile extends TaskService {
 	 * 
 	 * @param file
 	 */
-	public synchronized void addExclude(List<String> files) {
-		final List<String> list = new ArrayList<String>();
+	public synchronized void addExclude(Set<String> files) {
+		final Set<String> list = new HashSet<String>();
 		String filename = null;
 		for (String f : files) {
 			filename = "/" + f;

@@ -48,7 +48,7 @@ public class CloudFileDao extends BaseDao {
 
 			Stopwatch stopwatch = new Stopwatch();
 			stopwatch.start();
-			final Connection connection = getDB();
+			final Connection connection = getConnection();
 
 			final String sql = String
 					.format("INSERT INTO %s ('path','length','isdir','mtime','fid','md5' ,'session') VALUES (?,?,?,?,?,?,?)",
@@ -84,7 +84,7 @@ public class CloudFileDao extends BaseDao {
 	public synchronized boolean deleteFiles(List<CloudFile> files) {
 		try {
 
-			final Connection connection = getDB();
+			final Connection connection = getConnection();
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement(String.format(
 							"DELETE FROM %s WHERE path=?", getTableName()));

@@ -4,6 +4,7 @@
 package com.yuncore.bdfs.util;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author ouyangfeng
@@ -13,9 +14,9 @@ public interface FileExclude {
 	
 	public void addExclude(String file);
 	
-	public void addExclude(List<String> files);
+	public void addExclude(Set<String> files);
 
-	public List<String> getExcludes();
+	public Set<String> getExcludes();
 	
 	public boolean rmExclude(String exclude);
 	

@@ -6,20 +6,8 @@
 	<property name="build.dir" location="build" />
 	<property name="dist.dir" location="${build.dir}/dist" />
 	<property name="dest.dir" location="${build.dir}/classes" />
-
-	<property name="src.com.dir" location="com" />
-	<property name="dest.com.dir" location="${dest.dir}/com" />
-
-	<property name="src.client.dir" location="client" />
-	<property name="dest.client.dir" location="${dest.dir}/client" />
-	<property name="dist.client.jar" value="client.jar" />
-	<property name="dist.client" location="${dist.dir}/${dist.client.jar}" />
-	<property name="dist.client.zip" location="${dist.dir}/client.zip" />
-
-	<property name="src.server.dir" location="server" />
-	<property name="dest.server.dir" location="${dest.dir}/server" />
-	<property name="dist.server" location="${dist.dir}/server.jar" />
-	<property name="dist.server.war" location="${dist.dir}/bdfs.war" />
+	<property name="dist.jar" value="${dist.dir}/bdsync.jar" />
+	<property name="dist.zip" location="${dist.dir}/bdsync.zip" />
 
 
 	<!--编译相关参数 -->
@@ -35,10 +23,10 @@
 		<mkdir dir="${dest.dir}" />
 	</target>
 
-	<target name="compiler-com" depends="-pre-compiler">
-		<mkdir dir="${dest.com.dir}" />
+	<target name="compiler" depends="-pre-compiler">
+		<mkdir dir="${dest.dir}" />
 		<echo level="info">compiler start</echo>
-		<javac srcdir="${src.com.dir}" destdir="${dest.com.dir}" encoding="${java.encoding}" includeantruntime="false" verbose="${verbose}" debug="true">
+		<javac srcdir="${src.dir}" destdir="${dest.dir}" encoding="${java.encoding}" includeantruntime="false" verbose="${verbose}" debug="true">
 			<classpath>
 				<fileset dir="${libs.dir}">
 					<include name="json-1.6.jar" />
@@ -48,37 +36,24 @@
 		<echo level="info">compiler finish</echo>
 	</target>
 
-	<target name="com" depends="compiler-com">
-	</target>
 
-	<target name="compiler-client" depends="com">
-		<mkdir dir="${dest.client.dir}" />
-		<echo level="info">compiler start</echo>
-		<javac srcdir="${src.client.dir}" destdir="${dest.client.dir}" encoding="${java.encoding}" includeantruntime="false" verbose="${verbose}" debug="true">
-			<classpath>
-				<fileset dir="${libs.dir}">
-					<include name="json-1.6.jar" />
-				</fileset>
-				<path location="${dest.com.dir}" />
-			</classpath>
-		</javac>
-		<echo level="info">compiler finish</echo>
-	</target>
 
-	<target name="client" depends="compiler-client">
+	<target name="package" depends="compiler">
 		<echo level="info">package jar start</echo>
-		<jar destfile="${dist.client}" basedir="${dest.client.dir}">
-			<fileset dir="${dest.com.dir}" />
+		<copyfile src="${src.dir}/cookie.json" dest="${dest.dir}/cookie.json"/>
+		<jar destfile="${dist.jar}" basedir="${dest.dir}">
+			<fileset dir="${dest.dir}" />
 			<zipfileset src="${libs.dir}/json-1.6.jar" />
+			<zipfileset src="${libs.dir}/sqlite-jdbc-3.8.10.1.jar" />
 			<manifest>
-				<attribute name="Main-class" value="com.yuncore.bdfs.client.ClientMain" />
+				<attribute name="Main-class" value="com.yuncore.bdfs.BDFSMain" />
 			</manifest>
 		</jar>
 		<echo level="info">package jar finish</echo>
 	</target>
 
-	<target name="client-release" depends="client">
-		<echo level="info">client-release start</echo>
+	<target name="release" depends="package">
+		<echo level="info">release start</echo>
 		<mkdir dir="${dist.dir}/client" />
 		<mkdir dir="${dist.dir}/client/bin" />
 		<mkdir dir="${dist.dir}/client/lib" />
@@ -90,59 +65,10 @@
 		<zip destfile="${dist.client.zip}" basedir="${dist.dir}/client">
 		</zip>
 		<delete dir="${dist.dir}/client" />
-		<echo level="info">client-release finish</echo>
+		<echo level="info">release finish</echo>
 	</target>
 
-	<target name="compiler-server" depends="com">
-		<mkdir dir="${dest.server.dir}" />
-		<echo level="info">compiler start</echo>
-		<javac srcdir="${src.server.dir}" destdir="${dest.server.dir}" encoding="${java.encoding}" includeantruntime="false" verbose="${verbose}" debug="true">
-			<classpath>
-				<fileset dir="${libs.dir}">
-					<include name="**/*.jar" />
-				</fileset>
-				<path location="${dest.com.dir}" />
-			</classpath>
-		</javac>
-		<echo level="info">compiler finish</echo>
-	</target>
-
-	<target name="server" depends="com,compiler-server">
-		<echo level="info">package jar start</echo>
-		<jar destfile="${dist.server}" basedir="${dest.server.dir}">
-			<fileset dir="${dest.com.dir}" />
-			<zipfileset file="${src.server.dir}/log4j.properties" />
-			<zipfileset file="${src.server.dir}/jdbc.properties" />
-			<manifest>
-				<attribute name="Main-class" value="com.yuncore.bdfs.server.BDFSServer" />
-			</manifest>
-			<zipfileset src="${libs.dir}/commons-logging-1.2.jar" />
-			<zipfileset src="${libs.dir}/json-1.6.jar" />
-			<zipfileset src="${libs.dir}/log4j-1.2.17.jar" />
-			<zipfileset src="${libs.dir}/mysql-connector-java-5.1.9.jar" />
-		</jar>
-		<echo level="info">package jar finish</echo>
-
-		<war destfile="${dist.server.war}" webxml="${src.server.dir}/web.xml">
-			<!-- 
-			<lib dir="${libs.dir}">
-				<exclude name="servlet-api.jar" />
-			</lib>
-			-->
-			<lib file="${dist.server}">
-			</lib>
-			<fileset dir="${src.server.dir}">
-				<include name="favicon.ico" />
-				<include name="index.html" />
-				<include name="bdfshtml.html" />
-				<include name="css/**" />
-				<include name="js/**" />
-				<include name="img/**" />
-			</fileset>
-		</war>
-	</target>
-
-	<target name="all" depends="clean,client-release,server">
+	<target name="all" depends="clean,release">
 	</target>
 
 </project>

@@ -14,11 +14,20 @@ public abstract class BaseDao {
 
 	private static final DBHelper db = new DBHelper();
 
-	protected synchronized Connection getDB() {
+	/**
+	 * 取数据库连接
+	 * @return
+	 */
+	protected synchronized Connection getConnection() {
 		return db.getConnection();
 	}
 
-	protected synchronized boolean executeSQL(String sql) {
+	/**
+	 * 执行sql语句
+	 * @param sql
+	 * @return
+	 */
+	public synchronized boolean executeSQL(String sql) {
 		Log.d(TAG, "executeSQL:" + sql);
 		return db.executeSQL(sql);
 	}
@@ -31,7 +40,7 @@ public abstract class BaseDao {
 	public synchronized boolean clear() {
 		boolean result = false;
 		try {
-			final Connection connection = getDB();
+			final Connection connection = getConnection();
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement(String.format("DELETE FROM %s",
 							getTableName()));
@@ -57,7 +66,7 @@ public abstract class BaseDao {
 	public synchronized long count() {
 		long count = 0l;
 		try {
-			final Connection connection = getDB();
+			final Connection connection = getConnection();
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement(String.format("SELECT COUNT(*) FROM %s",
 							getTableName()));
@@ -73,6 +82,32 @@ public abstract class BaseDao {
 		}
 
 		return count;
+	}
+
+	/**
+	 * 删除表
+	 * @param table
+	 * @return
+	 */
+	public synchronized boolean delete(String table) {
+		boolean result = false;
+		try {
+			final Connection connection = getConnection();
+			final PreparedStatement prepareStatement = connection
+					.prepareStatement(String.format("DROP TABLE IF EXISTS %s",
+							table));
+
+			connection.setAutoCommit(false);
+			result = prepareStatement.execute();
+			connection.commit();
+			connection.setAutoCommit(true);
+			connection.close();
+
+		} catch (SQLException e) {
+			Log.e(TAG, "delete", e);
+		}
+
+		return result;
 	}
 
 	public abstract String getTableName();

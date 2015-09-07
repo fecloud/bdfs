@@ -220,7 +220,7 @@ public class NanoHTTPd {
                 }
             }
         });
-        myThread.setName("Httpd-accept");
+        myThread.setName("Httpd-Accept");
         myThread.start();
     }
 
@@ -249,6 +249,10 @@ public class NanoHTTPd {
         }
 
         public void run() {
+        	String name = Thread.currentThread().getName();
+        	name = name.substring(name.length()-1);
+        	name = "Httpd-Worker-" + name;
+        	Thread.currentThread().setName(name);
             try {
                 InputStream is = mySocket.getInputStream();
                 if (is == null) return;

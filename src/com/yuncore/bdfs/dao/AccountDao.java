@@ -31,7 +31,7 @@ public class AccountDao extends BaseDao {
 
 	public synchronized Account getAccount() {
 		try {
-			final Connection connection = getDB();
+			final Connection connection = getConnection();
 			final PreparedStatement prepareStatement = connection
 					.prepareStatement("SELECT username,password FROM "
 							+ getTableName());

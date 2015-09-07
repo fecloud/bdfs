@@ -15,7 +15,7 @@ import javax.net.ssl.HttpsURLConnection;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.yuncore.bdfs.Const;
+import com.yuncore.bdfs.Environment;
 import com.yuncore.bdfs.api.BDFSURL;
 import com.yuncore.bdfs.api.FSApi;
 import com.yuncore.bdfs.app.Context;
@@ -43,7 +43,7 @@ public class FSApiImple implements FSApi {
 	private static boolean DEBUG = false;
 
 	private static Context context;
-	
+
 	public FSApiImple() {
 		super();
 		inStanceContext();
@@ -53,7 +53,7 @@ public class FSApiImple implements FSApi {
 		try {
 			if (null == context)
 				context = (Context) Class.forName(
-						System.getProperty(Const.CONTEXT)).newInstance();
+						Environment.getContextClassName()).newInstance();
 		} catch (Exception e) {
 		}
 	}
@@ -342,13 +342,14 @@ public class FSApiImple implements FSApi {
 	}
 
 	@Override
-	public boolean upload(String localpath, String cloudpath) throws ApiException {
+	public boolean upload(String localpath, String cloudpath)
+			throws ApiException {
 		return upload(localpath, cloudpath, null);
 	}
-	
+
 	@Override
-	public boolean upload(String localpath, String cloudpath, OutputDataListener listener)
-			throws ApiException {
+	public boolean upload(String localpath, String cloudpath,
+			OutputDataListener listener) throws ApiException {
 		try {
 			if (context.load()) {
 				final String BDUSS = HttpCookieContainer.getInstance()
@@ -358,10 +359,12 @@ public class FSApiImple implements FSApi {
 						URLEncoder.encode(cloudFile.getParentPath(), "UTF-8"),
 						URLEncoder.encode(cloudFile.getName(), "UTF-8"), BDUSS);
 
-				final HttpFormOutput http = new HttpFormOutput(url, localpath, listener);
+				final HttpFormOutput http = new HttpFormOutput(url, localpath,
+						listener);
 				if (http.http()) {
-					if(DEBUG)
-						Log.i(TAG, String.format("upload result:%s", http.result()));
+					if (DEBUG)
+						Log.i(TAG, String.format("upload result:%s",
+								http.result()));
 					final String resultString = http.result();
 					final JSONObject object = new JSONObject(resultString);
 					if (object.has("md5")) {
@@ -390,13 +393,16 @@ public class FSApiImple implements FSApi {
 				final String content_md5 = MD5.md5File(localpath);
 				final String slice_md5 = MD5.md5File(localpath, RAPIDUPLOAD);
 				final String url = BDFSURL.getsecondupload(
-						URLEncoder.encode(cloudFile.getParentPath(), "UTF-8"), URLEncoder.encode(cloudFile.getName(), "UTF-8"),
-						file.length(), content_md5, slice_md5, URLEncoder.encode(BDUSS, "UTF-8"), bdstoken);
+						URLEncoder.encode(cloudFile.getParentPath(), "UTF-8"),
+						URLEncoder.encode(cloudFile.getName(), "UTF-8"),
+						file.length(), content_md5, slice_md5,
+						URLEncoder.encode(BDUSS, "UTF-8"), bdstoken);
 
 				final Http http = new Http(url, Method.GET);
 				if (http.http()) {
 					if (DEBUG)
-						Log.i(TAG, String.format("upload result:%s", http.result()));
+						Log.i(TAG, String.format("upload result:%s",
+								http.result()));
 					final String resultString = http.result();
 					final JSONObject object = new JSONObject(resultString);
 					if (object.has("md5")) {
@@ -457,10 +463,9 @@ public class FSApiImple implements FSApi {
 
 				final Http http = new Http(url, Method.GET);
 				if (http.http()) {
-//					if (DEBUG)
-						Log.d(TAG,
-								String.format("fileExists result:%s",
-										http.result()));
+					// if (DEBUG)
+					Log.d(TAG, String.format("fileExists result:%s",
+							http.result()));
 					final String resultString = http.result();
 					final JSONObject object = new JSONObject(resultString);
 					if (object.has("errno") && object.getInt("errno") == 0
@@ -469,18 +474,18 @@ public class FSApiImple implements FSApi {
 						if (jsonArray.length() > 0) {
 							JSONObject jsonObject = null;
 							CloudFile pcsFile = null;
-							//返回的文件可能有很多
-							for (int i = 0; i < jsonArray.length(); i++){
+							// 返回的文件可能有很多
+							for (int i = 0; i < jsonArray.length(); i++) {
 								jsonObject = jsonArray.getJSONObject(0);
 								pcsFile = new CloudFile();
 								pcsFile.formJOSN(jsonObject.toString());
-								//找到名字匹配的
-								if (pcsFile.getName().equals(f.getName())){
+								// 找到名字匹配的
+								if (pcsFile.getName().equals(f.getName())) {
 									return pcsFile;
 								}
-								
+
 							}
-							
+
 						}
 
 					}
@@ -497,14 +502,14 @@ public class FSApiImple implements FSApi {
 		return null;
 
 	}
-	
+
 	@Override
 	public CloudRmResult rm(String filenames) throws ApiException {
 		return rm(new String[] { filenames });
 	}
 
 	@Override
-	public CloudRmResult rm(String [] filenames) throws ApiException {
+	public CloudRmResult rm(String[] filenames) throws ApiException {
 		try {
 			if (context.load()) {
 				final String bdstoken = context.getProperty(BDSTOKEN, "");
@@ -533,7 +538,7 @@ public class FSApiImple implements FSApi {
 		return null;
 
 	}
-	
+
 	public boolean upload2(String localpath, String cloudpath)
 			throws ApiException {
 		return upload2(localpath, cloudpath, null);
@@ -631,7 +636,7 @@ public class FSApiImple implements FSApi {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public CloudPageFile list(String dir) throws ApiException {
 		int i = 1;
@@ -680,15 +685,17 @@ public class FSApiImple implements FSApi {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.yuncore.bdfs.client.api.FSApi#exists(java.lang.String)
 	 */
 	@Override
 	public CloudFile exists(String file, boolean dir) throws ApiException {
 		String dirpath = null;
-		if(dir){
+		if (dir) {
 			dirpath = file;
-		}else {
+		} else {
 			dirpath = new BDFSFile(file).getParentPath();
 		}
 		dirpath = dirpath.replaceAll("\\\\", "/");
@@ -699,21 +706,22 @@ public class FSApiImple implements FSApi {
 				cloudFile.setDir(true);
 				cloudFile.setPath(file);
 				return cloudFile;
-			}else {
-				if(null != list.getList()){
+			} else {
+				if (null != list.getList()) {
 					Log.d(TAG, "getList:" + list.getList().size());
-					for(CloudFile f:list.getList()){
-						//百度云windows不区别大小写的
-						if(f.getPath().equalsIgnoreCase(file)){
-							Log.d(TAG, "found in getlist :" + f.getAbsolutePath());
+					for (CloudFile f : list.getList()) {
+						// 百度云windows不区别大小写的
+						if (f.getPath().equalsIgnoreCase(file)) {
+							Log.d(TAG,
+									"found in getlist :" + f.getAbsolutePath());
 							return f;
 						}
 					}
 					Log.d(TAG, "not found in getlist");
 				}
 			}
-		} else if(list.getErrno() == -9){
-			//文件夹不存在
+		} else if (list.getErrno() == -9) {
+			// 文件夹不存在
 			return null;
 		}
 		return null;

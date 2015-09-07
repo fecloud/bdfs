@@ -3,7 +3,6 @@ package com.yuncore.bdfs.local;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.yuncore.bdfs.Const;
 import com.yuncore.bdfs.dao.LocalFileDao;
 import com.yuncore.bdfs.entity.BDFSFile;
 import com.yuncore.bdfs.task.Task;
@@ -21,20 +20,22 @@ public class GetLocalFileExecute extends TaskExecute {
 
 	private LocalFileDao localFileDao;
 
+	private long session;
+
 	public GetLocalFileExecute(String root, TaskStatus taskStatus,
 			TaskContainer taskContainer, FileExclude exclude,
-			LocalFileDao localFileDao) {
+			LocalFileDao localFileDao, long session) {
 		super(taskStatus, taskContainer);
 		this.root = root;
 		this.exclude = exclude;
 		this.localFileDao = localFileDao;
+		this.session = session;
 	}
 
 	protected void getDirFiles(GetLocalFileTask task) {
 
 		final List<BDFSFile> listFiles = FileUtil.listFiles(root,
-				task.getDir(), Long.parseLong(System.getProperty(
-						Const.LOCALLIST_SESSION, "0")));
+				task.getDir(), session);
 		if (listFiles != null) {
 			excute(listFiles, task.getDir());
 		}

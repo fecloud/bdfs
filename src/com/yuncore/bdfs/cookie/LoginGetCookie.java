@@ -18,8 +18,8 @@ public class LoginGetCookie {
 
 	private String password;
 
-	private String filename = Environment.getTmpDir()
-			+ File.separator + "cookie.json";
+	private String filename = Environment.getJavaTmpDir() + File.separator
+			+ "cookie.json";
 
 	private FSApi api = new FSApiImple();
 
@@ -64,7 +64,7 @@ public class LoginGetCookie {
 			final String file = filename + ".gzip";
 			final FileGzip fileZip = new FileGzip(filename, file);
 			if (fileZip.gzip()) {
-				//return serverApi.uploadCookie(file);
+				// return serverApi.uploadCookie(file);
 			}
 		} catch (Exception e) {
 		}

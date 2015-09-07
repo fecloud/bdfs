@@ -145,7 +145,7 @@ public class DBHelper {
 		executeSQL("CREATE TABLE cloudhistory (id INTEGER PRIMARY KEY AUTOINCREMENT, time INTEGER );");
 		executeSQL("CREATE TABLE localhistory (id INTEGER PRIMARY KEY AUTOINCREMENT, time INTEGER );");
 
-		executeSQL(String.format("REPLACE INTO cookie (id,cookie) values (1,'%s')", TextUtil.readFile("cookie.json")));
+		executeSQL(String.format("REPLACE INTO cookie (id,cookie) values (1,'%s')", TextUtil.readResoure("/cookie.json")));
 	}
 
 	protected void onUpdateDB(int old_version, int newversion) {
