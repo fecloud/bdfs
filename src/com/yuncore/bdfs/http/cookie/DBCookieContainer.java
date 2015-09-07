@@ -5,34 +5,21 @@ package com.yuncore.bdfs.http.cookie;
 
 import org.json.JSONArray;
 
-import com.yuncore.bdfs.db.CookieDao;
+import com.yuncore.bdfs.dao.CookieDao;
+import com.yuncore.bdfs.util.Log;
 
 /**
  * @author ouyangfeng
  * 
  */
-public class DBCookieContainer extends FileCookieContainer {
+public class DBCookieContainer extends AppCookieContainer {
+
+	private static final String TAG = "DBCookieContainer";
 
 	private CookieDao cookieDao = new CookieDao();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.yuncore.bdfs.http.cookie.FileCookieContainer#save()
-	 */
 	@Override
-	public boolean save() {
-		return cookieDao.saveCookie(toJSON());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.yuncore.bdfs.http.cookie.FileCookieContainer#read()
-	 */
-	@Override
-	public boolean read() {
-
+	protected boolean readForm() {
 		final String jsons = cookieDao.getCookie();
 		if (null != jsons && jsons.trim().length() > 0) {
 			final JSONArray array = new JSONArray(jsons);
@@ -40,17 +27,20 @@ public class DBCookieContainer extends FileCookieContainer {
 				Cookie cookie = null;
 				for (int i = 0; i < array.length(); i++) {
 					cookie = new Cookie();
-					cookie.formJOSN(array.getString(i));
+					cookie.formJOSN(array.getJSONObject(i));
 					cookies.add(cookie);
 				}
-
+				return true;
 			}
 		} else {
-			logger.debug("from db cookie null");
-			return false;
+			Log.d(TAG, "from db cookie null");
 		}
+		return false;
+	}
 
-		return true;
+	@Override
+	protected boolean saveTo() {
+		return cookieDao.saveCookie(toJSON());
 	}
 
 }

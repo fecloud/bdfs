@@ -2,52 +2,41 @@ package com.yuncore.bdfs.entity;
 
 import org.json.JSONObject;
 
-import com.yuncore.bdfs.tools.Util;
+import com.yuncore.bdfs.entity.BDFSFile;
 
-public class CloudFile extends LocalFile implements EntityJSONObject {
+public class CloudFile extends BDFSFile {
 
-	// private int dirEmpty;
-	//
-	// public int getDirEmpty() {
-	// return dirEmpty;
-	// }
+	private String md5;
 
-	// public void setDirEmpty(int dirEmpty) {
-	// this.dirEmpty = dirEmpty;
-	// }
+	public String getMd5() {
+		return md5;
+	}
 
-	public String getAbsolutePath() {
-		if (getDir().endsWith("/")) {
-			return getDir() + getName();
-		}
-		return getDir() + "/" + getName();
+	public void setMd5(String md5) {
+		this.md5 = md5;
 	}
 
 	@Override
 	public boolean formJOSN(JSONObject object) {
 		if (null != object) {
-			if (object.has("server_filename")) {
-				setName(object.getString("server_filename"));
-			}
 
 			if (object.has("size")) {
-				setLength(object.getLong("size"));
+				this.length = object.getLong("size");
 			}
-
 			if (object.has("isdir")) {
-				setType(object.getInt("isdir"));
+				this.isdir = object.getInt("isdir") == 1 ? true : false;
 			}
 
 			if (object.has("path")) {
-				String path = object.getString("path");
-				path = Util.getUnixPath(path);
-				setDir(path);
+				this.path = object.getString("path");
 			}
 
-			// if (object.has("dir_empty")) {
-			// dirEmpty = object.getInt("dir_empty");
-			// }
-
+			if (object.has("md5")) {
+				md5 = object.getString("md5");
+			}
+			if (!isdir && object.has("server_mtime")) {
+				mtime = object.getLong("server_mtime");
+			}
 			return true;
 		}
 		return false;
@@ -60,7 +49,7 @@ public class CloudFile extends LocalFile implements EntityJSONObject {
 	 */
 	@Override
 	public boolean formJOSN(String json) {
-		return false;
+		return formJOSN(new JSONObject(json));
 	}
 
 	/*
@@ -70,6 +59,38 @@ public class CloudFile extends LocalFile implements EntityJSONObject {
 	 */
 	@Override
 	public String toJSON() {
+		return null;
+	}
+
+	/**
+	 * 取文件的所在的路径
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public static String getUnixPath(String file) {
+		if (null != file) {
+			int lastIndexOf = file.lastIndexOf("/");
+			if (lastIndexOf == 0) {
+				return "/";
+			} else {
+				return file.substring(0, lastIndexOf);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * 取文件的所在的文件
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public static String getUnixFileName(String file) {
+		if (null != file) {
+			int lastIndexOf = file.lastIndexOf("/");
+			return file.substring(lastIndexOf + 1);
+		}
 		return null;
 	}
 

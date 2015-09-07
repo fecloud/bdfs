@@ -2,8 +2,12 @@ package com.yuncore.bdfs.entity;
 
 import org.json.JSONObject;
 
-public class CloudRmResult implements EntityJSONObject {
+import com.yuncore.bdfs.entity.EntityJSON;
 
+public class CloudRmResult implements EntityJSON {
+
+	private int errno;
+	
 	private long taskid;
 
 	public long getTaskid() {
@@ -17,6 +21,9 @@ public class CloudRmResult implements EntityJSONObject {
 	@Override
 	public boolean formJOSN(JSONObject object) {
 		if (null != object) {
+			if (object.has("errno")) {
+				errno = object.getInt("errno");
+			}
 			if (object.has("taskid")) {
 				taskid = object.getLong("taskid");
 			}
@@ -37,7 +44,7 @@ public class CloudRmResult implements EntityJSONObject {
 	 */
 	@Override
 	public boolean formJOSN(String json) {
-		return false;
+		return formJOSN(new JSONObject(json));
 	}
 
 	/*
@@ -53,6 +60,14 @@ public class CloudRmResult implements EntityJSONObject {
 	@Override
 	public void toJSON(JSONObject object) {
 		
+	}
+
+	public int getErrno() {
+		return errno;
+	}
+
+	public void setErrno(int errno) {
+		this.errno = errno;
 	}
 
 }

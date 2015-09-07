@@ -1,6 +1,6 @@
 package com.yuncore.bdfs.app;
 
-import com.yuncore.bdfs.exception.BDFsException;
+import com.yuncore.bdfs.exception.BDFSException;
 
 public interface Context {
 
@@ -10,12 +10,6 @@ public interface Context {
 
 	Object setProperty(String key, String value);
 
-	boolean load() throws BDFsException;
-
-	String getUserName();
-
-	String getPassWord();
-
-	boolean login() throws BDFsException;
+	boolean load() throws BDFSException;
 
 }

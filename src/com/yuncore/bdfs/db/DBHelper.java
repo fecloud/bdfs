@@ -7,22 +7,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.apache.log4j.Logger;
+import com.yuncore.bdfs.Environment;
+import com.yuncore.bdfs.util.Log;
+import com.yuncore.bdfs.util.TextUtil;
 
 public class DBHelper {
 
-	Logger logger = Logger.getLogger(DBHelper.class.getName());
+	private static final String TAG = "DBHelper";
 
 	private static final int DB_VERSION = 1;
 
 	public DBHelper() {
 
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
+			Class.forName("org.sqlite.JDBC");
 		} catch (ClassNotFoundException e) {
-			logger.error("DBHelper Class.forName(\"com.mysql.jdbc.Driver\")", e);
+			Log.e(TAG, "DBHelper Class.forName(\"org.sqlite.JDBC\")", e);
 		}
-
 		try {
 
 			final int dbVersion = dbVersion();
@@ -35,23 +36,18 @@ public class DBHelper {
 				updateVersion();
 			}
 		} catch (Exception e) {
-			logger.error("DBHelper error", e);
+			Log.e(TAG, "DBHelper error", e);
 		}
 
 	}
 
 	public synchronized Connection getConnection() {
 		try {
-
-			final String url = "jdbc:mysql://rds6v2uvvrennaa.mysql.rds.aliyuncs.com:3306/db7k81jhgfm13wla?user=db7k81jhgfm13wla&password=ouyangfeng";
-			// final String url =
-			// "jdbc:mysql://localhost:3306/fcloud?user=root&password=root&useUnicode=true&characterEncoding=UTF-8";
-			// final String url =
-			// "jdbc:mysql://10.0.0.8:3306/bdfs?user=root&password=fcloud&useUnicode=true&characterEncoding=UTF-8";
-			final Connection conn = DriverManager.getConnection(url);
+			final Connection conn = DriverManager.getConnection(String.format(
+					"jdbc:sqlite:%s", Environment.getDBFile()));
 			return conn;
 		} catch (Exception e) {
-			logger.error("DBHelper getConnection", e);
+			Log.e(TAG, "DBHelper getConnection", e);
 		}
 		return null;
 	}
@@ -61,20 +57,20 @@ public class DBHelper {
 		try {
 			final Connection connection = getConnection();
 			final PreparedStatement prepareStatement = connection
-					.prepareStatement("SHOW TABLES LIKE 'version' ");
+					.prepareStatement("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='version';");
 
 			final ResultSet resultSet = prepareStatement.executeQuery();
 
-			String version = null;
+			int version = 0;
 			if (resultSet.next()) {
-				version = resultSet.getString(1);
+				version = resultSet.getInt(1);
 			}
 			resultSet.close();
 			prepareStatement.close();
 			connection.close();
-			return version != null;
+			return version  > 0;
 		} catch (SQLException e) {
-			logger.error("dbVersion", e);
+			Log.e(TAG, "dbVersion", e);
 		}
 		return false;
 	}
@@ -99,7 +95,7 @@ public class DBHelper {
 				prepareStatement.close();
 				connection.close();
 			} catch (SQLException e) {
-				logger.error("dbVersion", e);
+				Log.e(TAG, "dbVersion", e);
 			}
 		}
 		return dbVersion;
@@ -107,10 +103,10 @@ public class DBHelper {
 	}
 
 	private synchronized void createVersion() throws SQLException {
-		logger.info("createVersion");
+		Log.i(TAG, "createVersion");
 		final Connection connection = getConnection();
 		final PreparedStatement prepareStatement = connection
-				.prepareStatement("CREATE TABLE version(id BIGINT PRIMARY KEY AUTO_INCREMENT,version BIGINT);");
+				.prepareStatement("CREATE TABLE version(id INTEGER PRIMARY KEY AUTOINCREMENT,version INTEGER);");
 		connection.setAutoCommit(false);
 		prepareStatement.execute();
 		connection.commit();
@@ -120,7 +116,7 @@ public class DBHelper {
 	}
 
 	private synchronized void updateVersion() throws SQLException {
-		logger.info("updateVersion");
+		Log.i(TAG, "updateVersion");
 		final Connection connection = getConnection();
 		final PreparedStatement prepareStatement = connection
 				.prepareStatement("REPLACE INTO version (id,version) values (1,?)");
@@ -134,23 +130,26 @@ public class DBHelper {
 	}
 
 	protected synchronized void onCreateDB() {
-		logger.info("onCreateDB");
+		Log.i(TAG, "onCreateDB");
 
-		executeSQL("CREATE TABLE localfile (id varchar(36) PRIMARY KEY,dir VARCHAR(2048) ,name VARCHAR(2048), length BIGINT,type BIGINT,fid varchar(32),session BIGINT);"); // 本地文件记录
-		executeSQL("CREATE TABLE localdelete (id VARCHAR(36) PRIMARY KEY, dir VARCHAR(2048) ,name VARCHAR(2048), length BIGINT,type BIGINT,fid varchar(32),session BIGINT);");// 本地被删除了
-		executeSQL("CREATE TABLE localupload (id VARCHAR(36) PRIMARY KEY, dir VARCHAR(2048) ,name VARCHAR(2048), length BIGINT,type BIGINT,fid varchar(32),session BIGINT);");// 本地要被上传的
-
-		executeSQL("CREATE TABLE cloudfile (id VARCHAR(36) PRIMARY KEY, dir VARCHAR(2048) ,name VARCHAR(2048), length BIGINT,type BIGINT,fid varchar(32),session BIGINT);");
-		executeSQL("CREATE TABLE clouddelete (id VARCHAR(36) PRIMARY KEY,dir VARCHAR(2048) ,name VARCHAR(2048), length BIGINT,type BIGINT,fid varchar(32),session BIGINT);");
-		executeSQL("CREATE TABLE clouddownload (id VARCHAR(36) PRIMARY KEY,dir VARCHAR(2048) ,name VARCHAR(2048), length BIGINT,type BIGINT,fid varchar(32),session BIGINT);");
+		executeSQL("CREATE TABLE cookie (id INTEGER PRIMARY KEY AUTOINCREMENT,cookie TEXT);"); // 本地文件记录
 		
-		executeSQL("CREATE TABLE cloudhistory (id int PRIMARY KEY AUTO_INCREMENT, time VARCHAR(36));");
-		executeSQL("CREATE TABLE localhistory (id int PRIMARY KEY AUTO_INCREMENT, time VARCHAR(36));");
+		executeSQL("CREATE TABLE localfile (id INTEGER PRIMARY KEY AUTOINCREMENT,path TEXT, length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, session INTEGER);"); // 本地文件记录
+		executeSQL("CREATE TABLE localdelete (id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT , length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, session INTEGER);");// 本地被删除了
+		executeSQL("CREATE TABLE localupload (id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT , length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, session INTEGER);");// 本地要被上传的
 
+		executeSQL("CREATE TABLE cloudfile (id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT , length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, md5 TEXT, session INTEGER);");
+		executeSQL("CREATE TABLE clouddelete (id TEXT PRIMARY KEY,path TEXT , length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, md5 varchar(32), session INTEGER);");
+		executeSQL("CREATE TABLE clouddownload (id TEXT PRIMARY KEY,path TEXT , length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, md5 varchar(32), session INTEGER);");
+
+		executeSQL("CREATE TABLE cloudhistory (id INTEGER PRIMARY KEY AUTOINCREMENT, time INTEGER );");
+		executeSQL("CREATE TABLE localhistory (id INTEGER PRIMARY KEY AUTOINCREMENT, time INTEGER );");
+
+		executeSQL(String.format("REPLACE INTO cookie (id,cookie) values (1,'%s')", TextUtil.readFile("cookie.json")));
 	}
 
 	protected void onUpdateDB(int old_version, int newversion) {
-		logger.warn(String.format("onUpdateDB old_version:%s newversion:%s",
+		Log.w(TAG, String.format("onUpdateDB old_version:%s newversion:%s",
 				old_version, newversion));
 
 	}
@@ -167,7 +166,7 @@ public class DBHelper {
 			connection.close();
 			return true;
 		} catch (SQLException e) {
-			logger.error("executeSQL error", e);
+			Log.e(TAG, "executeSQL error", e);
 		}
 		return false;
 	}

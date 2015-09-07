@@ -6,19 +6,20 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class CloudPageFile implements EntityJSONObject{
+public class CloudPageFile implements EntityJSON {
 
 	private int errno;
-	
+
 	private List<CloudFile> list;
 
 	@Override
 	public boolean formJOSN(JSONObject object) {
-		if(object.has("errno")){
+		if (object.has("errno")) {
 			errno = object.getInt("errno");
 		}
+		
+		list = new ArrayList<CloudFile>();
 		if (object.has("list")) {
-			list = new ArrayList<CloudFile>();
 			final JSONArray array = object.getJSONArray("list");
 			CloudFile file = null;
 			for (int i = 0; i < array.length(); i++) {
@@ -29,7 +30,7 @@ public class CloudPageFile implements EntityJSONObject{
 		}
 		return true;
 	}
-	
+
 	public int getErrno() {
 		return errno;
 	}
@@ -51,15 +52,19 @@ public class CloudPageFile implements EntityJSONObject{
 		return "PCSPageFile [list=" + list + "]";
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.yuncore.dbpcs.entity.EntityJSONObject#formJOSN(java.lang.String)
 	 */
 	@Override
 	public boolean formJOSN(String json) {
-		return false;
+		return formJOSN(new JSONObject(json));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.yuncore.dbpcs.entity.EntityJSONObject#toJSON()
 	 */
 	@Override
@@ -69,7 +74,7 @@ public class CloudPageFile implements EntityJSONObject{
 
 	@Override
 	public void toJSON(JSONObject object) {
-		
+
 	}
 
 }

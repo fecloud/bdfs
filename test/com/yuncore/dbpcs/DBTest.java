@@ -1,10 +1,10 @@
 package com.yuncore.dbpcs;
 
+import com.yuncore.bdfs.dao.CloudFileDeleteDao;
+import com.yuncore.bdfs.dao.DownloadDao;
+import com.yuncore.bdfs.dao.UploadDao;
+import com.yuncore.bdfs.db.DBHelper;
 import com.yuncore.bdfs.entity.BDFSFile;
-import com.yuncore.bdfs.server.dao.CloudFileDeleteDao;
-import com.yuncore.bdfs.server.dao.DownloadDao;
-import com.yuncore.bdfs.server.dao.UploadDao;
-import com.yuncore.bdfs.server.db.DBHelper;
 
 public class DBTest extends PCSTestCase {
 

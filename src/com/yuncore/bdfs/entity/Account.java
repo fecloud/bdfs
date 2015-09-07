@@ -2,7 +2,7 @@ package com.yuncore.bdfs.entity;
 
 import org.json.JSONObject;
 
-public class Account implements EntityJSONObject {
+public class Account implements EntityJSON {
 
 	private String username;
 

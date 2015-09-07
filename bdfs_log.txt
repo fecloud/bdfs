@@ -1,1 +1,0 @@
-2015-08-25 17:37:20,057 DEBUG [main] DBHelper              - DBHelper getConnection url:jdbc:mysql://localhost:3306/bdpan?user=root&password=root&useUnicode=true&characterEncoding=UTF-8
