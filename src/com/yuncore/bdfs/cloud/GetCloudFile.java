@@ -8,6 +8,7 @@ import java.util.Set;
 
 import com.yuncore.bdfs.Environment;
 import com.yuncore.bdfs.dao.CloudFileDao;
+import com.yuncore.bdfs.dao.CloudFileTmpDao;
 import com.yuncore.bdfs.task.TaskExecute;
 import com.yuncore.bdfs.task.TaskService;
 import com.yuncore.bdfs.util.BDFSFileExclude;
@@ -29,7 +30,7 @@ public class GetCloudFile extends TaskService {
 		this.threads = threads;
 		exclude = new BDFSFileExclude();
 		this.dir = dir;
-		cloudFileDao = new CloudFileDao();
+		cloudFileDao = new CloudFileTmpDao();
 	}
 
 	public synchronized boolean list() {

@@ -25,10 +25,10 @@ public class CloudCompareDao extends LocalCompareDao {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.yuncore.dbpcs.db.LocalCompareDao#getCopyTableName()
+	 * @see com.yuncore.bdfs.dao.LocalCompareDao#getBeforeTableName()
 	 */
 	@Override
-	public String getCopyTableName() {
+	public String getBeforeTableName() {
 		return "cloudfile";
 	}
 
@@ -76,7 +76,7 @@ public class CloudCompareDao extends LocalCompareDao {
 	protected String getTag() {
 		return this.getClass().getSimpleName();
 	}
-	
+
 	@Override
 	protected String getCopyTableDataSql() {
 		return "INSERT INTO %s SELECT id,path,length,isdir,mtime,fid,md5,session FROM %s";

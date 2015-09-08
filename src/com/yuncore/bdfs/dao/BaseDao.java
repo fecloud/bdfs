@@ -16,6 +16,7 @@ public abstract class BaseDao {
 
 	/**
 	 * 取数据库连接
+	 * 
 	 * @return
 	 */
 	protected synchronized Connection getConnection() {
@@ -24,6 +25,7 @@ public abstract class BaseDao {
 
 	/**
 	 * 执行sql语句
+	 * 
 	 * @param sql
 	 * @return
 	 */
@@ -38,24 +40,7 @@ public abstract class BaseDao {
 	 * @return
 	 */
 	public synchronized boolean clear() {
-		boolean result = false;
-		try {
-			final Connection connection = getConnection();
-			final PreparedStatement prepareStatement = connection
-					.prepareStatement(String.format("DELETE FROM %s",
-							getTableName()));
-
-			connection.setAutoCommit(false);
-			result = prepareStatement.execute();
-			connection.commit();
-			connection.setAutoCommit(true);
-			connection.close();
-
-		} catch (SQLException e) {
-			Log.e(TAG, "clear", e);
-		}
-
-		return result;
+		return executeSQL(String.format("DELETE FROM %s", getTableName()));
 	}
 
 	/**
@@ -68,8 +53,7 @@ public abstract class BaseDao {
 		try {
 			final Connection connection = getConnection();
 			final PreparedStatement prepareStatement = connection
-					.prepareStatement(String.format("SELECT COUNT(*) FROM %s",
-							getTableName()));
+					.prepareStatement(String.format("SELECT COUNT(*) FROM %s", getTableName()));
 			final ResultSet resultSet = prepareStatement.executeQuery();
 			if (null != resultSet && resultSet.next()) {
 				count = resultSet.getLong(1);
@@ -86,28 +70,32 @@ public abstract class BaseDao {
 
 	/**
 	 * 删除表
+	 * 
 	 * @param table
 	 * @return
 	 */
 	public synchronized boolean delete(String table) {
+		return executeSQL(String.format("DROP TABLE IF EXISTS %s", table));
+	}
+
+	/**
+	 * 删除表
+	 * 
+	 * @param tables
+	 * @return
+	 */
+	public synchronized boolean deletes(String... tables) {
+
 		boolean result = false;
-		try {
-			final Connection connection = getConnection();
-			final PreparedStatement prepareStatement = connection
-					.prepareStatement(String.format("DROP TABLE IF EXISTS %s",
-							table));
-
-			connection.setAutoCommit(false);
-			result = prepareStatement.execute();
-			connection.commit();
-			connection.setAutoCommit(true);
-			connection.close();
-
-		} catch (SQLException e) {
-			Log.e(TAG, "delete", e);
+		if (null != tables) {
+			for (String t : tables) {
+				result = delete(t);
+				if (!result) {
+					return result;
+				}
+			}
 		}
-
-		return result;
+		return true;
 	}
 
 	public abstract String getTableName();

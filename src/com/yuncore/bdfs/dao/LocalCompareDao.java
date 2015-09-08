@@ -7,22 +7,23 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.yuncore.bdfs.Const;
 import com.yuncore.bdfs.Environment;
 import com.yuncore.bdfs.util.Log;
 import com.yuncore.bdfs.util.Stopwatch;
 
 public class LocalCompareDao extends BaseDao {
 
-	static String TAG = "LocalCompareDao";
-
 	@Override
 	public String getTableName() {
 		return "localcompare";
 	}
 
-	public String getCopyTableName() {
+	public String getBeforeTableName() {
 		return "localfile";
+	}
+
+	public String getNowTableName() {
+		return "localfile_tmp";
 	}
 
 	public String getSameTableName() {
@@ -62,27 +63,7 @@ public class LocalCompareDao extends BaseDao {
 	 * @return
 	 */
 	public synchronized boolean clearTables() {
-		return clearTables(getTableName(), getSameTableName());
-	}
-
-	/**
-	 * 删除表
-	 * 
-	 * @param tables
-	 * @return
-	 */
-	public synchronized boolean clearTables(String... tables) {
-
-		boolean result = false;
-		if (null != tables) {
-			for (String t : tables) {
-				result = executeSQL(String.format("DROP TABLE IF EXISTS %s", t));
-				if (!result) {
-					return result;
-				}
-			}
-		}
-		return true;
+		return deletes(getTableName(), getSameTableName());
 	}
 
 	/**
@@ -90,17 +71,17 @@ public class LocalCompareDao extends BaseDao {
 	 * 
 	 * @return
 	 */
-	public synchronized boolean copyFromLocaFile() {
+	public synchronized boolean copyBeforeAndNow() {
 
 		Stopwatch stopwatch = new Stopwatch();
 		stopwatch.start();
 
-		boolean result = executeSQL(String.format("DROP TABLE IF EXISTS %s",
-				getTableName()));
+		boolean result = executeSQL(
+				String.format("CREATE TABLE %s AS SELECT * FROM %s", getTableName(), getBeforeTableName()));
 
-		result = executeSQL(String.format(
-				"CREATE TABLE %s AS SELECT * FROM %s", getTableName(),
-				getCopyTableName()));
+		if (result) {
+			result = copyTableData(getNowTableName(), getTableName());
+		}
 
 		stopwatch.stop(getTag() + " copyFromLocaFile");
 
@@ -113,8 +94,8 @@ public class LocalCompareDao extends BaseDao {
 
 			try {
 				final Connection connection = getConnection();
-				final StringBuilder sql = new StringBuilder(String.format(
-						"DELETE FROM %s WHERE fid IN( ", getTableName()));
+				final StringBuilder sql = new StringBuilder(
+						String.format("DELETE FROM %s WHERE fid IN( ", getTableName()));
 
 				final int size = files.size();
 				for (int i = 0; i < size; i++) {
@@ -124,8 +105,7 @@ public class LocalCompareDao extends BaseDao {
 				}
 				sql.append(" )");
 
-				final PreparedStatement prepareStatement = connection
-						.prepareStatement(sql.toString());
+				final PreparedStatement prepareStatement = connection.prepareStatement(sql.toString());
 				// Stopwatch stopwatch = new Stopwatch();
 				// stopwatch.start();
 
@@ -154,18 +134,17 @@ public class LocalCompareDao extends BaseDao {
 	 * @return
 	 */
 	public synchronized boolean findSame() {
-		Stopwatch stopwatch = new Stopwatch();
-		stopwatch.start();
-
-		boolean result = executeSQL(String.format("DROP TABLE IF EXISTS %s",
-				getSameTableName()));
-
-		result = executeSQL(String
-				.format("CREATE TABLE %s AS SELECT fid FROM %s group by fid having count(1) > 1",
-						getSameTableName(), getCopyTableName()));
-		stopwatch.stop(getTag() + " findSame");
-
-		return result;
+		 Stopwatch stopwatch = new Stopwatch();
+		 stopwatch.start();
+		
+		 boolean result = executeSQL(String.format("DROP TABLE IF EXISTS %s",
+		 getSameTableName()));
+		
+		result = executeSQL(String.format("CREATE TABLE %s AS SELECT fid FROM %s GROUP BY fid having COUNT(1) > 1",
+				getSameTableName(), getTableName()));
+		 stopwatch.stop(getTag() + " findSame");
+		
+		 return result;
 	}
 
 	/**
@@ -199,33 +178,22 @@ public class LocalCompareDao extends BaseDao {
 		}
 	}
 
+	/**
+	 * 删除对比前的数据
+	 * 
+	 * @return
+	 */
 	public synchronized boolean deleteBefore() {
-		try {
-			final Connection connection = getConnection();
-			final StringBuilder sql = new StringBuilder(String.format(
-					"DELETE FROM %s WHERE session<>%s", getCopyTableName(),
-					System.getProperty(getSession())));
+		return new LocalFileDao().clear();
+	}
 
-			final PreparedStatement prepareStatement = getConnection()
-					.prepareStatement(sql.toString());
-			Stopwatch stopwatch = new Stopwatch();
-			stopwatch.start();
-
-			connection.setAutoCommit(false);
-			final int executeBatch = prepareStatement.executeUpdate();
-			connection.commit();
-			connection.setAutoCommit(true);
-			connection.close();
-			stopwatch.stop(getTag() + " deleteBefore");
-
-			return executeBatch > 0;
-
-		} catch (SQLException e) {
-			Log.e(TAG, "", e);
-		}
-
-		return false;
-
+	/**
+	 * 插入最新的数据
+	 * 
+	 * @return
+	 */
+	public synchronized boolean insertNew() {
+		return copyTableData(getNowTableName(), getBeforeTableName());
 	}
 
 	/**
@@ -241,11 +209,9 @@ public class LocalCompareDao extends BaseDao {
 
 			// Stopwatch stopwatch = new Stopwatch();
 			// stopwatch.start();
-			final String sql = String.format("SELECT fid FROM %s LIMIT %s,%s",
-					getSameTableName(), start, count);
+			final String sql = String.format("SELECT fid FROM %s LIMIT %s,%s", getSameTableName(), start, count);
 			final Connection connection = getConnection();
-			final PreparedStatement prepareStatement = connection
-					.prepareStatement(sql);
+			final PreparedStatement prepareStatement = connection.prepareStatement(sql);
 
 			final ResultSet resultSet = prepareStatement.executeQuery();
 			while (resultSet.next()) {
@@ -265,8 +231,7 @@ public class LocalCompareDao extends BaseDao {
 	}
 
 	public synchronized List<Long> groupBySession(String table) {
-		final String sql = String.format(
-				"SELECT session FROM %s GROUP BY session", table);
+		final String sql = String.format("SELECT session FROM %s GROUP BY session", table);
 		try {
 			final List<Long> list = new ArrayList<Long>();
 
@@ -275,8 +240,7 @@ public class LocalCompareDao extends BaseDao {
 
 			Log.d(TAG, sql);
 			final Connection connection = getConnection();
-			final PreparedStatement prepareStatement = connection
-					.prepareStatement(sql);
+			final PreparedStatement prepareStatement = connection.prepareStatement(sql);
 
 			final ResultSet resultSet = prepareStatement.executeQuery();
 			while (resultSet.next()) {
@@ -320,41 +284,23 @@ public class LocalCompareDao extends BaseDao {
 	 * 
 	 * @return
 	 */
-	public synchronized boolean copyTableData(String src, String dest,
-			String srcWhere) {
+	public synchronized boolean copyTableData(String src, String dest, String srcWhere) {
 		String sql = String.format(getCopyTableDataSql(), dest, src);
 		if (null != srcWhere) {
 			sql += String.format(" WHERE ", srcWhere);
 		}
-		try {
 
-			Stopwatch stopwatch = new Stopwatch();
-			stopwatch.start();
+		Stopwatch stopwatch = new Stopwatch();
+		stopwatch.start();
 
-			Log.d(TAG, sql);
-			final Connection connection = getConnection();
-			final PreparedStatement prepareStatement = connection
-					.prepareStatement(sql);
+		executeSQL(sql);
 
-			connection.setAutoCommit(false);
-			final boolean result = prepareStatement.execute();
+		stopwatch.stop(getTag() + " copyAllToAction");
 
-			prepareStatement.close();
-			connection.commit();
-			connection.setAutoCommit(true);
-			connection.close();
-			stopwatch.stop(getTag() + " copyAllToAction");
-
-			return result;
-
-		} catch (SQLException e) {
-			Log.e(TAG, "", e);
-		}
-		return false;
+		return true;
 	}
 
-	protected static String buildLocalFile(ResultSet resultSet)
-			throws SQLException {
+	protected static String buildLocalFile(ResultSet resultSet) throws SQLException {
 		final String fid = resultSet.getString("fid");
 		return fid;
 	}

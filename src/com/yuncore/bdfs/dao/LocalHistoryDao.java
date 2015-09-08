@@ -20,7 +20,7 @@ public class LocalHistoryDao extends BaseDao {
 		return "localhistory";
 	}
 
-	public synchronized boolean insert() {
+	public synchronized boolean insert(long time) {
 		String sql = String.format("INSERT INTO %s (time) VALUES (?)",
 				getTableName());
 		try {

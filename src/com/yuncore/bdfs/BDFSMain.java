@@ -7,6 +7,7 @@ package com.yuncore.bdfs;
 
 import com.yuncore.bdfs.cookie.LoginGetCookie;
 import com.yuncore.bdfs.http.cookie.FileCookieContainer;
+import com.yuncore.bdfs.sync.Sync;
 
 /**
  * The class <code>BDFSMain</code>

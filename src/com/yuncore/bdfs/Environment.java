@@ -41,6 +41,11 @@ public final class Environment {
 	public static final String LOCALLIST_SESSION = "bdfs.locallist_session";
 
 	public static final String CLOUDLIST_SESSION = "bdfs.cloudlist_session";
+	
+	/**
+	 * 程序的命令行
+	 */
+	public static final String CMD = "sun.java.command";
 
 	public static final String getDBFile() {
 		return System.getProperty(DB_FILE, "bdfs.db");
@@ -98,4 +103,7 @@ public final class Environment {
 		return System.getProperty(CLOUDLIST_SESSION, "0");
 	}
 
+	public static final String getCommdLine(){
+		return System.getProperty(CMD, "");
+	}
 }

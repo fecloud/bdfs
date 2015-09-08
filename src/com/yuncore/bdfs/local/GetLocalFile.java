@@ -7,6 +7,7 @@ import java.util.Set;
 import com.yuncore.bdfs.ClientEnv;
 import com.yuncore.bdfs.Environment;
 import com.yuncore.bdfs.dao.LocalFileDao;
+import com.yuncore.bdfs.dao.LocalFileTmpDao;
 import com.yuncore.bdfs.task.TaskExecute;
 import com.yuncore.bdfs.task.TaskService;
 import com.yuncore.bdfs.util.BDFSFileExclude;
@@ -27,20 +28,14 @@ public class GetLocalFile extends TaskService {
 		this.threads = threads;
 		exclude = new BDFSFileExclude();
 		this.dir = new File(dir);
-		localFileDao = new LocalFileDao("localfile_tmp");
-
-		localFileDao.delete(localFileDao.getTableName());
-		localFileDao
-				.executeSQL(String
-						.format("CREATE TABLE %s (id INTEGER PRIMARY KEY AUTOINCREMENT,path TEXT, length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, session INTEGER);",
-								localFileDao.getTableName()));
+		localFileDao = new LocalFileTmpDao();
+		localFileDao.clear();
 	}
 
 	@Override
 	protected TaskExecute newTaskExecute() {
-		final GetLocalFileExecute getLocalExecute = new GetLocalFileExecute(
-				dir.getAbsolutePath(), taskStatus, taskContainer, exclude,
-				localFileDao, session);
+		final GetLocalFileExecute getLocalExecute = new GetLocalFileExecute(dir.getAbsolutePath(), taskStatus,
+				taskContainer, exclude, localFileDao, session);
 		return getLocalExecute;
 	}
 

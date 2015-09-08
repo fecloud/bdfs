@@ -15,25 +15,15 @@ public class LocalFileDao extends BaseDao {
 
 	private static String TAG = "LocalFileDao";
 
-	private String tableName;
-
 	private List<BDFSFile> cache = new ArrayList<BDFSFile>();
 
 	private int size;
 
 	private static final int CACHE_SIZE = 5000;
 
-	public LocalFileDao() {
-		this.tableName = "localfile";
-	}
-
-	public LocalFileDao(String tableName) {
-		this.tableName = tableName;
-	}
-	
 	@Override
 	public String getTableName() {
-		return tableName;
+		return "localfile";
 	}
 
 	public synchronized boolean insertAllCacaheFlush() {
@@ -65,11 +55,10 @@ public class LocalFileDao extends BaseDao {
 			stopwatch.start();
 			final Connection connection = getConnection();
 
-			final String sql = String
-					.format("INSERT INTO %s ('path','length','isdir','mtime' ,'fid','session') VALUES (?,?,?,?,?,?)",
-							getTableName());
-			final PreparedStatement prepareStatement = connection
-					.prepareStatement(sql);
+			final String sql = String.format(
+					"INSERT INTO %s ('path','length','isdir','mtime' ,'fid','session') VALUES (?,?,?,?,?,?)",
+					getTableName());
+			final PreparedStatement prepareStatement = connection.prepareStatement(sql);
 
 			for (BDFSFile f : cache) {
 				prepareStatement.setString(1, f.getPath());
@@ -101,12 +90,12 @@ public class LocalFileDao extends BaseDao {
 	 * @param file
 	 * @return
 	 * 
-	 *         public boolean exists(BDFSFile file) { boolean con = false; if
+	 * 		public boolean exists(BDFSFile file) { boolean con = false; if
 	 *         (null != file) { try { final Connection connection = getDB();
 	 *         final PreparedStatement prepareStatement = connection
-	 *         .prepareStatement(String
-	 *         .format("SELECT COUNT(*) FROM %s WHERE fid=? AND isdir=? AND length=?"
-	 *         , getTableName())); prepareStatement.setString(1, file.getfId());
+	 *         .prepareStatement(String .format(
+	 *         "SELECT COUNT(*) FROM %s WHERE fid=? AND isdir=? AND length=?" ,
+	 *         getTableName())); prepareStatement.setString(1, file.getfId());
 	 *         prepareStatement.setInt(2, file.isDir() ? 0 : 1);
 	 *         prepareStatement.setLong(3, file.getLength());
 	 * 
@@ -116,8 +105,7 @@ public class LocalFileDao extends BaseDao {
 	 *         (SQLException e) { logger.error("", e); } } return con; }
 	 */
 
-	protected static BDFSFile buildLocalFile(ResultSet resultSet)
-			throws SQLException {
+	protected static BDFSFile buildLocalFile(ResultSet resultSet) throws SQLException {
 		final BDFSFile file = new BDFSFile();
 		file.setId(resultSet.getString("id"));
 		file.setPath(resultSet.getString("path"));
