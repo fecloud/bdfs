@@ -47,7 +47,7 @@ public class LocalFileMonitor extends Thread {
 			for (int i = 2; i < args.length; i++) {
 				if (args[i].equals(getExcludeFilesFlag())) {
 					startAdd = true;
-				} else if (args[i].startsWith("-")) {
+				} else if (startAdd && args[i].startsWith("-")) {
 					break;
 				} else if (startAdd) {
 					excludeFiles.add(args[i]);

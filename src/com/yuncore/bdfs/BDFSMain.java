@@ -5,6 +5,7 @@
  */
 package com.yuncore.bdfs;
 
+import com.yuncore.bdfs.BDFSService.BDFSServiceListener;
 import com.yuncore.bdfs.cookie.LoginGetCookie;
 import com.yuncore.bdfs.http.cookie.FileCookieContainer;
 import com.yuncore.bdfs.sync.Sync;
@@ -15,7 +16,13 @@ import com.yuncore.bdfs.sync.Sync;
  * @author Feng OuYang
  * @version 1.0
  */
-public class BDFSMain {
+public class BDFSMain implements BDFSServiceListener {
+
+	private Sync pcsSync;
+
+	private BDFSMain(String[] args) {
+		pcsSync = new Sync(args);
+	}
 
 	public static void main(String[] args) {
 		if (args.length < 1) {
@@ -24,13 +31,15 @@ public class BDFSMain {
 			final String action = args[0].trim();
 			if ("sync".equalsIgnoreCase(action)) {
 				if (args.length >= 2) {
-					final Sync pcsSync = new Sync(args);
-					pcsSync.start();
+					final BDFSMain bdfsMain = new BDFSMain(args);
+					new BDFSService(bdfsMain).start();
 				} else {
 					printHelp();
 				}
 			} else if ("cookie".equalsIgnoreCase(action)) {
 				cookie(args);
+			} else if ("stop".equalsIgnoreCase(action)) {
+				new ShutDownBDFSService().start();
 			} else {
 				printHelp();
 			}
@@ -48,12 +57,33 @@ public class BDFSMain {
 					break;
 				}
 			}
-			Environment.setCookiecontainerClassName(FileCookieContainer.class.getName());
+			Environment.setCookiecontainerClassName(FileCookieContainer.class
+					.getName());
 			new LoginGetCookie(write, args[index + 1], args[index + 1])
 					.getCookie();
 		} else {
 			printHelp();
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.yuncore.bdfs.BDFSService.BDFSServiceListener#onStop()
+	 */
+	@Override
+	public void onStop() {
+		pcsSync.stop();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.yuncore.bdfs.BDFSService.BDFSServiceListener#onStart()
+	 */
+	@Override
+	public void onStart() {
+		pcsSync.start();
 	}
 
 	private static final void printHelp() {
@@ -64,6 +94,8 @@ public class BDFSMain {
 				.println("sync <local_dir> <-p port> [-l exinclude dir] [-c exinclude dir]");
 		System.err.println("");
 		System.err.println("cookie [-w] <username> <password>");
+		System.err.println("");
+		System.err.println("stop");
 		System.err.println("");
 	}
 

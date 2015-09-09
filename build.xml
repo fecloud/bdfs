@@ -4,10 +4,13 @@
 	<property name="src.dir" location="src" />
 	<property name="libs.dir" location="libs" />
 	<property name="build.dir" location="build" />
+	<property name="dist.jar" value="bdsync.jar" />
 	<property name="dist.dir" location="${build.dir}/dist" />
 	<property name="dest.dir" location="${build.dir}/classes" />
-	<property name="dist.jar" value="${dist.dir}/bdsync.jar" />
-	<property name="dist.zip" location="${dist.dir}/bdsync.zip" />
+	<property name="dist.release.dir" location="${build.dir}/release" />
+	<property name="dist.release.bin.dir" location="${dist.release.dir}/bin" />
+	<property name="dist.release.lib.dir" location="${dist.release.dir}/lib" />
+	<property name="dist.zip" location="${build.dir}/bdsync.zip" />
 
 
 	<!--编译相关参数 -->
@@ -40,8 +43,8 @@
 
 	<target name="package" depends="compiler">
 		<echo level="info">package jar start</echo>
-		<copyfile src="${src.dir}/cookie.json" dest="${dest.dir}/cookie.json"/>
-		<jar destfile="${dist.jar}" basedir="${dest.dir}">
+		<copy file="${src.dir}/cookie.json" todir="${dest.dir}"/>
+		<jar destfile="${dist.dir}/${dist.jar}" basedir="${dest.dir}">
 			<fileset dir="${dest.dir}" />
 			<zipfileset src="${libs.dir}/json-1.6.jar" />
 			<zipfileset src="${libs.dir}/sqlite-jdbc-3.8.10.1.jar" />
@@ -54,17 +57,16 @@
 
 	<target name="release" depends="package">
 		<echo level="info">release start</echo>
-		<mkdir dir="${dist.dir}/client" />
-		<mkdir dir="${dist.dir}/client/bin" />
-		<mkdir dir="${dist.dir}/client/lib" />
-		<copy tofile="${dist.dir}/client/lib/${dist.client.jar}" file="${dist.client}" />
-		<copy tofile="${dist.dir}/client/bin/bdsync" file="${src.client.dir}/bdsyncrun" />
-		<copy tofile="${dist.dir}/client/bdsync" file="${src.client.dir}/bdsync" />
-		<copy tofile="${dist.dir}/client/install" file="${src.client.dir}/install" />
-		<copy tofile="${dist.dir}/client/linaro_bdsync" file="${src.client.dir}/linaro_bdsync" />
-		<zip destfile="${dist.client.zip}" basedir="${dist.dir}/client">
+		<mkdir dir="${dist.release.dir}" />
+		<mkdir dir="${dist.release.bin.dir}" />
+		<mkdir dir="${dist.release.lib.dir}" />
+		<copy todir="${dist.release.lib.dir}" file="${dist.dir}/${dist.jar}" />
+		<copy todir="${dist.release.bin.dir}" file="bdsyncrun" />
+		<copy todir="${dist.release.bin.dir}" file="bdsync" />
+		<copy todir="${dist.release.dir}" file="install" />
+		<copy todir="${dist.release.bin.dir}" file="linaro_bdsync" />
+		<zip destfile="${dist.zip}" basedir="${dist.release.dir}">
 		</zip>
-		<delete dir="${dist.dir}/client" />
 		<echo level="info">release finish</echo>
 	</target>
 
