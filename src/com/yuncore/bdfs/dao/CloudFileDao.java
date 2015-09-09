@@ -147,4 +147,12 @@ public class CloudFileDao extends BaseDao {
 	public String getTableName() {
 		return "cloudfile";
 	}
+
+	/* (non-Javadoc)
+	 * @see com.yuncore.bdfs.dao.BaseDao#getTag()
+	 */
+	@Override
+	public String getTag() {
+		return TAG;
+	}
 }

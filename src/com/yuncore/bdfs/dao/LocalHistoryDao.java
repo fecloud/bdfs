@@ -13,20 +13,16 @@ import com.yuncore.bdfs.util.Log;
 
 public class LocalHistoryDao extends BaseDao {
 
-	static String TAG = "LocalHistoryDao";
-
 	@Override
 	public String getTableName() {
 		return "localhistory";
 	}
 
 	public synchronized boolean insert(long time) {
-		String sql = String.format("INSERT INTO %s (time) VALUES (?)",
-				getTableName());
+		String sql = String.format("INSERT INTO %s (time) VALUES (?)", getTableName());
 		try {
 			final Connection connection = getConnection();
-			final PreparedStatement prepareStatement = connection
-					.prepareStatement(sql);
+			final PreparedStatement prepareStatement = connection.prepareStatement(sql);
 			prepareStatement.setString(1, "" + new Date().getTime());
 			connection.setAutoCommit(false);
 			boolean execute = prepareStatement.execute();
@@ -36,7 +32,7 @@ public class LocalHistoryDao extends BaseDao {
 
 			return execute;
 		} catch (Exception e) {
-			Log.e(TAG, "", e);
+			Log.e(getTag(), "", e);
 		}
 		return false;
 	}
@@ -47,19 +43,15 @@ public class LocalHistoryDao extends BaseDao {
 
 	public synchronized List<History> getHistory(int count) {
 
-		String sql = String.format("SELECT id,time FROM %s ORDER by id DESC",
-				getTableName());
+		String sql = String.format("SELECT id,time FROM %s ORDER by id DESC", getTableName());
 		if (count > 0) {
-			sql = String.format(
-					"SELECT id,time FROM %s ORDER by id DESC LIMIT 0,%s",
-					getTableName(), count);
+			sql = String.format("SELECT id,time FROM %s ORDER by id DESC LIMIT 0,%s", getTableName(), count);
 		}
 
 		final List<History> list = new ArrayList<History>();
 		try {
 			final Connection connection = getConnection();
-			final PreparedStatement prepareStatement = connection
-					.prepareStatement(sql);
+			final PreparedStatement prepareStatement = connection.prepareStatement(sql);
 			final ResultSet resultSet = prepareStatement.executeQuery();
 			History history = null;
 			while (resultSet.next()) {
@@ -72,8 +64,18 @@ public class LocalHistoryDao extends BaseDao {
 			connection.close();
 			return list;
 		} catch (SQLException e) {
-			Log.e(TAG, "", e);
+			Log.e(getTag(), "", e);
 		}
 		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.yuncore.bdfs.dao.BaseDao#getTag()
+	 */
+	@Override
+	public String getTag() {
+		return getClass().getSimpleName();
 	}
 }

@@ -13,6 +13,11 @@ package com.yuncore.bdfs.dao;
  */
 public class LocalFileTmpDao extends LocalFileDao {
 
+	public LocalFileTmpDao() {
+		executeSQL(
+				"CREATE TABLE IF NOT EXISTS localfile_tmp (id INTEGER PRIMARY KEY AUTOINCREMENT ,path TEXT, length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, session INTEGER);");
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

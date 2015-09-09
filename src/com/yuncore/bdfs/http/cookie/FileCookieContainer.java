@@ -7,13 +7,14 @@ import java.io.FileOutputStream;
 
 import org.json.JSONArray;
 
+import com.yuncore.bdfs.Environment;
 import com.yuncore.bdfs.http.cookie.AppCookieContainer;
 import com.yuncore.bdfs.http.cookie.Cookie;
 
 public class FileCookieContainer extends AppCookieContainer {
 
 
-	private String filename = System.getProperty("java.io.tmpdir")
+	private String filename = Environment.getJavaTmpDir()
 			+ File.separator + "cookie.json";
 
 	public synchronized boolean saveToFile() {

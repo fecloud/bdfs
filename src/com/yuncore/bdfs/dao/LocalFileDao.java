@@ -114,5 +114,13 @@ public class LocalFileDao extends BaseDao {
 		file.setSession(resultSet.getLong("session"));
 		return file;
 	}
+	
+	/* (non-Javadoc)
+	 * @see com.yuncore.bdfs.dao.BaseDao#getTag()
+	 */
+	@Override
+	public String getTag() {
+		return TAG;
+	}
 
 }

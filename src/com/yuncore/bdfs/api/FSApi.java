@@ -26,7 +26,7 @@ public interface FSApi {
 	/**
 	 * 每页数量
 	 */
-	int PAGESIZE = 2000;
+	int PAGESIZE = 200000;
 	
 	/**
 	 * 登录
@@ -178,9 +178,9 @@ public interface FSApi {
 	 * 
 	 * @param dir
 	 * @return
-	 */
+	 
 	public CloudPageFile list(String dir, int page) throws ApiException;
-
+*/
 	/**
 	 * 列表当前目录的文件(包含文件夹)
 	 * 

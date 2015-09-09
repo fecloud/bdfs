@@ -5,6 +5,8 @@ import java.util.List;
 import com.yuncore.bdfs.Environment;
 import com.yuncore.bdfs.dao.LocalCompareDao;
 import com.yuncore.bdfs.dao.LocalFileDao;
+import com.yuncore.bdfs.dao.LocalHistoryDao;
+import com.yuncore.bdfs.util.Log;
 
 public class LocalCompare {
 
@@ -26,6 +28,17 @@ public class LocalCompare {
 	public synchronized boolean needCompareBefore() {
 		final LocalFileDao localFileDao = new LocalFileDao();
 		return localFileDao.count() > 0;
+	}
+
+	/**
+	 * 把最新的扫描时间加入数据库中
+	 * 
+	 * @return
+	 */
+	public synchronized boolean addNewHistory() {
+		final LocalHistoryDao localHistoryDao = new LocalHistoryDao();
+		final long time = Long.parseLong(Environment.getLocallistSession());
+		return localHistoryDao.insert(time);
 	}
 
 	/**
@@ -70,21 +83,29 @@ public class LocalCompare {
 		compareDao.clearTables();
 
 		if (needCompareBefore()) {
+			Log.d(getTag(), "before has data");
 			compareDao.copyBeforeAndNow();
 			compareDao.findSame();
 			compareDao.deleteSame();
 			dispathDeleteAndAction();
 		} else {
 			// 从来没有同步过,本地上传,云端下载
+			Log.d(getTag(), "before no data");
 			compareDao.copyTableData(compareDao.getNowTableName(), compareDao.getActionTableName());
 		}
 
-		compareDao.deleteBefore();
-		compareDao.insertNew();
+		compareDao.delete(compareDao.getBeforeTableName());
+		compareDao.rename(compareDao.getNowTableName(), compareDao.getBeforeTableName());
+
+		addNewHistory();
 
 		compareDao.clearTables();
 
 		return true;
+	}
+
+	public String getTag() {
+		return "LocalCompare";
 	}
 
 }

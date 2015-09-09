@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.yuncore.bdfs.ClientEnv;
 import com.yuncore.bdfs.Environment;
 import com.yuncore.bdfs.dao.LocalFileDao;
 import com.yuncore.bdfs.dao.LocalFileTmpDao;
@@ -44,7 +43,6 @@ public class GetLocalFile extends TaskService {
 			session = System.currentTimeMillis();
 			Environment.setLocallistSession("" + session);
 			taskContainer.addTask(new GetLocalFileTask(""));
-			ClientEnv.setProperty(ClientEnv.key_localfilelist_last, session);
 			waitTaskFinish();
 			localFileDao.insertAllCacaheFlush();
 			return true;

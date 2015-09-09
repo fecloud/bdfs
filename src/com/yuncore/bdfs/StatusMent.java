@@ -7,7 +7,7 @@ import org.json.JSONObject;
 
 import com.yuncore.bdfs.entity.EntityJSON;
 
-public class ClientEnv {
+public class StatusMent {
 
 	/**
 	 * 正在上传的文件

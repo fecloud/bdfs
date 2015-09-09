@@ -13,12 +13,20 @@ package com.yuncore.bdfs.dao;
  */
 public class CloudFileTmpDao extends CloudFileDao {
 
-	/* (non-Javadoc)
+	public CloudFileTmpDao() {
+		executeSQL(
+				"CREATE TABLE IF NOT EXISTS cloudfile_tmp (id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT , length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, md5 TEXT, session INTEGER);");
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.yuncore.bdfs.dao.CloudFileDao#getTableName()
 	 */
 	@Override
 	public String getTableName() {
 		return "cloudfile_tmp";
 	}
-	
+
 }

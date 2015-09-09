@@ -69,14 +69,13 @@ public class Http {
 	public boolean http() throws MalformedURLException, IOException {
 		if (DEBUG) {
 			httpLog.log(String.format("url:%s", url));
-			httpLog.log(String.format("method:%s", method == Method.GET ? "GET"
-					: "POST"));
+			httpLog.log(String.format("method:%s", method == Method.GET ? "GET" : "POST"));
 		}
 		final String proxyString = System.getProperty("http_proxy");
 		if (null != proxyString && proxyString.split(":").length == 2) {
 			final String[] proxyArray = proxyString.split(":");
-			final Proxy proxy = new Proxy(Type.HTTP, new InetSocketAddress(
-					proxyArray[0], Integer.parseInt(proxyArray[1])));
+			final Proxy proxy = new Proxy(Type.HTTP,
+					new InetSocketAddress(proxyArray[0], Integer.parseInt(proxyArray[1])));
 			conn = (HttpURLConnection) new URL(url).openConnection(proxy);
 		} else {
 			conn = (HttpURLConnection) new URL(url).openConnection();
@@ -87,7 +86,7 @@ public class Http {
 		conn.setInstanceFollowRedirects(false);
 		conn.setRequestMethod(method == Method.GET ? "GET" : "POST");
 		conn.addRequestProperty("User-Agent", USER_AGENT);
-		//conn.addRequestProperty("Connection", "close");
+		// conn.addRequestProperty("Connection", "close");
 		addHost();
 		conn.addRequestProperty("Accept", "*/*");
 		addRequestProperty();
@@ -98,10 +97,10 @@ public class Http {
 
 		conn.setConnectTimeout(20000);
 		conn.setReadTimeout(20000);
-		
+
 		addFormString();
 		addFormData();
-		
+
 		conn.connect();
 		if (DEBUG)
 			printResponeHead();
@@ -136,8 +135,7 @@ public class Http {
 	}
 
 	protected boolean execResult() throws IOException {
-		if (getResponseCode() == HttpURLConnection.HTTP_OK
-				|| getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP
+		if (getResponseCode() == HttpURLConnection.HTTP_OK || getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP
 				|| getResponseCode() == HttpURLConnection.HTTP_PARTIAL) {
 			return true;
 		}
@@ -165,25 +163,19 @@ public class Http {
 
 	public String result() throws IOException {
 		if (execResult() && null == result) {
-			final String contentEncoding = conn
-					.getHeaderField("Content-Encoding");
-			if (contentEncoding != null
-					&& contentEncoding.trim().equals("gzip")) {
-				this.result = Gzip.readToStringByGzip(conn.getInputStream(),
-						"UTF-8");
+			final String contentEncoding = conn.getHeaderField("Content-Encoding");
+			if (contentEncoding != null && contentEncoding.trim().equals("gzip")) {
+				this.result = Gzip.readToStringByGzip(conn.getInputStream(), "UTF-8");
 			} else {
-				this.result = TextUtil.readToString(conn.getInputStream(),
-						"UTF-8");
+				this.result = TextUtil.readToString(conn.getInputStream(), "UTF-8");
 			}
 		}
 		return result;
 	}
 
-	protected boolean addFormString() throws UnsupportedEncodingException,
-			IOException {
+	protected boolean addFormString() throws UnsupportedEncodingException, IOException {
 		if (null != formString) {
-			conn.addRequestProperty("Content-Type",
-					"application/x-www-form-urlencoded; charset=UTF-8");
+			conn.addRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
 			conn.getOutputStream().write(formString.getBytes("UTF-8"));
 		}
 		return true;
@@ -212,13 +204,11 @@ public class Http {
 	}
 
 	private void printRequestHead() {
-		final Map<String, List<String>> headerFields = conn
-				.getRequestProperties();
+		final Map<String, List<String>> headerFields = conn.getRequestProperties();
 		httpLog.log("");
 		httpLog.log("[===============request header ===================]");
 		for (Entry<String, List<String>> entry : headerFields.entrySet()) {
-			httpLog.log(String.format("[%s:%s]", entry.getKey(),
-					entry.getValue()));
+			httpLog.log(String.format("[%s:%s]", entry.getKey(), entry.getValue()));
 		}
 		httpLog.log("");
 	}
@@ -228,8 +218,11 @@ public class Http {
 		httpLog.log("");
 		httpLog.log("[===============respone header ===================]");
 		for (Entry<String, List<String>> entry : headerFields.entrySet()) {
-			httpLog.log(String.format("[%s:%s]", entry.getKey(),
-					entry.getValue()));
+			if (entry.getKey() != null) {
+				httpLog.log(String.format("[%s:%s]", entry.getKey(), entry.getValue()));
+			} else {
+				httpLog.log(String.format("[%s]", entry.getValue()));
+			}
 		}
 		httpLog.log("");
 	}
@@ -249,8 +242,7 @@ public class Http {
 		if (cookies != null && !cookies.isEmpty()) {
 			final StringBuilder cookie_str = new StringBuilder();
 			for (int i = 0; i < cookies.size(); i++) {
-				cookie_str.append(cookies.get(i).getName()).append("=")
-						.append(cookies.get(i).getValue());
+				cookie_str.append(cookies.get(i).getName()).append("=").append(cookies.get(i).getValue());
 				if (i != cookies.size() - 1) {
 					cookie_str.append(";");
 				}

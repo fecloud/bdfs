@@ -106,7 +106,7 @@ public class DBHelper {
 		Log.i(TAG, "createVersion");
 		final Connection connection = getConnection();
 		final PreparedStatement prepareStatement = connection
-				.prepareStatement("CREATE TABLE version(id INTEGER PRIMARY KEY AUTOINCREMENT,version INTEGER);");
+				.prepareStatement("CREATE TABLE IF NOT EXISTS version(id INTEGER PRIMARY KEY AUTOINCREMENT,version INTEGER);");
 		connection.setAutoCommit(false);
 		prepareStatement.execute();
 		connection.commit();
@@ -132,20 +132,18 @@ public class DBHelper {
 	protected synchronized void onCreateDB() {
 		Log.i(TAG, "onCreateDB");
 
-		executeSQL("CREATE TABLE cookie (id INTEGER PRIMARY KEY AUTOINCREMENT,cookie TEXT);"); // 本地文件记录
+		executeSQL("CREATE TABLE IF NOT EXISTS cookie (id INTEGER PRIMARY KEY AUTOINCREMENT,cookie TEXT);"); // 本地文件记录
 		
-		executeSQL("CREATE TABLE localfile (id INTEGER PRIMARY KEY AUTOINCREMENT,path TEXT, length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, session INTEGER);"); // 本地文件记录
-		executeSQL("CREATE TABLE localfile_tmp (id INTEGER PRIMARY KEY AUTOINCREMENT,path TEXT, length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, session INTEGER);"); // 本地文件记录
-		executeSQL("CREATE TABLE localdelete (id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT , length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, session INTEGER);");// 本地被删除了
-		executeSQL("CREATE TABLE localupload (id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT , length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, session INTEGER);");// 本地要被上传的
+		executeSQL("CREATE TABLE IF NOT EXISTS localfile (id INTEGER PRIMARY KEY AUTOINCREMENT,path TEXT, length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, session INTEGER);"); // 本地文件记录
+		executeSQL("CREATE TABLE IF NOT EXISTS localdelete (id INTEGER , path TEXT , length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, session INTEGER);");// 本地被删除了
+		executeSQL("CREATE TABLE IF NOT EXISTS localupload (id INTEGER , path TEXT , length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, session INTEGER);");// 本地要被上传的
 
-		executeSQL("CREATE TABLE cloudfile (id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT , length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, md5 TEXT, session INTEGER);");
-		executeSQL("CREATE TABLE cloudfile_tmp (id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT , length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, md5 TEXT, session INTEGER);");
-		executeSQL("CREATE TABLE clouddelete (id TEXT PRIMARY KEY,path TEXT , length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, md5 varchar(32), session INTEGER);");
-		executeSQL("CREATE TABLE clouddownload (id TEXT PRIMARY KEY,path TEXT , length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, md5 varchar(32), session INTEGER);");
+		executeSQL("CREATE TABLE IF NOT EXISTS cloudfile (id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT , length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, md5 TEXT, session INTEGER);");
+		executeSQL("CREATE TABLE IF NOT EXISTS clouddelete (id INTEGER ,path TEXT , length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, md5 varchar(32), session INTEGER);");
+		executeSQL("CREATE TABLE IF NOT EXISTS clouddownload (id INTEGER ,path TEXT , length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, md5 varchar(32), session INTEGER);");
 
-		executeSQL("CREATE TABLE cloudhistory (id INTEGER PRIMARY KEY AUTOINCREMENT, time INTEGER );");
-		executeSQL("CREATE TABLE localhistory (id INTEGER PRIMARY KEY AUTOINCREMENT, time INTEGER );");
+		executeSQL("CREATE TABLE IF NOT EXISTS cloudhistory (id INTEGER PRIMARY KEY AUTOINCREMENT, time INTEGER );");
+		executeSQL("CREATE TABLE IF NOT EXISTS localhistory (id INTEGER PRIMARY KEY AUTOINCREMENT, time INTEGER );");
 
 		executeSQL(String.format("REPLACE INTO cookie (id,cookie) values (1,'%s')", TextUtil.readResoure("/cookie.json")));
 	}

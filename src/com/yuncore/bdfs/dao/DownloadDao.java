@@ -9,7 +9,6 @@ import java.util.List;
 
 import com.yuncore.bdfs.entity.BDFSFile;
 import com.yuncore.bdfs.util.Log;
-import com.yuncore.bdfs.util.Stopwatch;
 
 public class DownloadDao extends BaseDao {
 
@@ -60,6 +59,26 @@ public class DownloadDao extends BaseDao {
 		}
 		return false;
 	}
+	
+	public boolean deleteByFid(String fid) {
+		try {
+			final Connection connection = getConnection();
+			final PreparedStatement prepareStatement = connection
+					.prepareStatement(String.format(
+							"DELETE FROM %s WHERE fid=?", getTableName()));
+			prepareStatement.setString(1, fid);
+			connection.setAutoCommit(false);
+			int result = prepareStatement.executeUpdate();
+			connection.commit();
+			connection.setAutoCommit(true);
+			connection.close();
+
+			return result > 0;
+		} catch (SQLException e) {
+			Log.e(TAG, "delete error", e);
+		}
+		return false;
+	}
 
 	public boolean delete(BDFSFile file) {
 		try {
@@ -93,8 +112,8 @@ public class DownloadDao extends BaseDao {
 	public List<BDFSFile> query(long start, int num) {
 
 		try {
-			final Stopwatch stopwatch = new Stopwatch();
-			stopwatch.start();
+//			final Stopwatch stopwatch = new Stopwatch();
+//			stopwatch.start();
 			final List<BDFSFile> list = new ArrayList<BDFSFile>();
 			final String sql = String.format(
 					"SELECT * FROM %s ORDER BY isdir DESC LIMIT %s,%s",
@@ -119,8 +138,8 @@ public class DownloadDao extends BaseDao {
 			resultSet.close();
 			prepareStatement.close();
 			connection.close();
-			stopwatch.stop(getClass().getSimpleName() + " query:" + num + " "
-					+ getTableName());
+//			stopwatch.stop(getClass().getSimpleName() + " query:" + num + " "
+//					+ getTableName());
 			return list;
 		} catch (SQLException e) {
 			Log.e(TAG, "query error", e);
@@ -128,4 +147,12 @@ public class DownloadDao extends BaseDao {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.yuncore.bdfs.dao.BaseDao#getTag()
+	 */
+	@Override
+	public String getTag() {
+		return TAG;
+	}
+	
 }

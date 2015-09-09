@@ -14,7 +14,8 @@ import java.util.Properties;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.yuncore.bdfs.ClientEnv;
+import com.yuncore.bdfs.Argsment;
+import com.yuncore.bdfs.StatusMent;
 import com.yuncore.bdfs.entity.EntityJSON;
 import com.yuncore.bdfs.util.Gzip;
 import com.yuncore.bdfs.util.Log;
@@ -29,12 +30,10 @@ public class Httpd extends NanoHTTPd {
 	}
 
 	@Override
-	public Response serve(String uri, String method, Properties header,
-			Properties parms, Properties files) {
+	public Response serve(String uri, String method, Properties header, Properties parms, Properties files) {
 		Response response = dispath(uri, method, header, parms, files);
 		if (response == null) {
-			response = new Response(HTTP_NOTFOUND, MIME_PLAINTEXT,
-					Gzip.gzip("not found".getBytes()));
+			response = new Response(HTTP_NOTFOUND, MIME_PLAINTEXT, Gzip.gzip("not found".getBytes()));
 		}
 		response.addHeader("Connection", "close");
 		response.addHeader("Content-Encoding", "gzip");
@@ -51,21 +50,21 @@ public class Httpd extends NanoHTTPd {
 	 * @param files
 	 * @return
 	 */
-	private Response dispath(String uri, String method, Properties header,
-			Properties parms, Properties files) {
+	private Response dispath(String uri, String method, Properties header, Properties parms, Properties files) {
 		if (null != parms) {
 			final String action = parms.getProperty("action", "");
 			final JSONObject object = new JSONObject();
 			if (action.equalsIgnoreCase("env")) {
 				printEnv(object);
-			} else if (action.equalsIgnoreCase("clientEnv")) {
-				printClientEnv(object);
+			} else if (action.equalsIgnoreCase("status_ment")) {
+				printStatusMent(object);
 			} else if (action.equalsIgnoreCase("threads")) {
 				getThreads(object);
 			} else if (action.equalsIgnoreCase("cpuinfo")) {
 				object.put("code", 200);
 				object.put("data", Runtime.getRuntime().availableProcessors());
-
+			} else if (action.equalsIgnoreCase("set_argsment")) {
+				setArgsment(parms, object);
 			} else if (action.equalsIgnoreCase("status")) {
 				object.put("code", 200);
 			} else {
@@ -73,8 +72,7 @@ public class Httpd extends NanoHTTPd {
 				object.put("msg", "not support");
 			}
 			try {
-				return new Response(HTTP_OK, MIME_JSON, Gzip.gzip(object
-						.toString().getBytes("UTF-8")));
+				return new Response(HTTP_OK, MIME_JSON, Gzip.gzip(object.toString().getBytes("UTF-8")));
 			} catch (UnsupportedEncodingException e) {
 			}
 		}
@@ -113,8 +111,8 @@ public class Httpd extends NanoHTTPd {
 	 * 
 	 * @param object
 	 */
-	private void printClientEnv(JSONObject object) {
-		final JSONObject env = ClientEnv.listJson();
+	private void printStatusMent(JSONObject object) {
+		final JSONObject env = StatusMent.listJson();
 		object.put("code", 200);
 		object.put("data", env);
 	}
@@ -140,14 +138,31 @@ public class Httpd extends NanoHTTPd {
 	private static List<String> getAllThreads() {
 		final List<String> list = new ArrayList<String>();
 		Map<Thread, StackTraceElement[]> maps = Thread.getAllStackTraces();
-		Iterator<Entry<Thread, StackTraceElement[]>> entrySet = maps.entrySet()
-				.iterator();
+		Iterator<Entry<Thread, StackTraceElement[]>> entrySet = maps.entrySet().iterator();
 		Entry<Thread, StackTraceElement[]> next = null;
 		while (entrySet.hasNext()) {
 			next = entrySet.next();
 			list.add(next.getKey().getName());
 		}
 		return list;
+	}
+
+	/**
+	 * 设置参数
+	 * 
+	 * @param name
+	 * @param value
+	 * @param object
+	 */
+	private void setArgsment(Properties parms, JSONObject object) {
+		final String name = parms.getProperty("name", null);
+		final String value = parms.getProperty("value", null);
+		if (name != null && value != null) {
+			Argsment.setProperty(name, value);
+			object.put("code", 200);
+		} else {
+			object.put("code", 400);
+		}
 	}
 
 	public static void main(String[] args) {

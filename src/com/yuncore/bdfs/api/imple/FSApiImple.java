@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -292,9 +291,8 @@ public class FSApiImple implements FSApi {
 		try {
 
 			if (http.http()) {
-				// if (DEBUG)
-				// logger.debug(String.format("diskHomePage:%s",
-				// http.result()));
+				 if (DEBUG)
+					 Log.d(TAG, String.format("diskHomePage:%s", http.result()));
 				final Pattern pattern = Pattern
 						.compile("yunData\\.\\w+\\s*=\\s*['|\"]\\w*['|\"];");
 				final Matcher matcher = pattern.matcher(http.result());
@@ -639,33 +637,34 @@ public class FSApiImple implements FSApi {
 
 	@Override
 	public CloudPageFile list(String dir) throws ApiException {
-		int i = 1;
-		CloudPageFile file = new CloudPageFile();
-		file.setList(new ArrayList<CloudFile>());
-		CloudPageFile pageFile = null;
-		while ((pageFile = list(dir, i)) != null) {
-			file.setErrno(pageFile.getErrno());
-			file.getList().addAll(pageFile.getList());
-			if (pageFile.getErrno() != 0 || pageFile.getList().isEmpty()
-					|| pageFile.getList().size() < PAGESIZE) {
-				break;
-			}
-			i++;
-		}
-		return file;
+//		int i = 1;
+//		CloudPageFile file = new CloudPageFile();
+//		file.setList(new ArrayList<CloudFile>());
+//		CloudPageFile pageFile = null;
+//		while ((pageFile = list(dir, i)) != null) {
+//			file.setErrno(pageFile.getErrno());
+//			file.getList().addAll(pageFile.getList());
+//			if (pageFile.getErrno() != 0 || pageFile.getList().isEmpty()
+//					|| pageFile.getList().size() < PAGESIZE) {
+//				break;
+//			}
+//			i++;
+//		}
+//		return file;
+		return list(dir, 1, PAGESIZE);
 	}
 
-	@Override
-	public CloudPageFile list(String dir, int page) throws ApiException {
-		return list(dir, page, PAGESIZE);
-	}
+//	@Override
+//	public CloudPageFile list(String dir, int page) throws ApiException {
+//		return list(dir, page, PAGESIZE);
+//	}
 
 	@Override
 	public CloudPageFile list(String dir, int page, int page_num)
 			throws ApiException {
 		try {
 			if (context.load()) {
-				final long c_time = DateUtil.current_time_ss();
+				final long c_time = System.currentTimeMillis();
 				final String url = BDFSURL.list(page, page_num, dir, c_time,
 						context.getProperty(BDSTOKEN));
 

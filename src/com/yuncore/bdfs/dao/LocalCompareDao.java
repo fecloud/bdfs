@@ -52,7 +52,7 @@ public class LocalCompareDao extends BaseDao {
 		return Environment.LOCALLIST_SESSION;
 	}
 
-	protected String getTag() {
+	public String getTag() {
 		return this.getClass().getSimpleName();
 	}
 
@@ -67,6 +67,18 @@ public class LocalCompareDao extends BaseDao {
 	}
 
 	/**
+	 * 创建对比表
+	 * 
+	 * @return
+	 */
+	public synchronized boolean createCompareSql() {
+		String sql = String.format(
+				"CREATE TABLE %s (id INTEGER, path TEXT, length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, session INTEGER);",
+				getTableName());
+		return executeSQL(sql);
+	}
+
+	/**
 	 * 从本地找重复的数据
 	 * 
 	 * @return
@@ -76,11 +88,15 @@ public class LocalCompareDao extends BaseDao {
 		Stopwatch stopwatch = new Stopwatch();
 		stopwatch.start();
 
-		boolean result = executeSQL(
-				String.format("CREATE TABLE %s AS SELECT * FROM %s", getTableName(), getBeforeTableName()));
+		boolean result = createCompareSql();
 
 		if (result) {
-			result = copyTableData(getNowTableName(), getTableName());
+			result = copyTableData(getBeforeTableName(), getTableName());
+			
+			if (result) {
+				result = copyTableData(getNowTableName(), getTableName());
+			}
+			
 		}
 
 		stopwatch.stop(getTag() + " copyFromLocaFile");
@@ -121,7 +137,7 @@ public class LocalCompareDao extends BaseDao {
 				return executeBatch > 0;
 
 			} catch (SQLException e) {
-				Log.e(TAG, "", e);
+				Log.e(getTag(), "", e);
 			}
 
 		}
@@ -134,17 +150,16 @@ public class LocalCompareDao extends BaseDao {
 	 * @return
 	 */
 	public synchronized boolean findSame() {
-		 Stopwatch stopwatch = new Stopwatch();
-		 stopwatch.start();
-		
-		 boolean result = executeSQL(String.format("DROP TABLE IF EXISTS %s",
-		 getSameTableName()));
-		
+		Stopwatch stopwatch = new Stopwatch();
+		stopwatch.start();
+
+		boolean result = executeSQL(String.format("DROP TABLE IF EXISTS %s", getSameTableName()));
+
 		result = executeSQL(String.format("CREATE TABLE %s AS SELECT fid FROM %s GROUP BY fid having COUNT(1) > 1",
 				getSameTableName(), getTableName()));
-		 stopwatch.stop(getTag() + " findSame");
-		
-		 return result;
+		stopwatch.stop(getTag() + " findSame");
+
+		return result;
 	}
 
 	/**
@@ -178,14 +193,14 @@ public class LocalCompareDao extends BaseDao {
 		}
 	}
 
-	/**
-	 * 删除对比前的数据
-	 * 
-	 * @return
-	 */
-	public synchronized boolean deleteBefore() {
-		return new LocalFileDao().clear();
-	}
+//	/**
+//	 * 删除对比前的数据
+//	 * 
+//	 * @return
+//	 */
+//	public synchronized boolean deleteBefore() {
+//		return new LocalFileDao().clear();
+//	}
 
 	/**
 	 * 插入最新的数据
@@ -224,7 +239,7 @@ public class LocalCompareDao extends BaseDao {
 
 			return list;
 		} catch (SQLException e) {
-			Log.e(TAG, "", e);
+			Log.e(getTag(), "", e);
 		}
 
 		return null;
@@ -238,13 +253,13 @@ public class LocalCompareDao extends BaseDao {
 			Stopwatch stopwatch = new Stopwatch();
 			stopwatch.start();
 
-			Log.d(TAG, sql);
+			Log.d(getTag(), sql);
 			final Connection connection = getConnection();
 			final PreparedStatement prepareStatement = connection.prepareStatement(sql);
 
 			final ResultSet resultSet = prepareStatement.executeQuery();
 			while (resultSet.next()) {
-				Log.d(TAG, "groupBySession:" + resultSet.getLong("session"));
+				Log.d(getTag(), "groupBySession:" + resultSet.getLong("session"));
 				list.add(resultSet.getLong("session"));
 			}
 
@@ -256,7 +271,7 @@ public class LocalCompareDao extends BaseDao {
 			return list;
 
 		} catch (SQLException e) {
-			Log.e(TAG, "", e);
+			Log.e(getTag(), "", e);
 		}
 		return null;
 	}

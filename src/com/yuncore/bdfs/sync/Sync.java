@@ -1,10 +1,13 @@
 package com.yuncore.bdfs.sync;
 
+import java.io.File;
 import java.io.IOException;
 
+import com.yuncore.bdfs.Argsment;
 import com.yuncore.bdfs.Environment;
 import com.yuncore.bdfs.app.ClientContext;
 import com.yuncore.bdfs.ctrl.Httpd;
+import com.yuncore.bdfs.down.CloudDownLoad;
 import com.yuncore.bdfs.http.cookie.DBCookieContainer;
 import com.yuncore.bdfs.sync.service.CloudFileMonitor;
 import com.yuncore.bdfs.sync.service.LocalFileMonitor;
@@ -15,6 +18,7 @@ public class Sync {
 	private static final String TAG = "Sync";
 
 	private String syncdir;
+	private String synctmpdir;
 
 	private int httpPort = 18080;
 
@@ -25,6 +29,7 @@ public class Sync {
 	public Sync(String[] args) {
 		this.args = args;
 		syncdir = args[1];
+		synctmpdir = args[1] + File.separator + ".bdsync";
 		setHttpPort(args);
 		startHttp();
 	}
@@ -54,6 +59,10 @@ public class Sync {
 
 	private void setEnv() {
 		Environment.setSyncDir(syncdir);
+		Environment.setSyncTmpDir(synctmpdir);
+		
+		Argsment.setAllowDownload("1");
+		
 		// System.setProperty(Const.TMP,
 		// String.format("%s%s%s", syncdir, File.separator, Const.TMP_DIR));
 		// System.setProperty("http_proxy", "localhost:8888");
@@ -69,8 +78,10 @@ public class Sync {
 	}
 
 	private void startCoreService() {
-		new LocalFileMonitor(args).start();
+		//new LocalFileMonitor(args).start();
 		new CloudFileMonitor(args).start();
+
+		new CloudDownLoad(syncdir, synctmpdir).start();;
 	}
 
 	public void stop() {

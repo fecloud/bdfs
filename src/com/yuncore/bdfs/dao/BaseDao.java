@@ -10,8 +10,6 @@ import com.yuncore.bdfs.util.Log;
 
 public abstract class BaseDao {
 
-	static String TAG = "BaseDao";
-
 	private static final DBHelper db = new DBHelper();
 
 	/**
@@ -30,7 +28,7 @@ public abstract class BaseDao {
 	 * @return
 	 */
 	public synchronized boolean executeSQL(String sql) {
-		Log.d(TAG, "executeSQL:" + sql);
+		Log.d(getTag(), "executeSQL:" + sql);
 		return db.executeSQL(sql);
 	}
 
@@ -62,7 +60,7 @@ public abstract class BaseDao {
 			prepareStatement.close();
 			connection.close();
 		} catch (SQLException e) {
-			Log.e(TAG, "count", e);
+			Log.e(getTag(), "count", e);
 		}
 
 		return count;
@@ -98,6 +96,18 @@ public abstract class BaseDao {
 		return true;
 	}
 
+	/**
+	 * 重命名表
+	 * 
+	 * @param src
+	 * @param dest
+	 * @return
+	 */
+	public synchronized boolean rename(String src, String dest) {
+		return executeSQL(String.format("ALTER TABLE %s RENAME TO %s", src, dest));
+	}
+
 	public abstract String getTableName();
 
+	public abstract String getTag();
 }

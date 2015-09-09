@@ -30,7 +30,7 @@ public final class Environment {
 
 	public static final String SYNCDIR = "bdfs.syncdir";
 
-	public static final String BDSYNCDIR = ".bdsync";
+	public static final String SYNCTMPDIR = "bdfs.syntmpcdir";
 
 	public static final String TMP = "bdfs.tmpdir";
 
@@ -41,11 +41,53 @@ public final class Environment {
 	public static final String LOCALLIST_SESSION = "bdfs.locallist_session";
 
 	public static final String CLOUDLIST_SESSION = "bdfs.cloudlist_session";
+
+	/**
+	 * 正在上传的文件
+	 */
+	public static final String key_uploading = "uploading";
+	
+	/**
+	 * 正在上传的文件已上传大小
+	 */
+	public static final String key_upload_size = "upload_size";
+	
+	/**
+	 * 本上传文件列表
+	 */
+	public static final String key_localfilelist = "localfilelist";
+	
+	/**
+	 * 本上传文件列表最后上传时间
+	 */
+	public static final String key_localfilelist_last = "localfilelist_last";
+	
+	/**
+	 * 正在下载的文件
+	 */
+	public static final String key_downloading = "downloading";
+	
+	/**
+	 * 正在下载的文件已上传大小
+	 */
+	public static final String key_download_size = "download_size";
 	
 	/**
 	 * 程序的命令行
 	 */
 	public static final String CMD = "sun.java.command";
+	
+	public static String getProperty(String key) {
+		return System.getProperty(key);
+	}
+	
+	public static String getProperty(String key, String def) {
+		return System.getProperty(key, def);
+	}
+	
+	public static void setProperty(String key, String value) {
+		System.setProperty(key, value);
+	}
 
 	public static final String getDBFile() {
 		return System.getProperty(DB_FILE, "bdfs.db");
@@ -66,9 +108,17 @@ public final class Environment {
 	public static final String getSyncDir() {
 		return System.getProperty(SYNCDIR, null);
 	}
-
+	
 	public static final void setSyncDir(String dir) {
 		System.setProperty(SYNCDIR, dir);
+	}
+	
+	public static final String getSyncTmpDir() {
+		return System.getProperty(SYNCTMPDIR, null);
+	}
+
+	public static final void setSyncTmpDir(String dir) {
+		System.setProperty(SYNCTMPDIR, dir);
 	}
 
 	public static final String getContextClassName() {

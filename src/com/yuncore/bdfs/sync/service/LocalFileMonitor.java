@@ -110,14 +110,14 @@ public class LocalFileMonitor extends Thread {
 	 */
 	protected void work() {
 		if (listNewFiles()) {
-			Log.w(getTag(), "GetLocalFile success");
+			Log.w(getTag(), "GetFiles success");
 			if (compareFiles()) {
-				Log.w(getTag(), "LocalCompare success");
+				Log.w(getTag(), "Compare success");
 			} else {
-				Log.w(getTag(), "LocalCompare success");
+				Log.w(getTag(), "Compare success");
 			}
 		} else {
-			Log.w(getTag(), "GetLocalFile fail");
+			Log.w(getTag(), "GetFiles fail");
 		}
 
 	}

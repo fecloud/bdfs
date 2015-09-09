@@ -96,4 +96,11 @@ public class CookieDao extends BaseDao {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.yuncore.bdfs.dao.BaseDao#getTag()
+	 */
+	@Override
+	public String getTag() {
+		return TAG;
+	}
 }

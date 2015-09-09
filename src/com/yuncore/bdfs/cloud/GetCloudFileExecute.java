@@ -37,8 +37,7 @@ public class GetCloudFileExecute extends TaskExecute {
 	 * @param taskStatus
 	 * @param taskContainer
 	 */
-	public GetCloudFileExecute(TaskStatus taskStatus,
-			TaskContainer taskContainer, FileExclude exclude,
+	public GetCloudFileExecute(TaskStatus taskStatus, TaskContainer taskContainer, FileExclude exclude,
 			CloudFileDao cloudFileDao) {
 		super(taskStatus, taskContainer);
 		this.exclude = exclude;
@@ -55,12 +54,10 @@ public class GetCloudFileExecute extends TaskExecute {
 	protected void doTask(Task task) {
 		final GetCloudFileTask fileTask = (GetCloudFileTask) task;
 		try {
-			final CloudPageFile listFiles = new FSApiImple().list(fileTask
-					.getDir());
+			final CloudPageFile listFiles = new FSApiImple().list(fileTask.getDir());
 			if (listFiles != null) {
 				if (listFiles.getErrno() == 0 && listFiles.getList() != null) {
-					final long session = Long.parseLong(Environment
-							.getCloudlistSession());
+					final long session = Long.parseLong(Environment.getCloudlistSession());
 
 					for (CloudFile f : listFiles.getList()) {
 						f.setSession(session);
@@ -75,12 +72,9 @@ public class GetCloudFileExecute extends TaskExecute {
 				} else {
 					if (listFiles.getErrno() == -6) {
 						Log.w(TAG, "cookie problem"); // cookie有错误
-						System.setProperty(AppCookieContainer.COOKIE_LOAD,
-								"false");
+						System.setProperty(AppCookieContainer.COOKIE_LOAD, "false");
 					}
-					Log.w(TAG,
-							"CloudPageFile listFiles error:"
-									+ listFiles.getErrno());
+					Log.w(TAG, "CloudPageFile listFiles error:" + listFiles.getErrno());
 					// 因为某种原因没有取得成功
 					taskContainer.addTask(task);
 				}
@@ -88,6 +82,7 @@ public class GetCloudFileExecute extends TaskExecute {
 			} else {
 				Log.w(TAG, "CloudPageFile listFiles null");
 				// 因为某种原因没有取得成功
+				//休息1s
 				taskContainer.addTask(task);
 			}
 		} catch (ApiException e) {
@@ -110,8 +105,7 @@ public class GetCloudFileExecute extends TaskExecute {
 				if (exclude.rmExclude(f.getAbsolutePath())) {
 					deletes.add(f);
 				} else {
-					taskContainer.addTask(new GetCloudFileTask(f
-							.getAbsolutePath()));
+					taskContainer.addTask(new GetCloudFileTask(f.getAbsolutePath()));
 				}
 
 			}

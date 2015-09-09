@@ -20,6 +20,7 @@ public class HttpLogLoader implements HttpLog {
 
 	private void inStanceHttpLog() {
 		try {
+			System.setProperty(httplog, ConsoleHttpLog.class.getName());
 			imple = (HttpLog) Class.forName(System.getProperty(httplog))
 					.newInstance();
 		} catch (Exception e) {
