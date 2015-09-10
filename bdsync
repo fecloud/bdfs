@@ -15,9 +15,9 @@
 PROG="bdsync"
 PROG_PATH="/data/app/$PROG" #::# Not need, but sometimes helpful (if $PROG resides in /opt for example).
 VM_RUN="/data/app/jdk1.8.0_60/bin/java"
-VM_ARGS="-Djava.io.tmpdir=/run/$PROG -Dbdfs.db=/usr/lib/$PROG/$PROG.db -Dbdfs.log.file=/var/log/$PROG.log"
+VM_ARGS="-Djava.io.tmpdir=/run/$PROG -Dbdfs.db=/var/lib/$PROG/$PROG.db -Dbdfs.log.file=/var/log/$PROG.log"
 VM_JAR="$PROG_PATH/lib/bdsync.jar"
-PROG_ARGS="sync /hdd -l bak tmp thum s 影视 -c 160 apps soft  编程相关 pdf"
+PROG_ARGS="sync /hdd -l git bak tmp thum s 影视 -c 160 apps soft  编程相关 pdf"
 MSG_PREFIX=" *"
 
 start() {
