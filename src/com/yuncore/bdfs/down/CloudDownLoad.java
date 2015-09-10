@@ -195,7 +195,7 @@ public class CloudDownLoad extends Thread {
 				int len = -1;
 
 				while (-1 != (len = in.read(buffer))) {
-					// ClientEnv.setProperty(ClientEnv.key_download_size, sum);
+					StatusMent.setProperty(StatusMent.key_download_size, sum);
 					out.write(buffer, 0, len);
 					sum += len;
 					if (sum == cloudFile.getLength()) {
