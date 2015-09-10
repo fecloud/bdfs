@@ -10,7 +10,7 @@
 	<property name="dist.release.dir" location="${build.dir}/release" />
 	<property name="dist.release.bin.dir" location="${dist.release.dir}/bin" />
 	<property name="dist.release.lib.dir" location="${dist.release.dir}/lib" />
-	<property name="dist.zip" location="${build.dir}/bdsync.zip" />
+	<property name="dist.zip.name" value="bdsync" />
 
 
 	<!--编译相关参数 -->
@@ -63,7 +63,10 @@
 		<copy todir="${dist.release.lib.dir}" file="${dist.dir}/${dist.jar}" />
 		<copy todir="${dist.release.bin.dir}" file="bdsync" />
 		<copy todir="${dist.release.dir}" file="install" />
-		<zip destfile="${dist.zip}" basedir="${dist.release.dir}">
+		<tstamp>
+			<format property="ymd" pattern="yyyyMMddHHmm"/>
+		</tstamp>
+		<zip destfile="${build.dir}/${dist.zip.name}-${ymd}.zip" basedir="${dist.release.dir}">
 		</zip>
 		<echo level="info">release finish</echo>
 	</target>
