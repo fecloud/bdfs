@@ -2,18 +2,18 @@ package com.yuncore.bdfs.http.cookie;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public abstract class AppCookieContainer implements CookieContainer {
 
-	public static final String COOKIECONTAINER = "cookiecontainer";
-
 	public static final String COOKIE_LOAD = "cookie_load";
 
-	public List<Cookie> cookies = new ArrayList<Cookie>();
+	public Set<Cookie> cookies = new HashSet<Cookie>();
 
 	public synchronized boolean addCookie(Cookie cookie) {
 		boolean result = false;

@@ -138,8 +138,7 @@ public class Cookie implements EntityJSON {
 				final String max_age_string = properties.getProperty("max-age");
 				if (null != max_age_string) {
 					try {
-						final long max_age_temp = Long
-								.parseLong(max_age_string);
+						final long max_age_temp = Long.parseLong(max_age_string);
 						this.max_age = max_age_temp;
 					} catch (Exception e) {
 					}
@@ -153,14 +152,12 @@ public class Cookie implements EntityJSON {
 
 				final String expires = properties.getProperty("expires");
 				if (null != expires && expires.length() > 0) {
-					final SimpleDateFormat Gmt = new SimpleDateFormat(
-							"EEE, d-MMM-yyyy HH:mm:ss z", Locale.US);
+					final SimpleDateFormat Gmt = new SimpleDateFormat("EEE, d-MMM-yyyy HH:mm:ss z", Locale.US);
 					this.expires = Gmt.parse(expires).getTime();
 				}
 
 				httponly = properties.containsKey("httponly");
-				version = Integer.parseInt(properties.getProperty("version",
-						"0"));
+				version = Integer.parseInt(properties.getProperty("version", "0"));
 
 				return true;
 			} catch (Exception e) {
@@ -172,10 +169,8 @@ public class Cookie implements EntityJSON {
 	private final String getCookieName(Properties properties) {
 		for (Object o : properties.keySet()) {
 			if (null != o) {
-				if (!o.toString().toLowerCase().equals("domain")
-						&& !o.toString().toLowerCase().equals("path")
-						&& !o.toString().toLowerCase().equals("domain")
-						&& !o.toString().toLowerCase().equals("expires")
+				if (!o.toString().toLowerCase().equals("domain") && !o.toString().toLowerCase().equals("path")
+						&& !o.toString().toLowerCase().equals("domain") && !o.toString().toLowerCase().equals("expires")
 						&& !o.toString().toLowerCase().equals("max-age")
 						&& !o.toString().toLowerCase().equals("version")
 						&& !o.toString().toLowerCase().equals("httponly")) {
@@ -201,14 +196,34 @@ public class Cookie implements EntityJSON {
 		}
 	}
 
-	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		final Cookie cookie = (Cookie) obj;
+		final String str = this.name + this.domain;
+		final String str2 = cookie.name + cookie.domain;
+		return str.equals(str2);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final String str = this.name + this.domain;
+		return str.hashCode();
+	}
 
 	@Override
 	public String toString() {
-		return "[name=" + name + ", value=" + value + ", domain="
-				+ domain + ", path=" + path + ", max_age=" + max_age
-				+ ", expires=" + expires + ", version=" + version
-				+ ", httponly=" + httponly + "]";
+		return "[name=" + name + ", value=" + value + ", domain=" + domain + ", path=" + path + ", max_age=" + max_age
+				+ ", expires=" + expires + ", version=" + version + ", httponly=" + httponly + "]";
 	}
 
 	/*
