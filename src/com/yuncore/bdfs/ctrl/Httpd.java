@@ -16,6 +16,12 @@ import org.json.JSONObject;
 
 import com.yuncore.bdfs.Argsment;
 import com.yuncore.bdfs.StatusMent;
+import com.yuncore.bdfs.dao.CloudFileDao;
+import com.yuncore.bdfs.dao.CloudFileDeleteDao;
+import com.yuncore.bdfs.dao.DownloadDao;
+import com.yuncore.bdfs.dao.LocalFileDao;
+import com.yuncore.bdfs.dao.LocalFileDeleteDao;
+import com.yuncore.bdfs.dao.UploadDao;
 import com.yuncore.bdfs.entity.EntityJSON;
 import com.yuncore.bdfs.util.Gzip;
 import com.yuncore.bdfs.util.Log;
@@ -89,6 +95,8 @@ public class Httpd extends NanoHTTPd {
 				object.put("data", Runtime.getRuntime().availableProcessors());
 			} else if (action.equalsIgnoreCase("set_argsment")) {
 				setArgsment(parms, object);
+			} else if (action.equals("statistics")) {
+				statistics(object);
 			} else if (action.equalsIgnoreCase("status")) {
 				object.put("code", 200);
 			} else {
@@ -190,12 +198,20 @@ public class Httpd extends NanoHTTPd {
 		}
 	}
 
-	public static void main(String[] args) {
-		try {
-			new Httpd(8080);
-			Thread.sleep(1000000);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	/**
+	 * 取数据库统计
+	 * 
+	 * @param object
+	 */
+	private void statistics(JSONObject object) {
+		object.put("code", 200);
+		object.put("cloudfile", new CloudFileDao().count());
+		object.put("clouddownload", new DownloadDao().count());
+		object.put("clouddelete", new CloudFileDeleteDao().count());
+
+		object.put("localfile", new LocalFileDao().count());
+		object.put("localupload", new UploadDao().count());
+		object.put("localdelete", new LocalFileDeleteDao().count());
 	}
+
 }
