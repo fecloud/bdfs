@@ -14,8 +14,11 @@ mkdir -p $PROG_PATH
 
 cp -r -v -n ./lib  $PROG_PATH/
 cp -r -v -n ./bin  $PROG_PATH/
-cp -v -n bdsync $PROG_PATH/
-cp -v -n linaro_bdsync $PROG_PATH/
+
+mkdir -p /usr/lib/$PROG
+
+chmod 777 /usr/lib/$PROG
+chmod 777 $PROG_PATH/bin/bdsync
 
 
 if [ -f "/usr/bin/$PROG" ] ;then
@@ -27,8 +30,7 @@ fi
 if [ -f "/etc/init.d/$PROG" ] ;then
 	echo "$MSG_PREFIX not need add to /etc/init.d"
 else
-
-	ln  -f -s $PROG_PATH/bin/linaro_bdsync /etc/init.d/$PROG
+	ln  -f -s $PROG_PATH/bin/bdsync /etc/init.d/$PROG
 fi
 
 if [ -f "/etc/rc0.d/K30$PROG" ] ; then

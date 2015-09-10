@@ -33,11 +33,35 @@ public class Httpd extends NanoHTTPd {
 	public Response serve(String uri, String method, Properties header, Properties parms, Properties files) {
 		Response response = dispath(uri, method, header, parms, files);
 		if (response == null) {
-			response = new Response(HTTP_NOTFOUND, MIME_PLAINTEXT, Gzip.gzip("not found".getBytes()));
+			response = new Response(HTTP_NOTFOUND, MIME_PLAINTEXT,
+					responeSupprtGzip(header) ? Gzip.gzip("not found".getBytes()) : "not found".getBytes());
 		}
 		response.addHeader("Connection", "close");
-		response.addHeader("Content-Encoding", "gzip");
+		if (responeSupprtGzip(header))
+			response.addHeader("Content-Encoding", "gzip");
 		return response;
+	}
+
+	/***
+	 * 是否支持gzip
+	 * 
+	 * @param header
+	 * @return
+	 */
+	private static boolean responeSupprtGzip(Properties header) {
+		String key = "";
+		if (header.containsKey("Accept-Encoding")) {
+			key = "Accept-Encoding";
+		} else if (header.containsKey("accept-encoding")) {
+			key = "accept-encoding";
+		}
+		if (key != null) {
+			final String value = header.getProperty(key);
+			if (null != value && value.trim().contains("gzip")) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -72,7 +96,8 @@ public class Httpd extends NanoHTTPd {
 				object.put("msg", "not support");
 			}
 			try {
-				return new Response(HTTP_OK, MIME_JSON, Gzip.gzip(object.toString().getBytes("UTF-8")));
+				return new Response(HTTP_OK, MIME_JSON, responeSupprtGzip(header)
+						? Gzip.gzip(object.toString().getBytes("UTF-8")) : object.toString().getBytes("UTF-8"));
 			} catch (UnsupportedEncodingException e) {
 			}
 		}

@@ -46,7 +46,7 @@ public final class Argsment {
 	}
 	
 	public final static long getCloudFileMonitorInterval() {
-		return Long.parseLong(System.getProperty(ClOUDFILE_MONITOR_INTERVAL, "60000"));
+		return Long.parseLong(System.getProperty(ClOUDFILE_MONITOR_INTERVAL, "600000"));
 	}
 
 	public final static void setCloudFileMonitorInterval(long interval) {
@@ -54,7 +54,7 @@ public final class Argsment {
 	}
 
 	public final static long getLocalFileMonitorInterval() {
-		return Long.parseLong(System.getProperty(LOCALFILE_MONITOR_INTERVAL, "60000"));
+		return Long.parseLong(System.getProperty(LOCALFILE_MONITOR_INTERVAL, "600000"));
 	}
 
 	public final static void setLocalFileMonitorInterval(long interval) {

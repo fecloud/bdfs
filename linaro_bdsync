@@ -1,3 +1,0 @@
-#/bin/sh
-ARGS=$*
-echo "su -c '/data/app/bdsync/bdsync $ARGS' linaro" | sh

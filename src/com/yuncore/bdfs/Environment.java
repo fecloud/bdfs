@@ -94,7 +94,7 @@ public final class Environment {
 	}
 
 	public static final String getLogFile() {
-		return System.getProperty(DB_FILE, "bdfs.log");
+		return System.getProperty(LOG_FILE, "bdfs.log");
 	}
 
 	public static final String getLogPriority() {

@@ -78,7 +78,7 @@ public class Sync {
 	}
 
 	private void startCoreService() {
-		//new LocalFileMonitor(args).start();
+		new LocalFileMonitor(args).start();
 		new CloudFileMonitor(args).start();
 
 		//new CloudDownLoad(syncdir, synctmpdir).start();;

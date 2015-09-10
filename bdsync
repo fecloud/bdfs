@@ -14,41 +14,33 @@
 ## Fill in name of program here.
 PROG="bdsync"
 PROG_PATH="/data/app/$PROG" #::# Not need, but sometimes helpful (if $PROG resides in /opt for example).
-PROG_ARGS="sync /hdd -l bak tmp thum s 影视 -c 160 apps"
-PID_PATH="$PROG_PATH/$PROG.pid"
-LOG_PATH="/var/log/$PROG"
+VM_RUN="/data/app/jdk1.8.0_60/bin/java"
+VM_ARGS="-Dbdfs.db=/usr/lib/$PROG/$PROG.db -Dbdfs.log.file=/var/log/$PROG.log"
+VM_JAR="$PROG_PATH/lib/bdsync.jar"
+PROG_ARGS="sync /hdd -l bak tmp thum s 影视 -c 160 apps soft  编程相关 pdf"
 MSG_PREFIX=" *"
 
 start() {
     PROG_STATUS=0
-#check process status
-    if [ -e "$PID_PATH" ]; then
-        for line in `cat $PID_PATH`
-        do
-            count=`ps -ef |grep $line |grep -v "grep" |wc -l`
-            if [ $count -gt 0 ]; then
-                PROG_STATUS=1
-                break;
-            fi
-        done
-    fi
+    su -c "$VM_RUN $VM_ARGS -jar $VM_JAR $PROG_ARGS 2>&1 >/dev/null &" linaro
+    PROG_STATUS=$?
 
     if [ $PROG_STATUS -eq 1 ]; then
         ## Program is running, exit with error.
         echo "$MSG_PREFIX $PROG is currently running..."
     else
-        ## Change from /dev/null to something like /var/log/$PROG if you want to save output.
-        $PROG_PATH/bin/$PROG $PROG_ARGS 2>&1 >$LOG_PATH &
         echo "$MSG_PREFIX $PROG started"
     fi
 }
 
 stop() {
-    if [ -e "$PID_PATH" ]; then
+
+    $VM_RUN $VM_ARGS -jar $VM_JAR stop 2>&1 >/dev/null
+
+    PROG_STATUS=$?
+
+    if [  $PROG_STATUS -eq 0 ]; then
         ## Program is running, so stop it
-        pid=`cat $PID_PATH | head -n 1`
-        kill -9 $pid &
-        rm -f  "$PID_PATH" &
         echo "$MSG_PREFIX $PROG stopped"
     else
         ## Program is not running, exit with error.
