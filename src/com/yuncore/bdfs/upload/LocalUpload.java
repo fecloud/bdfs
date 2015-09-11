@@ -2,6 +2,7 @@ package com.yuncore.bdfs.upload;
 
 import java.io.File;
 
+import com.yuncore.bdfs.Argsment;
 import com.yuncore.bdfs.StatusMent;
 import com.yuncore.bdfs.api.FSApi;
 import com.yuncore.bdfs.api.imple.FSApiImple;
@@ -17,8 +18,6 @@ import com.yuncore.bdfs.util.Log;
 public class LocalUpload extends Thread implements OutputDataListener {
 
 	static final String TAG = "LocalUpload";
-
-	protected volatile boolean falg;
 
 	protected FSApi api;
 
@@ -36,27 +35,37 @@ public class LocalUpload extends Thread implements OutputDataListener {
 	public void run() {
 		setName(LocalUpload.class.getSimpleName());
 		Log.i(TAG, String.format("LocalUpload root:%s tmpDir:%s", root));
-		falg = true;
 
 		BDFSFile file = null;
 		boolean upload = true;
-		while (falg) {
-			file = getUpload();
-			if (file != null) {
-				Log.i(TAG,
-						"getUpload " + file.getAbsolutePath() + " size:" + FileUtil.byteSizeToHuman(file.getLength()));
-				StatusMent.setProperty(StatusMent.key_uploading, file);
-				upload = uploadFile(file);
-				if (upload) {
-					StatusMent.setProperty(StatusMent.key_uploading, "");
-					delUpload(file);
+		while (true) {
+			if (Argsment.getAllowUpload()) {
+
+				file = getUpload();
+				if (file != null) {
+					Log.i(TAG, "getUpload " + file.getAbsolutePath() + " size:"
+							+ FileUtil.byteSizeToHuman(file.getLength()));
+					StatusMent.setProperty(StatusMent.key_uploading, file);
+					upload = uploadFile(file);
+					if (upload) {
+						StatusMent.setProperty(StatusMent.key_uploading, "");
+						delUpload(file);
+					}
+				} else {
+					try {
+						Thread.sleep(30000);
+						StatusMent.setProperty(StatusMent.key_uploading, false);
+					} catch (InterruptedException e) {
+						break;
+					}
 				}
 			} else {
-				try {
-					Thread.sleep(30000);
-					StatusMent.setProperty(StatusMent.key_uploading, false);
-				} catch (InterruptedException e) {
-					break;
+				Log.w(TAG, "not allow upload");
+				while (!Argsment.getAllowUpload()) {
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+					}
 				}
 			}
 		}

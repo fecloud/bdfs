@@ -19,6 +19,13 @@ public class CloudFileTmpDao extends CloudFileDao {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see com.yuncore.bdfs.dao.CloudFileDao#getTag()
+	 */
+	@Override
+	public String getTag() {
+		return "CloudFileTmpDao";
+	}
 	/*
 	 * (non-Javadoc)
 	 * 

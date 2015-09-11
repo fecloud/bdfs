@@ -18,6 +18,13 @@ public class LocalFileTmpDao extends LocalFileDao {
 				"CREATE TABLE IF NOT EXISTS localfile_tmp (id INTEGER PRIMARY KEY AUTOINCREMENT ,path TEXT, length INTEGER, isdir INTEGER, mtime INTEGER, fid TEXT, session INTEGER);");
 	}
 
+	/* (non-Javadoc)
+	 * @see com.yuncore.bdfs.dao.LocalFileDao#getTag()
+	 */
+	@Override
+	public String getTag() {
+		return "LocalFileTmpDao";
+	}
 	/*
 	 * (non-Javadoc)
 	 * 

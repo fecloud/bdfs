@@ -29,8 +29,10 @@ public class LocalFileDao extends BaseDao {
 	public synchronized boolean insertAllCacaheFlush() {
 		if (size != 0) {
 			final boolean result = insertAll();
-			size = 0;
-			cache.clear();
+			if(result){
+				size = 0;
+				cache.clear();
+			}
 			return result;
 		} else {
 			return true;

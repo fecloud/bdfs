@@ -39,7 +39,6 @@ public class StatusMent {
 	 */
 	public static final String key_download_size = "download_size";
 	
-
 	private static final Hashtable<String, Object> env = new Hashtable<String, Object>();
 
 	public static final void setProperty(String key, Object value) {
