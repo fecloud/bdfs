@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 import com.yuncore.bdfs.Argsment;
-import com.yuncore.bdfs.Environment;
 import com.yuncore.bdfs.StatusMent;
 import com.yuncore.bdfs.api.FSApi;
 import com.yuncore.bdfs.api.imple.FSApiImple;
@@ -57,7 +56,7 @@ public class CloudDownLoad extends Thread {
 					downloaded = downloadFile(cloudFile);
 					// 删除下载任务
 					if (downloaded) {
-						Environment.setProperty(Environment.key_downloading, "");
+						StatusMent.setProperty(StatusMent.key_downloading, "");
 						delDownLoad(cloudFile);
 					}
 				} else {

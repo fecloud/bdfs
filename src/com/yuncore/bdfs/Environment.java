@@ -43,48 +43,26 @@ public final class Environment {
 	public static final String CLOUDLIST_SESSION = "bdfs.cloudlist_session";
 
 	/**
-	 * 正在上传的文件
+	 * 程序启动时间
 	 */
-	public static final String key_uploading = "uploading";
-	
-	/**
-	 * 正在上传的文件已上传大小
-	 */
-	public static final String key_upload_size = "upload_size";
-	
-	/**
-	 * 本上传文件列表
-	 */
-	public static final String key_localfilelist = "localfilelist";
-	
-	/**
-	 * 本上传文件列表最后上传时间
-	 */
-	public static final String key_localfilelist_last = "localfilelist_last";
-	
-	/**
-	 * 正在下载的文件
-	 */
-	public static final String key_downloading = "downloading";
-	
-	/**
-	 * 正在下载的文件已上传大小
-	 */
-	public static final String key_download_size = "download_size";
-	
+	public static final String BOOT_TIME = "start.runtime";
 	/**
 	 * 程序的命令行
 	 */
 	public static final String CMD = "sun.java.command";
-	
+
+	static {
+		System.getProperty(BOOT_TIME, "" + System.currentTimeMillis());
+	}
+
 	public static String getProperty(String key) {
 		return System.getProperty(key);
 	}
-	
+
 	public static String getProperty(String key, String def) {
 		return System.getProperty(key, def);
 	}
-	
+
 	public static void setProperty(String key, String value) {
 		System.setProperty(key, value);
 	}
@@ -108,11 +86,11 @@ public final class Environment {
 	public static final String getSyncDir() {
 		return System.getProperty(SYNCDIR, null);
 	}
-	
+
 	public static final void setSyncDir(String dir) {
 		System.setProperty(SYNCDIR, dir);
 	}
-	
+
 	public static final String getSyncTmpDir() {
 		return System.getProperty(SYNCTMPDIR, null);
 	}
@@ -153,7 +131,7 @@ public final class Environment {
 		return System.getProperty(CLOUDLIST_SESSION, "0");
 	}
 
-	public static final String getCommdLine(){
+	public static final String getCommdLine() {
 		return System.getProperty(CMD, "");
 	}
 }

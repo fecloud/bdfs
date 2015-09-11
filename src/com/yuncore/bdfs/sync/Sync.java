@@ -81,11 +81,13 @@ public class Sync {
 		new LocalFileMonitor(args).start();
 		new CloudFileMonitor(args).start();
 
-		//new CloudDownLoad(syncdir, synctmpdir).start();;
+//		new CloudDownLoad(syncdir, synctmpdir).start();
 	}
 
 	public void stop() {
-
+		if(httpd != null){
+			httpd.stop();
+		}
 	}
 
 }
