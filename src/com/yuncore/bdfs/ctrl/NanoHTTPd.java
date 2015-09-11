@@ -231,6 +231,7 @@ public class NanoHTTPd {
         try {
             myServerSocket.close();
             myThread.join();
+            pool.shutdownNow();
         } catch (IOException ioe) {
         } catch (InterruptedException e) {
         }
