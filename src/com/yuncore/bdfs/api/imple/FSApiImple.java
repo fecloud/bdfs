@@ -14,6 +14,7 @@ import javax.net.ssl.HttpsURLConnection;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.yuncore.bddown.api.BDSYNCURL;
 import com.yuncore.bdfs.Environment;
 import com.yuncore.bdfs.api.BDFSURL;
 import com.yuncore.bdfs.api.FSApi;
@@ -285,40 +286,43 @@ public class FSApiImple implements FSApi {
 
 	@Override
 	public Map<String, String> diskHomePage() throws ApiException {
-		final String url = BDFSURL.diskHomePage();
+		final String url = BDSYNCURL.diskHomePage();
 
 		final Http http = new Http(url, Method.GET);
 		try {
-
-			if (http.http()) {
-				 if (DEBUG)
-					 Log.d(TAG, String.format("diskHomePage:%s", http.result()));
-				final Pattern pattern = Pattern
-						.compile("yunData\\.\\w+\\s*=\\s*['|\"]\\w*['|\"];");
+			if (http.http() && http.getResponseCode() == HttpURLConnection.HTTP_OK) {
+				if (DEBUG)
+					Log.d(TAG, String.format("diskHomePage:%s", http.result()));
+				final Pattern pattern = Pattern.compile("context=\\{.*\\};");
 				final Matcher matcher = pattern.matcher(http.result());
 				String temp = null;
-				String[] strings = null;
-				Map<String, String> maps = new Hashtable<String, String>();
+				String json = null;
+				final Map<String, String> maps = new Hashtable<String, String>();
 				while (matcher.find()) {
 					temp = matcher.group();
-					if (null != temp) {
-						strings = temp.split("=");
-						if (null != strings && strings.length == 2) {
-							maps.put(
-									strings[0].trim()
-											.replaceAll("yunData.", ""),
-									strings[1].trim().replaceAll("'", "")
-											.replaceAll(";", "")
-											.replaceAll("\"", ""));
-						}
+					temp = temp.trim();
+					int star = "context=".length();
+					int end = temp.length() -";".length();
+					json = temp.substring(star, end);
+					final JSONObject jsonObject = new JSONObject(json);
+					if(jsonObject.has("username")){
+						maps.put("MYNAME", jsonObject.getString("username"));
 					}
+					if(jsonObject.has("bdstoken")){
+						maps.put(BDSTOKEN, jsonObject.getString("bdstoken"));
+					}
+					break;
+				}
+				if (maps.isEmpty()) {
+					throw new ApiException("diskHomePage error maps empty");
 				}
 				return maps;
+			} else {
+				throw new ApiException("diskHomePage error not load " + url);
 			}
 		} catch (IOException e) {
 			throw new ApiException("diskHomePage error", e);
 		}
-		return null;
 	}
 
 	@Override
